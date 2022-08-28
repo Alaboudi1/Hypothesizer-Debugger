@@ -3,24 +3,33 @@ import { useState } from 'react';
 import Recorder from './Recorder';
 import './App.css';
 import { InformationPanel } from './InformationPanel';
+import { useEffect } from 'react';
 
 const App = (): JSX.Element => {
   const [trace, setTrace] = useState<any[]>([]);
+  const [loadingMessage, setLoadingMessage] = useState<string>('');
 
+  useEffect(() => {
+    window.electron.ipcRenderer.on('CDP', (message) => {
+      if (message.command === 'finalCoverage') {
+        setTrace(message.payload);
+      } else if (message.command === 'progress') {
+        setLoadingMessage(message.payload);
+      }
+    });
+  }, []);
   const getRecorder = (): JSX.Element => {
-    return (
-      <Recorder
-        setMethodCoverage={(rawTrace: any[]) => {
-          console.log(rawTrace);
-          setTrace(rawTrace);
-        }}
-      />
-    );
+    return <Recorder />;
   };
 
   const getMainContainer = (): JSX.Element => {
     if (trace.length === 0) {
-      return <>{getRecorder()}</>;
+      return (
+        <>
+          {getRecorder()}
+          {loadingMessage}
+        </>
+      );
     }
     return (
       <>

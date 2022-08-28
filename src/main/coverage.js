@@ -1,14 +1,7 @@
-import {
-  TraceMap,
-  originalPositionFor,
-  SourceMapInput,
-} from '@jridgewell/trace-mapping';
+const { TraceMap, originalPositionFor } = require('@jridgewell/trace-mapping');
+const { parentPort, workerData } = require('worker_threads');
 
-const extractCoverageFromBundle = (
-  file: string,
-  rangeStart: number,
-  rangeEnd: number
-) => {
+const extractCoverageFromBundle = (file, rangeStart, rangeEnd) => {
   const lineBundleStart = file.substring(0, rangeStart).split(/\n/).length;
   const lineBundleEnd = file.substring(0, rangeEnd).split(/\n/).length;
 
@@ -18,11 +11,7 @@ const extractCoverageFromBundle = (
   };
 };
 
-const getTraceMap = (
-  sourceMap: SourceMapInput,
-  lineStart: number,
-  lineEnd: number
-): any => {
+const getTraceMap = (sourceMap, lineStart, lineEnd) => {
   const traceMap = new TraceMap(sourceMap);
   const start = originalPositionFor(traceMap, { line: lineStart, column: 0 });
   const end = originalPositionFor(traceMap, { line: lineEnd, column: 0 });
@@ -33,7 +22,12 @@ const getTraceMap = (
 };
 
 const getCoverages = (record, files) => {
-  const coverage = record.map((item) => {
+  const coverage = record.map((item, i) => {
+    parentPort.postMessage({
+      command: 'progress',
+      payload: `Extracting coverage for trace ${i} of ${record.length}`,
+    });
+
     if (item.type !== 'codeCoverage') {
       return item;
     }
@@ -86,4 +80,7 @@ const getCoverages = (record, files) => {
   return coverage;
 };
 
-export default getCoverages;
+parentPort.postMessage({
+  command: 'finalCoverage',
+  payload: getCoverages(workerData.coverage, workerData.files),
+});

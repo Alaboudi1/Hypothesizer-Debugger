@@ -6,28 +6,19 @@ import { TraceWithMapping } from '../types/finalTypes';
 
 type recordState = 'ideal' | 'record' | 'collect';
 
-const Recorder: React.FC<RecorderProps> = ({
-  setMethodCoverage,
-}): React.ReactElement => {
+const Recorder: React.FC<RecorderProps> = (): React.ReactElement => {
   const [recordState, setRecordingState] = React.useState<recordState>('ideal');
   const events = React.useRef<TemporaryEventType[]>([]);
 
-  window.electron.ipcRenderer.on('CDP', (payload) => {
-    console.log(payload);
-    setMethodCoverage(payload.finalCoverage);
-  });
-
   const recorder = async (recordState: recordState): Promise<void> => {
-    if (recordState == 'record') {
+    if (recordState === 'record') {
       setRecordingState(recordState);
       window.electron.ipcRenderer.sendMessage('CDP', { command: 'record' });
-    } else if (recordState == 'collect') {
+    } else if (recordState === 'collect') {
       setRecordingState(recordState);
       window.electron.ipcRenderer.sendMessage('CDP', {
         command: 'stopRecording',
       });
-      // const coverageData = getCoverage(coverage, []);
-      // setMethodCoverage(coverageData);
       setRecordingState('ideal');
     }
   };

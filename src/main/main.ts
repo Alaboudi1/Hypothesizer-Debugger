@@ -12,10 +12,10 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { Worker } from 'worker_threads';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { record, stopRecording } from './cdp';
-import getCoverages from './coverage';
 
 class AppUpdater {
   constructor() {
@@ -32,13 +32,13 @@ ipcMain.on('CDP', async (event, arg) => {
   }
   if (arg.command === 'stopRecording') {
     const { coverage, files } = await stopRecording();
-    const finalCoverage = getCoverages(coverage, files);
-
-    event.sender.send('CDP', {
-      command: 'profilerResult',
-      coverage,
-      finalCoverage,
-      files,
+    const worker = new Worker(path.join(__dirname, 'coverage.js'), {
+      workerData: { coverage, files },
+    });
+    worker.on('message', (message) => {
+      event.sender.send('CDP', {
+        ...message,
+      });
     });
   }
 });
@@ -88,6 +88,7 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       sandbox: false,
+      nodeIntegration: true,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
