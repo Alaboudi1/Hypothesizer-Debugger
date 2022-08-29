@@ -14,8 +14,5 @@
     "postinstall": "npm run electron-rebuild && npm run link-modules",
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts"
   },
-  "dependencies": {
-    "@mui/material": "^5.10.1",
-    "@mui/icons-material": "^5.8.4"
-  }
+  "dependencies": {}
 }

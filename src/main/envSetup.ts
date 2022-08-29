@@ -1,40 +1,29 @@
 // a function that check if python is installed
-import { exec } from 'child_process';
+import { execSync } from 'child_process';
 
-const checkPaythonIsInstalled = async () => {
-  return new Promise((resolve, reject) => {
-    exec('python3', (err) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(true);
-    });
-  });
-};
-
-const installSemgrep = async () => {
-  const isSemgrepInstalled = await checkSemgrep();
-  if (!isSemgrepInstalled) {
-    return new Promise((resolve, reject) => {
-      exec('python3 -m pip install semgrep', (err) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(true);
-      });
-    });
+const checkPaythonIsInstalled = () => {
+  try {
+    execSync('python3 -V');
+    return true;
+  } catch (error) {
+    return false;
   }
-  return true;
 };
-const checkSemgrep = async () => {
-  return new Promise((resolve) => {
-    exec('semgrep --help', (err) => {
-      if (err) {
-        resolve(false);
-      }
-      resolve(true);
-    });
-  });
+
+const checkSemgrep = () => {
+  try {
+    execSync('semgrep --help');
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const installSemgrep = () => {
+  const isSemgrepInstalled = checkSemgrep();
+  if (!isSemgrepInstalled) {
+    execSync('python3 -m pip install semgrep');
+  }
 };
 
 export default {

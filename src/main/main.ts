@@ -45,6 +45,7 @@ ipcMain.on('CDP', async (event, arg) => {
         )
       );
     }
+
     const workers = coverageDivs.map((coverage, i) => {
       return new Worker(path.join(__dirname, 'coverage.js'), {
         workerData: { record: coverage, files, index: i },
@@ -115,6 +116,10 @@ const createWindow = async () => {
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
+
+  const WORKER_PATH = app.isPackaged
+    ? path.join(process.resourcesPath, 'assets', 'coverage.js')
+    : path.join(__dirname, '../../assets', 'coverage.js');
 
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths);

@@ -30,6 +30,7 @@ const executablePathForMacOS =
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const executablePathForWindows =
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe';
+
 const executablePathForLinux = '/usr/bin/google-chrome';
 
 let setIntervalCallback: string | number | NodeJS.Timer | undefined;
@@ -156,6 +157,7 @@ const launchBrowser = async (port: number) => {
     args: ['--window-size=1920,1080'],
     defaultViewport: null,
   });
+
   page = await browser.newPage();
   await page.goto(`http://localhost:${port}`);
 };
