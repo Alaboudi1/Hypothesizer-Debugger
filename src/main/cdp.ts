@@ -149,17 +149,18 @@ const networkEvents = async () => {
     }
   });
 };
-const record = async () => {
+const launchBrowser = async (port: number) => {
   browser = await puppeteer.launch({
     headless: false,
     executablePath: getOS(),
-    // make the page take the entire screen
     args: ['--window-size=1920,1080'],
-    // make the viewport the same size as the screen
     defaultViewport: null,
   });
   page = await browser.newPage();
-  await page.goto('http://localhost:3000/');
+  await page.goto(`http://localhost:${port}`);
+};
+const record = async () => {
+  await launchBrowser(3000);
   client = await page.target().createCDPSession();
   await DomEvents();
   await networkEvents();

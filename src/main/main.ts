@@ -32,13 +32,52 @@ ipcMain.on('CDP', async (event, arg) => {
   }
   if (arg.command === 'stopRecording') {
     const { coverage, files } = await stopRecording();
-    const worker = new Worker(path.join(__dirname, 'coverage.js'), {
-      workerData: { coverage, files },
-    });
-    worker.on('message', (message) => {
-      event.sender.send('CDP', {
-        ...message,
+    const divs = 10;
+    const results = [];
+    const coverageDivs = [];
+    let progress = 0;
+    console.log(coverage.length);
+    for (let i = 0; i < divs; i++) {
+      coverageDivs.push(
+        coverage.slice(
+          i * (coverage.length / divs),
+          (i + 1) * (coverage.length / divs)
+        )
+      );
+    }
+    const workers = coverageDivs.map((coverage, i) => {
+      return new Worker(path.join(__dirname, 'coverage.js'), {
+        workerData: { record: coverage, files, index: i },
       });
+    });
+
+    workers.forEach((worker) => {
+      worker
+        .on('message', (message) => {
+          if (message.command === 'finalCoverage') {
+            if (results.length < divs - 1) {
+              results.push(message.payload);
+            } else {
+              results.push(message.payload);
+              let payload = results.flat().sort((a, b) => {
+                return a.index - b.index;
+              });
+              event.sender.send('CDP', {
+                ...message,
+                payload,
+              });
+            }
+          } else if (message.command === 'progress') {
+            progress += 1;
+            event.sender.send('CDP', {
+              ...message,
+              payload: ((progress / coverage.length) * 100).toFixed(2),
+            });
+          }
+        })
+        .on('error', (error) => {
+          console.log(error);
+        });
     });
   }
 });

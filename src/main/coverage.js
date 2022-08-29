@@ -21,11 +21,10 @@ const getTraceMap = (sourceMap, lineStart, lineEnd) => {
   };
 };
 
-const getCoverages = (record, files) => {
+const getCoverages = (record, files, index) => {
   const coverage = record.map((item, i) => {
     parentPort.postMessage({
       command: 'progress',
-      payload: `Extracting coverage for trace ${i} of ${record.length}`,
     });
 
     if (item.type !== 'codeCoverage') {
@@ -74,6 +73,7 @@ const getCoverages = (record, files) => {
     return {
       type: 'codeCoverage',
       coverage: parsedCodeCoverage,
+      index,
     };
   });
 
@@ -82,5 +82,5 @@ const getCoverages = (record, files) => {
 
 parentPort.postMessage({
   command: 'finalCoverage',
-  payload: getCoverages(workerData.coverage, workerData.files),
+  payload: getCoverages(workerData.record, workerData.files, workerData.index),
 });

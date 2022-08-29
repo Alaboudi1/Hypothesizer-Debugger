@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // import { TimelineItem } from 'react-chrono';
 import Recorder from './Recorder';
 import './App.css';
 import { InformationPanel } from './InformationPanel';
-import { useEffect } from 'react';
 
 const App = (): JSX.Element => {
   const [trace, setTrace] = useState<any[]>([]);
@@ -15,7 +14,7 @@ const App = (): JSX.Element => {
         setTrace(message.payload);
         console.log(message.payload);
       } else if (message.command === 'progress') {
-        setLoadingMessage(message.payload);
+        setLoadingMessage(`extracting coverage: ${message.payload}%`);
       }
     });
   }, []);
