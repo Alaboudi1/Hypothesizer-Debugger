@@ -13,6 +13,7 @@ const App = (): JSX.Element => {
     window.electron.ipcRenderer.on('CDP', (message) => {
       if (message.command === 'finalCoverage') {
         setTrace(message.payload);
+        console.log(message.payload);
       } else if (message.command === 'progress') {
         setLoadingMessage(message.payload);
       }
