@@ -150,19 +150,29 @@ const networkEvents = async () => {
     }
   });
 };
-const launchBrowser = async (port: number) => {
-  browser = await puppeteer.launch({
-    headless: false,
-    executablePath: getOS(),
-    args: ['--window-size=1920,1080'],
-    defaultViewport: null,
-  });
+const launchBrowser = async (url: string) => {
+  try {
+    browser = await puppeteer.launch({
+      headless: false,
+      executablePath: getOS(),
+      args: ['--window-size=1920,1080'],
+      defaultViewport: null,
+    });
 
-  page = await browser.newPage();
-  await page.goto(`http://localhost:${port}`);
+    page = await browser.newPage();
+    await page.goto(url);
+    return await Promise.resolve();
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };
-const record = async () => {
-  await launchBrowser(3000);
+
+const record = async (url = 'http://localhost:3000') => {
+  try {
+    await launchBrowser(url);
+  } catch (error) {
+    return Promise.reject(error);
+  }
   client = await page.target().createCDPSession();
   await DomEvents();
   await networkEvents();
@@ -179,6 +189,7 @@ const record = async () => {
     });
     coverage.push({ result, timeStamp, type: 'codeCoverage' });
   }, 0);
+  return Promise.resolve();
 };
 
 const stopRecording = async () => {

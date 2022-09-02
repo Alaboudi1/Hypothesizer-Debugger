@@ -1,7 +1,7 @@
 const init = () => {
+  document.body.focus();
   const saveEvents = (events) => {
     const previousEvents = JSON.parse(localStorage.getItem('events')) || [];
-    console.log(previousEvents);
     localStorage.setItem('events', JSON.stringify([...previousEvents, events]));
   };
 

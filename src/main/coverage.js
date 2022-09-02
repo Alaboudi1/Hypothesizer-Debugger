@@ -1,5 +1,5 @@
-const { TraceMap, originalPositionFor } = require('@jridgewell/trace-mapping');
 const { parentPort, workerData } = require('worker_threads');
+const { SourceMapConsumer } = require('source-map');
 
 const extractCoverageFromBundle = (file, rangeStart, rangeEnd) => {
   const lineBundleStart = file.substring(0, rangeStart).split(/\n/).length;
@@ -11,10 +11,17 @@ const extractCoverageFromBundle = (file, rangeStart, rangeEnd) => {
   };
 };
 
-const getTraceMap = (sourceMap, lineStart, lineEnd) => {
-  const traceMap = new TraceMap(sourceMap);
-  const start = originalPositionFor(traceMap, { line: lineStart, column: 0 });
-  const end = originalPositionFor(traceMap, { line: lineEnd, column: 0 });
+const initMapConsumer = async (sourceMap) => {
+  const consumer = await new SourceMapConsumer(sourceMap);
+  return consumer;
+};
+const destroyMapConsumer = (consumer) => {
+  consumer.destroy();
+};
+
+const getTraceMap = (consumer, lineStart, lineEnd) => {
+  const start = consumer.originalPositionFor({ line: lineStart, column: 0 });
+  const end = consumer.originalPositionFor({ line: lineEnd, column: 0 });
   return {
     start,
     end,
@@ -22,65 +29,83 @@ const getTraceMap = (sourceMap, lineStart, lineEnd) => {
 };
 
 const getCoverages = (record, files, index) => {
-  const coverage = record.map((item, i) => {
-    parentPort.postMessage({
-      command: 'progress',
-    });
-
+  const coverage = record.map(async (item, i) => {
     if (item.type !== 'codeCoverage') {
-      return item;
+      parentPort.postMessage({
+        command: 'progress',
+      });
+      return {
+        ...item,
+        index,
+      };
     }
-    const parsedCodeCoverage = item.coverage.map((bundle) => {
+
+    const parsedCodeCoverage = item.coverage.map(async (bundle) => {
       const { functions } = bundle;
       const { content, map } = files.find(
         (file) => file.scriptId === bundle.scriptId
       );
+      const consumer = await initMapConsumer(map);
 
-      const functionCoverages = functions
-        .map((functionItem) => {
-          const { lineBundleStart, lineBundleEnd } = extractCoverageFromBundle(
-            content,
-            functionItem.ranges.startOffset,
-            functionItem.ranges.endOffset
-          );
-          const { start, end } = getTraceMap(
-            map,
-            lineBundleStart,
-            lineBundleEnd
-          );
-          let codeCoverage = null;
-          if (start.line === null && end.line === null) return null;
-          const orginalFileIndex = map.sources.indexOf(start.source);
-          const originalFile = map.sourcesContent[orginalFileIndex];
-          const originalFileLines = originalFile.split(/\n/);
+      const functionCoverage = functions.map((functionItem) => {
+        const { lineBundleStart, lineBundleEnd } = extractCoverageFromBundle(
+          content,
+          functionItem.ranges.startOffset,
+          functionItem.ranges.endOffset
+        );
+        const { start, end } = getTraceMap(
+          consumer,
+          lineBundleStart,
+          lineBundleEnd
+        );
+        if (start.line === null && end.line === null) return null;
 
-          codeCoverage = originalFileLines.slice(start.line - 1, end.line);
-          return {
-            start,
-            end,
-            functionName: functionItem.functionName,
-            codeCoverage,
-            count: functionItem.ranges.count,
-          };
-        })
-        .filter((item) => item !== null);
+        const orginalFileIndex = map.sources.indexOf(start.source);
+        const originalFile = map.sourcesContent[orginalFileIndex];
+        const originalFileLines = originalFile.split(/\n/);
+
+        let codeCoverage = null;
+        codeCoverage = originalFileLines.slice(start.line - 1, end.line);
+        parentPort.postMessage({
+          command: 'progress',
+        });
+        return {
+          start,
+          end,
+          functionName: functionItem.functionName,
+          codeCoverage,
+          count: functionItem.ranges.count,
+        };
+      });
+      destroyMapConsumer(consumer);
       return {
         scriptId: bundle.scriptId,
         url: bundle.url,
-        functions: functionCoverages,
+        functions: functionCoverage.filter((func) => func !== null),
+        timeStamp: item.timeStamp,
+        type: 'codeCoverage',
+        index,
       };
     });
-    return {
-      type: 'codeCoverage',
-      coverage: parsedCodeCoverage,
-      index,
-    };
+    const coverages = await Promise.all(parsedCodeCoverage);
+
+    return coverages;
   });
 
-  return coverage;
+  return Promise.all(coverage);
 };
 
-parentPort.postMessage({
-  command: 'finalCoverage',
-  payload: getCoverages(workerData.record, workerData.files, workerData.index),
-});
+const payload = getCoverages(
+  workerData.record,
+  workerData.files,
+  workerData.index
+)
+  .then((payload) =>
+    parentPort.postMessage({
+      command: 'finalCoverage',
+      payload: payload.flat(),
+    })
+  )
+  .catch((err) => {
+    console.log(err);
+  });

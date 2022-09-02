@@ -16,6 +16,7 @@ import { Worker } from 'worker_threads';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { record, stopRecording } from './cdp';
+import getKnowledge from './fetchKnowledge';
 
 class AppUpdater {
   constructor() {
@@ -24,62 +25,89 @@ class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
-
 let mainWindow: BrowserWindow | null = null;
+
+const getTotalCoverage = (coverage) =>
+  coverage.flatMap((c) => {
+    if (c.type !== 'codeCoverage') {
+      return c;
+    }
+    return c.coverage.flatMap((i) => i.functions);
+  }).length;
+
+const devideCoverage = (coverage: any, divs: number) => {
+  const coverageDivs = [];
+  for (let i = 0; i < divs; i++) {
+    coverageDivs.push(
+      coverage.slice(
+        i * (coverage.length / divs),
+        (i + 1) * (coverage.length / divs)
+      )
+    );
+  }
+  return coverageDivs;
+};
+
+const getCoverage = async (coverage, files, event) => {
+  const divs = 10;
+  const results: any[] = [];
+
+  let progress = 0;
+  const totalCoverage = getTotalCoverage(coverage);
+
+  const workerCallback = (message) => {
+    if (message.command === 'finalCoverage') {
+      if (results.length < divs - 1) {
+        results.push(message.payload);
+      } else {
+        results.push(message.payload);
+        const coverages = results.flat().sort((a, b) => {
+          return a.index - b.index || a.timeStamp - b.timeStamp;
+        });
+
+        event.sender.send('CDP', {
+          ...message,
+          payload: {
+            coverages,
+            files,
+          },
+        });
+      }
+    } else if (message.command === 'progress') {
+      progress += 1;
+      event.sender.send('CDP', {
+        ...message,
+        payload: ((progress / totalCoverage) * 100).toFixed(0),
+      });
+    }
+  };
+
+  const coverageDivs = devideCoverage(coverage, divs);
+  const workers = coverageDivs.map((coverage, i) => {
+    return new Worker(path.join(__dirname, 'coverage.js'), {
+      workerData: { record: coverage, files, index: i },
+    });
+  });
+
+  workers.forEach((worker) => worker.on('message', workerCallback));
+};
+
 ipcMain.on('CDP', async (event, arg) => {
   if (arg.command === 'record') {
     await record();
   }
   if (arg.command === 'stopRecording') {
     const { coverage, files } = await stopRecording();
-    const divs = 10;
-    const results = [];
-    const coverageDivs = [];
-    let progress = 0;
-    console.log(coverage.length);
-    for (let i = 0; i < divs; i++) {
-      coverageDivs.push(
-        coverage.slice(
-          i * (coverage.length / divs),
-          (i + 1) * (coverage.length / divs)
-        )
-      );
-    }
 
-    const workers = coverageDivs.map((coverage, i) => {
-      return new Worker(path.join(__dirname, 'coverage.js'), {
-        workerData: { record: coverage, files, index: i },
-      });
-    });
+    await getCoverage(coverage, files, event);
+  }
+  if (arg.command === 'openDevTools') {
+    mainWindow?.webContents.openDevTools();
+  }
+  if (arg.command === 'hypothesize') {
+    const knowledge = await getKnowledge(arg.payload);
 
-    workers.forEach((worker) => {
-      worker
-        .on('message', (message) => {
-          if (message.command === 'finalCoverage') {
-            if (results.length < divs - 1) {
-              results.push(message.payload);
-            } else {
-              results.push(message.payload);
-              let payload = results.flat().sort((a, b) => {
-                return a.index - b.index;
-              });
-              event.sender.send('CDP', {
-                ...message,
-                payload,
-              });
-            }
-          } else if (message.command === 'progress') {
-            progress += 1;
-            event.sender.send('CDP', {
-              ...message,
-              payload: ((progress / coverage.length) * 100).toFixed(2),
-            });
-          }
-        })
-        .on('error', (error) => {
-          console.log(error);
-        });
-    });
+    console.log(knowledge);
   }
 });
 
