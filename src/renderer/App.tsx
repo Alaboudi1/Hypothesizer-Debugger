@@ -21,6 +21,8 @@ const App = (): JSX.Element => {
         console.log(message.payload);
       } else if (message.command === 'progress') {
         setLoadingMessage(message.payload);
+      } else if (message.command === 'hypotheses') {
+        console.log(message.payload);
       }
     });
   }, []);

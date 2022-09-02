@@ -105,9 +105,12 @@ ipcMain.on('CDP', async (event, arg) => {
     mainWindow?.webContents.openDevTools();
   }
   if (arg.command === 'hypothesize') {
-    const knowledge = await getKnowledge(arg.payload);
+    const hypotheses = await getKnowledge(arg.payload);
 
-    console.log(knowledge);
+    event.sender.send('CDP', {
+      command: 'hypotheses',
+      payload: hypotheses,
+    });
   }
 });
 
