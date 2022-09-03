@@ -8,6 +8,8 @@ const App = (): JSX.Element => {
   const [trace, setTrace] = useState<any[]>([]);
   const [loadingMessage, setLoadingMessage] = useState<number>(0);
   const hypothesesLinks = useRef<string[]>([]);
+  const [targetUrl, setTargetUrl] = useState<string>('http://localhost:3000');
+
   useEffect(() => {
     window.electron.ipcRenderer.on('CDP', (message) => {
       if (message.command === 'finalCoverage') {
@@ -48,7 +50,11 @@ const App = (): JSX.Element => {
   };
 
   const getRecorder = (): JSX.Element => {
-    return <Recorder />;
+    return (
+      <>
+        <Recorder targetUrl={targetUrl} />
+      </>
+    );
   };
 
   const getMainContainer = (): JSX.Element => {
@@ -102,6 +108,14 @@ const App = (): JSX.Element => {
         >
           devtools
         </button>
+        <input
+          type="text"
+          value={targetUrl}
+          onChange={(e) => {
+            setTargetUrl(e.target.value);
+          }}
+          title="url"
+        />
       </div>
       <div className="mainContainer">{getMainContainer()}</div>
     </div>

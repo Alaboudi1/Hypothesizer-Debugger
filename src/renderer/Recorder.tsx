@@ -6,14 +6,19 @@ import { TraceWithMapping } from '../types/finalTypes';
 
 type recordState = 'ideal' | 'record' | 'collect';
 
-const Recorder: React.FC<RecorderProps> = (): React.ReactElement => {
+const Recorder: React.FC<RecorderProps> = ({
+  targetUrl,
+}): React.ReactElement => {
   const [recordState, setRecordingState] = React.useState<recordState>('ideal');
   const events = React.useRef<TemporaryEventType[]>([]);
 
   const recorder = async (recordState: recordState): Promise<void> => {
     if (recordState === 'record') {
       setRecordingState(recordState);
-      window.electron.ipcRenderer.sendMessage('CDP', { command: 'record' });
+      window.electron.ipcRenderer.sendMessage('CDP', {
+        command: 'record',
+        payload: { targetUrl },
+      });
     } else if (recordState === 'collect') {
       setRecordingState(recordState);
       window.electron.ipcRenderer.sendMessage('CDP', {

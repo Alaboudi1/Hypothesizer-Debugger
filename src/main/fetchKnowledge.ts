@@ -12,8 +12,8 @@ const getKnowledgeFromLocalFile = async (url: string) => {
   return response;
 };
 
-const getKnowledge = async (urls: string[]) => {
-  const knowledge = urls.map(async (url) => {
+const getKnowledge = (urls: string[]) => {
+  const knowledge = urls.map((url) => {
     if (url.startsWith('http')) {
       return getKnowledgeFromURL(url);
     }

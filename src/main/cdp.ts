@@ -23,9 +23,9 @@ type networkEvents = {
   method?: string;
 };
 
-let browser: puppeteer.Browser;
-let page: puppeteer.Page;
-let client: puppeteer.CDPSession;
+let browser: puppeteer.Browser | null = null;
+let page: puppeteer.Page | null = null;
+let client: puppeteer.CDPSession | null = null;
 const executablePathForMacOS =
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const executablePathForWindows =
@@ -33,8 +33,8 @@ const executablePathForWindows =
 
 const executablePathForLinux = '/usr/bin/google-chrome';
 
-let setIntervalCallback: string | number | NodeJS.Timer | undefined;
-const coverage: coverage[] = [];
+let setIntervalCallback: string | number | NodeJS.Timer | undefined = undefined;
+let coverage: coverage[] = [];
 const networkEventsCoverage: networkEvents[] = [];
 
 const getFiles = async (coverages: any[]) =>
@@ -67,7 +67,10 @@ const getFiles = async (coverages: any[]) =>
           map,
         };
       })
-  );
+  ).catch((error) => {
+    debugger;
+    console.log(error);
+  });
 
 const getOS = () => {
   const os = process.platform;
@@ -167,7 +170,7 @@ const launchBrowser = async (url: string) => {
   }
 };
 
-const record = async (url = 'http://localhost:3000') => {
+const record = async (url: string) => {
   try {
     await launchBrowser(url);
   } catch (error) {
@@ -202,7 +205,9 @@ const stopRecording = async () => {
   const events = await page.evaluate(() => {
     return JSON.parse(localStorage.getItem('events') || '[]');
   });
-  await browser.close();
+  await client.send('Profiler.disable');
+  await client.send('Network.disable');
+  await client.send('DOM.disable');
 
   const finalCoverage = coverage
     .map((coverageInstance) => {
@@ -215,7 +220,13 @@ const stopRecording = async () => {
     .filter((coverageInstance) => {
       return coverageInstance.coverage.length > 0;
     });
-
+  await page.close();
+  await browser.close();
+  browser = null;
+  page = null;
+  client = null;
+  setIntervalCallback = undefined;
+  coverage = [];
   return {
     coverage: [...finalCoverage, ...events, ...networkEventsCoverage].sort(
       (a, b) => a.timeStamp - b.timeStamp

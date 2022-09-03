@@ -94,7 +94,7 @@ const getCoverage = async (coverage, files, event) => {
 
 ipcMain.on('CDP', async (event, arg) => {
   if (arg.command === 'record') {
-    await record();
+    await record(arg.payload.targetUrl);
   }
   if (arg.command === 'stopRecording') {
     const { coverage, files } = await stopRecording();
