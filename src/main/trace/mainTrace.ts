@@ -26,7 +26,8 @@ let client: puppeteer.CDPSession | null = null;
 const executablePathForMacOS =
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const executablePathForWindows =
-  'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe';
+  // use edge
+  'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 
 const executablePathForLinux = '/usr/bin/google-chrome';
 
