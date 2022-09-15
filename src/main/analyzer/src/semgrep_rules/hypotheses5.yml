@@ -1,0 +1,8 @@
+rules:
+
+- id: my_pattern_id #Rule #2
+  pattern: '"functionName": "handleSearchInputChanges"'
+  message: Semgrep found a match
+  languages: [json]
+  severity: WARNING
+

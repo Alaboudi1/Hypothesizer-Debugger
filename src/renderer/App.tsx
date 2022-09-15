@@ -13,12 +13,12 @@ const App = (): JSX.Element => {
   useEffect(() => {
     window.electron.ipcRenderer.on('CDP', (message) => {
       if (message.command === 'finalCoverage') {
-        const localHypothesesLink = getHypothesesLocalURL(
-          message.payload.files
-        );
-        if (localHypothesesLink) {
-          hypothesesLinks.current.push(localHypothesesLink);
-        }
+        // const localHypothesesLink = getHypothesesLocalURL(
+        //   message.payload.files
+        // );
+        // if (localHypothesesLink) {
+        //   hypothesesLinks.current.push(localHypothesesLink);
+        // }
         setTrace(message.payload);
         console.log(message.payload);
       } else if (message.command === 'progress') {
@@ -52,7 +52,7 @@ const App = (): JSX.Element => {
   const getRecorder = (): JSX.Element => {
     return (
       <>
-        <Recorder targetUrl={targetUrl} />
+        <Recorder />
       </>
     );
   };
@@ -68,6 +68,17 @@ const App = (): JSX.Element => {
               <progress value={loadingMessage} max={100} />
             </div>
           )}
+          <button
+            type="button"
+            onClick={() =>
+              window.electron.ipcRenderer.sendMessage('CDP', {
+                command: 'launch',
+                payload: { targetUrl },
+              })
+            }
+          >
+            start
+          </button>{' '}
         </>
       );
     }
@@ -78,7 +89,11 @@ const App = (): JSX.Element => {
           onClick={() =>
             window.electron.ipcRenderer.sendMessage('CDP', {
               command: 'hypothesize',
-              payload: hypothesesLinks.current,
+              payload: {
+                coverages: trace.mergedCoverageMaps,
+                files: trace.filesContent,
+                knowledgeURL: hypothesesLinks.current,
+              },
             })
           }
         >

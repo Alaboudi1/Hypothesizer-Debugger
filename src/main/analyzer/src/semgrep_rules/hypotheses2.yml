@@ -1,0 +1,9 @@
+rules:
+
+- id: my_pattern_id #Rule #2
+  pattern: '"functionName": "syncNestedUpdateFlag"'
+  message: Semgrep found a match
+  languages: [json]
+  severity: WARNING
+
+

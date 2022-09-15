@@ -1,0 +1,261 @@
+[
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/react-dom/cjs/react-dom.development.js",
+    "functionsCoverage": [
+      "isReplayingEvent",
+      "getEventTarget",
+      "needsStateRestore",
+      "finishEventHandler",
+      "batchedUpdates",
+      "shouldPreventMouseEvent",
+      "getListener",
+      "rethrowCaughtError",
+      "getNearestMountedFiber",
+      "getCurrentUpdatePriority",
+      "setCurrentUpdatePriority",
+      "clearIfContinuousEvent",
+      "dispatchContinuousEvent",
+      "dispatchEvent",
+      "dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay",
+      "findInstanceBlockingEvent",
+      "SyntheticBaseEvent",
+      "timeStamp",
+      "relatedTarget",
+      "movementX",
+      "movementY",
+      "getEventModifierState",
+      "getCompositionEventType",
+      "extractCompositionEvent",
+      "getNativeBeforeInputChars",
+      "extractBeforeInputEvent",
+      "extractEvents",
+      "isTextInputElement",
+      "shouldUseChangeEvent",
+      "shouldUseClickEvent",
+      "extractEvents$1",
+      "extractEvents$2",
+      "extractEvents$3",
+      "extractEvents$4",
+      "extractEvents$5",
+      "processDispatchQueue",
+      "dispatchEventsForPlugins",
+      "isMatchingRootContainer",
+      "dispatchEventForPluginEventSystem",
+      "",
+      "accumulateSinglePhaseListeners",
+      "accumulateEnterLeaveListenersForEvent",
+      "accumulateEnterLeaveTwoPhaseListeners",
+      "getClosestInstanceFromNode",
+      "getNodeFromInstance",
+      "getFiberCurrentPropsFromNode",
+      "flushSyncCallbacksOnlyInLegacyMode",
+      "resetRenderTimer",
+      "batchedUpdates$1"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/scheduler/cjs/scheduler.development.js",
+    "functionsCoverage": [
+      "push../node_modules/scheduler/cjs/scheduler.development.js.exports.unstable_now"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/webpack/bootstrap",
+    "functionsCoverage": [
+      "getModuleExports"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/babel-preset-react-app/node_modules/@babel/runtime/helpers/esm/arrayWithHoles.js",
+    "functionsCoverage": [
+      "",
+      "_arrayWithHoles"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/babel-preset-react-app/node_modules/@babel/runtime/helpers/esm/slicedToArray.js",
+    "functionsCoverage": [
+      "",
+      "_slicedToArray"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/react/cjs/react.development.js",
+    "functionsCoverage": [
+      "isArray",
+      "hasValidRef",
+      "hasValidKey",
+      "ReactElement",
+      "createElement",
+      "isValidElement",
+      "isValidElementType",
+      "resolveDispatcher",
+      "useState",
+      "validateChildKeys",
+      "validatePropTypes",
+      "createElementWithValidation"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/src/components/Search.tsx",
+    "functionsCoverage": [
+      "Search",
+      "handleSearchInputChanges"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/adapters/xhr.js",
+    "functionsCoverage": [
+      "xhrAdapter"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/core/Axios.js",
+    "functionsCoverage": [
+      "request"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/core/InterceptorManager.js",
+    "functionsCoverage": [
+      "forEach"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/core/buildFullPath.js",
+    "functionsCoverage": [
+      "buildFullPath"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/core/dispatchRequest.js",
+    "functionsCoverage": [
+      "throwIfCancellationRequested",
+      "dispatchRequest",
+      "cleanHeaderConfig"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/core/mergeConfig.js",
+    "functionsCoverage": [
+      "mergeConfig",
+      "getMergedValue",
+      "valueFromConfig2",
+      "defaultToConfig2",
+      "computeConfigValue"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/core/transformData.js",
+    "functionsCoverage": [
+      "transformData"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/defaults/index.js",
+    "functionsCoverage": [
+      "transformRequest"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/helpers/bind.js",
+    "functionsCoverage": [
+      "wrap"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/helpers/buildURL.js",
+    "functionsCoverage": [
+      "buildURL"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/helpers/isURLSameOrigin.js",
+    "functionsCoverage": [
+      "resolveURL",
+      "isURLSameOrigin"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/helpers/normalizeHeaderName.js",
+    "functionsCoverage": [
+      "normalizeHeaderName",
+      "processHeader"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/helpers/parseProtocol.js",
+    "functionsCoverage": [
+      "parseProtocol"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/helpers/validator.js",
+    "functionsCoverage": [
+      "validator",
+      "transitional",
+      "assertOptions"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/utils.js",
+    "functionsCoverage": [
+      "",
+      "isKindOf",
+      "isArray",
+      "isUndefined",
+      "isBuffer",
+      "isArrayBufferView",
+      "isString",
+      "isObject",
+      "isPlainObject",
+      "isStream",
+      "isFormData",
+      "isStandardBrowserEnv",
+      "forEach",
+      "merge",
+      "assignValue"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/babel-preset-react-app/node_modules/@babel/runtime/helpers/esm/defineProperty.js",
+    "functionsCoverage": [
+      "",
+      "_defineProperty"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/babel-preset-react-app/node_modules/@babel/runtime/helpers/esm/objectSpread.js",
+    "functionsCoverage": [
+      "",
+      "_objectSpread",
+      ""
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/setimmediate/setImmediate.js",
+    "functionsCoverage": [
+      "setImmediate",
+      "registerImmediate"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/src/components/App.tsx",
+    "functionsCoverage": [
+      "App",
+      "fetchMovies"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/src/components/Header.tsx",
+    "functionsCoverage": [
+      "Header"
+    ]
+  },
+  {
+    "file": "/Users/abdulaziz/Documents/projects/movies-search/src/store/reducer/index.tsx",
+    "functionsCoverage": [
+      "reducer"
+    ]
+  }
+]

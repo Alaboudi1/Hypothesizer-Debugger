@@ -1,9 +1,6 @@
-// import * as puppeteer from 'puppeteer';
 import * as puppeteer from 'puppeteer-core';
-
 import axios from 'axios';
 import { injectedCode } from './injectedScript';
-// node http client
 
 type coverage = {
   result: puppeteer.Protocol.Profiler.TakePreciseCoverageResponse;
@@ -33,9 +30,9 @@ const executablePathForWindows =
 
 const executablePathForLinux = '/usr/bin/google-chrome';
 
-let setIntervalCallback: string | number | NodeJS.Timer | undefined = undefined;
+let setIntervalCallback: string | number | NodeJS.Timer | undefined;
 let coverage: coverage[] = [];
-const networkEventsCoverage: networkEvents[] = [];
+let networkEventsCoverage: networkEvents[] = [];
 
 const getFiles = async (coverages: any[]) =>
   Promise.all(
@@ -92,12 +89,14 @@ const cleanUpCoverage = (
   const cleanedCoverage = coverageInstance.result
     .map((entry) => {
       const { url, scriptId, functions } = entry;
-      const cleanedFunctions = functions.map(({ functionName, ranges }) => {
-        return {
-          functionName,
-          ranges: ranges[0],
-        };
-      });
+      const cleanedFunctions = functions
+        .map(({ functionName, ranges }) => {
+          return {
+            functionName,
+            ranges: ranges[0],
+          };
+        })
+        .filter((f) => f.ranges.count > 0);
       return {
         url,
         scriptId,
@@ -164,23 +163,17 @@ const launchBrowser = async (url: string) => {
 
     page = await browser.newPage();
     await page.goto(url);
-    return await Promise.resolve();
   } catch (error) {
-    return Promise.reject(error);
+    console.log(error);
   }
 };
 
-const record = async (url: string) => {
-  try {
-    await launchBrowser(url);
-  } catch (error) {
-    return Promise.reject(error);
-  }
-  client = await page.target().createCDPSession();
+const record = async () => {
+  client = await page?.target().createCDPSession();
   await DomEvents();
   await networkEvents();
-  await client.send('Profiler.enable');
-  await client.send('Profiler.startPreciseCoverage', {
+  await client?.send('Profiler.enable');
+  await client?.send('Profiler.startPreciseCoverage', {
     callCount: true,
     detailed: true,
   });
@@ -222,17 +215,21 @@ const stopRecording = async () => {
     });
   await page.close();
   await browser.close();
+  const payload = [...finalCoverage, ...events, ...networkEventsCoverage].sort(
+    (a, b) => a.timeStamp - b.timeStamp
+  );
   browser = null;
   page = null;
   client = null;
   setIntervalCallback = undefined;
   coverage = [];
+
+  networkEventsCoverage = [];
+
   return {
-    coverage: [...finalCoverage, ...events, ...networkEventsCoverage].sort(
-      (a, b) => a.timeStamp - b.timeStamp
-    ),
+    coverage: payload,
     files: await getFiles(finalCoverage),
   };
 };
 
-export { record, stopRecording };
+export { record, stopRecording, launchBrowser };

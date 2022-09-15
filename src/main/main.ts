@@ -9,122 +9,38 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
-import { Worker } from 'worker_threads';
-import MenuBuilder from './menu';
+import { app, BrowserWindow, shell } from 'electron';
 import { resolveHtmlPath } from './util';
-import { record, stopRecording } from './cdp';
-import getKnowledge from './fetchKnowledge';
+import initConnector from './backendConnector';
 
-class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
 let mainWindow: BrowserWindow | null = null;
-
-const getTotalCoverage = (coverage) =>
-  coverage.flatMap((c) => {
-    if (c.type !== 'codeCoverage') {
-      return c;
-    }
-    return c.coverage.flatMap((i) => i.functions);
-  }).length;
-
-const devideCoverage = (coverage: any, divs: number) => {
-  const coverageDivs = [];
-  for (let i = 0; i < divs; i++) {
-    coverageDivs.push(
-      coverage.slice(
-        i * (coverage.length / divs),
-        (i + 1) * (coverage.length / divs)
-      )
-    );
-  }
-  return coverageDivs;
-};
-
-const getCoverage = async (coverage, files, event) => {
-  const divs = 10;
-  const results: any[] = [];
-
-  let progress = 0;
-  const totalCoverage = getTotalCoverage(coverage);
-
-  const workerCallback = (message) => {
-    if (message.command === 'finalCoverage') {
-      if (results.length < divs - 1) {
-        results.push(message.payload);
-      } else {
-        results.push(message.payload);
-        const coverages = results.flat().sort((a, b) => {
-          return a.index - b.index || a.timeStamp - b.timeStamp;
-        });
-
-        event.sender.send('CDP', {
-          ...message,
-          payload: {
-            coverages,
-            files,
-          },
-        });
-      }
-    } else if (message.command === 'progress') {
-      progress += 1;
-      event.sender.send('CDP', {
-        ...message,
-        payload: ((progress / totalCoverage) * 100).toFixed(0),
-      });
-    }
-  };
-
-  const coverageDivs = devideCoverage(coverage, divs);
-  const workers = coverageDivs.map((coverage, i) => {
-    return new Worker(path.join(__dirname, 'coverage.js'), {
-      workerData: { record: coverage, files, index: i },
-    });
-  });
-
-  workers.forEach((worker) => worker.on('message', workerCallback));
-};
-
-ipcMain.on('CDP', async (event, arg) => {
-  if (arg.command === 'record') {
-    await record(arg.payload.targetUrl);
-  }
-  if (arg.command === 'stopRecording') {
-    const { coverage, files } = await stopRecording();
-
-    await getCoverage(coverage, files, event);
-  }
-  if (arg.command === 'openDevTools') {
-    mainWindow?.webContents.openDevTools();
-  }
-  if (arg.command === 'hypothesize') {
-    const hypotheses = await getKnowledge(arg.payload);
-
-    event.sender.send('CDP', {
-      command: 'hypotheses',
-      payload: hypotheses,
-    });
-  }
-});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
+const setupWindow = (
+  width: number,
+  height: number,
+  onTop: boolean,
+  xPosition: number,
+  yPosition: number
+) => {
+  mainWindow?.setSize(width, height, true);
+  mainWindow?.setPosition(xPosition, yPosition, true);
+  mainWindow?.setAlwaysOnTop(onTop);
+};
+const setupDevtools = () => {
+  // chek if dev tools are open
+  if (mainWindow?.webContents.isDevToolsOpened()) {
+    mainWindow?.webContents.closeDevTools();
+  } else {
+    mainWindow?.webContents.openDevTools();
+  }
+};
 
 const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
-
-if (isDebug) {
-  require('electron-debug')();
-}
 
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
@@ -148,10 +64,6 @@ const createWindow = async () => {
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
 
-  const WORKER_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets', 'coverage.js')
-    : path.join(__dirname, '../../assets', 'coverage.js');
-
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths);
   };
@@ -169,7 +81,6 @@ const createWindow = async () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
-
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
@@ -187,18 +98,11 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
-
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });
-
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
 };
 
 /**
@@ -218,9 +122,8 @@ app
   .then(() => {
     createWindow();
     app.on('activate', () => {
-      // On macOS it's common to re-create a window in the app when the
-      // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
     });
   })
+  .then(() => initConnector(setupWindow, setupDevtools))
   .catch(console.log);
