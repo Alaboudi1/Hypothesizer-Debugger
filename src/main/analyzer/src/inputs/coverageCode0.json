@@ -106,7 +106,9 @@
   {
     "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/adapters/xhr.js",
     "functionsCoverage": [
-      "xhrAdapter"
+      "xhrAdapter",
+      "dispatchXhrRequest",
+      "setRequestHeader"
     ]
   },
   {
@@ -140,15 +142,18 @@
     "functionsCoverage": [
       "mergeConfig",
       "getMergedValue",
+      "mergeDeepProperties",
       "valueFromConfig2",
       "defaultToConfig2",
+      "mergeDirectKeys",
       "computeConfigValue"
     ]
   },
   {
     "file": "/Users/abdulaziz/Documents/projects/movies-search/node_modules/axios/lib/core/transformData.js",
     "functionsCoverage": [
-      "transformData"
+      "transformData",
+      "transform"
     ]
   },
   {
@@ -194,6 +199,7 @@
     "functionsCoverage": [
       "validator",
       "transitional",
+      "",
       "assertOptions"
     ]
   },

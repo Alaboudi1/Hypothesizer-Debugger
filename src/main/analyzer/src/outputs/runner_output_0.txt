@@ -23,17 +23,17 @@ Findings:
      semgrep_rules.my_pattern_id
         Semgrep found a match
 
-        188┆ "functionsCoverage": [
-        189┆   "isArray",
-        190┆   "willCoercionThrow",
-        191┆   "testStringCoercion",
-        192┆   "checkKeyStringCoercion",
-        193┆   "hasValidRef",
-        194┆   "hasValidKey",
-        195┆   "defineKeyPropWarningGetter",
-        196┆   "ReactElement",
-        197┆   "createElement",
-           [hid 11 additional lines, adjust with --max-lines-per-finding]
+        161┆ "functionsCoverage": [
+        162┆   "isArray",
+        163┆   "hasValidRef",
+        164┆   "hasValidKey",
+        165┆   "ReactElement",
+        166┆   "createElement",
+        167┆   "isValidElement",
+        168┆   "isValidElementType",
+        169┆   "resolveDispatcher",
+        170┆   "useState",
+           [hid 6 additional lines, adjust with --max-lines-per-finding]
 
 
 

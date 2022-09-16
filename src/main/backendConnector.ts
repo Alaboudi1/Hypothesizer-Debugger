@@ -39,7 +39,7 @@ const initConnector = (setupWindow: SetupWindow, setupDevTools: () => void) => {
         setupDevTools();
       }
       if (arg.command === 'hypothesize') {
-        const hypotheses = await getHypotheses(
+        getHypotheses(
           arg.payload.coverages,
           arg.payload.files,
           arg.payload.knowledgeURL,

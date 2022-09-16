@@ -1,6 +1,0 @@
-Semgrep Report for inputs/
-
-
-
-
-
