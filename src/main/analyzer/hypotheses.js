@@ -33,6 +33,8 @@ const clearInputsAndOutputs = () => {
   } else if (isWindows) {
     execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'inputs')}`);
     execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'outputs')}`);
+    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs')}`);
+    execSync(`mkdir ${path.join(__dirname, 'src', 'outputs')}`);
   }
 };
 
