@@ -8,10 +8,9 @@ def run_semgrep(rules, target, output_filename):
         f'semgrep --config={rules} {target}', shell=True, stdout=subprocess.PIPE)
     output = process.stdout.read().strip()
     output = output.decode('UTF-8')
-    with open(output_filename, 'a') as f:
-        print(f'Semgrep Report for {target}\n', file=f)
-        print(output, file=f)
-        print(f'\n\n', file=f)
+    # write to a json file
+    with open(output_filename, 'w') as f:
+        f.write(output)
 
 
 def analyze():

@@ -1,39 +1,7 @@
-Semgrep Report for inputs/
-
 Findings:
 
-  inputs/coverageCode0.json 
-     semgrep_rules.my_pattern_id
-        Semgrep found a match
+  inputs/codeCoverage/codeCoverage0.js 
+     semgrep_rules.API_1
+        API_1
 
-         84┆ "functionsCoverage": [
-         85┆   "isArray",
-         86┆   "hasValidRef",
-         87┆   "hasValidKey",
-         88┆   "ReactElement",
-         89┆   "createElement",
-         90┆   "isValidElement",
-         91┆   "isValidElementType",
-         92┆   "resolveDispatcher",
-         93┆   "useState",
-           [hid 4 additional lines, adjust with --max-lines-per-finding] 
-
-
-  inputs/coverageCode1.json 
-     semgrep_rules.my_pattern_id
-        Semgrep found a match
-
-        161┆ "functionsCoverage": [
-        162┆   "isArray",
-        163┆   "hasValidRef",
-        164┆   "hasValidKey",
-        165┆   "ReactElement",
-        166┆   "createElement",
-        167┆   "isValidElement",
-        168┆   "isValidElementType",
-        169┆   "resolveDispatcher",
-        170┆   "useState",
-           [hid 6 additional lines, adjust with --max-lines-per-finding]
-
-
-
+        103┆ "preventDefault",

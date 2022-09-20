@@ -123,20 +123,18 @@ const networkEvents = async () => {
 
   client.on('Network.requestWillBeSent', async (params) => {
     const timeStamp = Date.now();
-    if (params.type === 'XHR')
-      networkEventsCoverage.push({
-        type: 'requestWillBeSent',
-        stack: params.initiator.stack,
-        requestId: params.requestId,
-        timeStamp,
-        url: params.request.url,
-        method: params.request.method,
-      });
+    networkEventsCoverage.push({
+      type: 'requestWillBeSent',
+      stack: params.initiator.stack,
+      requestId: params.requestId,
+      timeStamp,
+      url: params.request.url,
+      method: params.request.method,
+    });
   });
   client.on('Network.responseReceived', async (params) => {
     const timeStamp = Date.now();
-
-    if (params.type === 'XHR') {
+    if (params.response.mimeType === 'application/json') {
       const data = await client.send('Network.getResponseBody', {
         requestId: params.requestId,
       });
@@ -149,6 +147,15 @@ const networkEvents = async () => {
         status: params.response.status,
         mimeType: params.response.mimeType,
         data: data.body,
+      });
+    } else {
+      networkEventsCoverage.push({
+        type: 'responseReceived',
+        requestId: params.requestId,
+        timeStamp,
+        url: params.response.url,
+        status: params.response.status,
+        mimeType: params.response.mimeType,
       });
     }
   });

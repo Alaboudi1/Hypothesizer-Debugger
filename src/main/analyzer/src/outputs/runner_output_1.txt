@@ -1,6 +1,11 @@
-Semgrep Report for inputs/
+Findings:
 
+  inputs/UICoverage/UICoverage0.js 
+     semgrep_rules.EVENT_1
+        EVENT_1
 
-
-
-
+         42┆ {
+         43┆   "InputType": "submit",
+         44┆   "target": "INPUT",
+         45┆   "type": "click"
+         46┆ }

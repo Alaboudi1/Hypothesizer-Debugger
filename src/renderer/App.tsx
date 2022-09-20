@@ -13,12 +13,13 @@ const App = (): JSX.Element => {
   useEffect(() => {
     window.electron.ipcRenderer.on('CDP', (message) => {
       if (message.command === 'finalCoverage') {
-        // const localHypothesesLink = getHypothesesLocalURL(
-        //   message.payload.files
-        // );
-        // if (localHypothesesLink) {
-        //   hypothesesLinks.current.push(localHypothesesLink);
-        // }
+        //split the file url from node_modules or src
+        const localHypothesesLink =
+          message.payload.filesContent[0].file
+            .split('node_modules')
+            .reverse()[1] ||
+          message.payload.filesContent[0].file.split('src')[0];
+        hypothesesLinks.current.push(`${localHypothesesLink}hypotheses.json`);
         setTrace(message.payload);
         console.log(message.payload);
       } else if (message.command === 'progress') {
@@ -28,26 +29,6 @@ const App = (): JSX.Element => {
       }
     });
   }, []);
-  const getHypothesesLocalURL = (files): string | undefined => {
-    let url;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const file of files) {
-      const { sources } = file.map;
-      // eslint-disable-next-line no-restricted-syntax
-      for (const source of sources) {
-        const node_modules_Index = source.indexOf('node_modules');
-        if (node_modules_Index !== -1) {
-          url = source.substring(0, node_modules_Index);
-          break;
-        }
-        if (url) {
-          break;
-        }
-      }
-    }
-
-    return url;
-  };
 
   const getRecorder = (): JSX.Element => {
     return (

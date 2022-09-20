@@ -1,0 +1,7 @@
+rules:
+  - id: EVENT_1
+    message: EVENT_1
+    languages:
+      - js
+    severity: WARNING
+    pattern: '{"type":"click","InputType":"submit"}'

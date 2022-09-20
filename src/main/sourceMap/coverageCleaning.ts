@@ -21,38 +21,42 @@ const mergeCoverage = (
   files: any[]
 ) => {
   const codeCoverageMerge = (value, codeCoverage) => {
+    let mergedCoverage;
     if (codeCoverage.length === 0) {
-      codeCoverage = [value];
+      mergedCoverage = [value];
     } else {
       let found = false;
-      codeCoverage = codeCoverage.map((c) => {
+      mergedCoverage = codeCoverage.map((c) => {
         if (c.file === value.file) {
           found = true;
           return {
             ...c,
             // compine functions with same functionName
             timeStamp: [c.timeStamp, value.timeStamp].flat(),
-            functions: c.functions.map((f) => {
-              const func = value.functions.find(
-                (v) => v.codeCoverage.join() === f.codeCoverage.join()
-              );
-              if (func) {
-                return {
-                  ...f,
-                  count: f.count + func.count,
-                };
-              }
-              return f;
-            }),
+            functions: [...value.functions, ...c.functions].reduce(
+              (acc, cur) => {
+                const index = acc.findIndex(
+                  (a) => a.codeCoverage.join('') === cur.codeCoverage.join('')
+                );
+                if (index === -1) {
+                  acc.push(cur);
+                } else {
+                  acc[index].count += cur.count;
+                }
+
+                return acc;
+              },
+              []
+            ),
           };
         }
         return c;
       });
       if (!found) {
-        codeCoverage.push(value);
+        mergedCoverage.push(value);
       }
     }
-    return codeCoverage;
+    return mergedCoverage;
   };
 
   return coverageMaps.map((coverageMap) => {
