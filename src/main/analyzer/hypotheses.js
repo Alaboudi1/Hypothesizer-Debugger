@@ -94,9 +94,21 @@ const clearFiles = () => {
   const isLinux = process.platform === 'linux';
   const isWindows = process.platform === 'win32';
   if (isMac || isLinux) {
-    execSync(`rm -rf ${path.join(__dirname, 'src', 'outputs')}/*`);
-    execSync(`rm -rf ${path.join(__dirname, 'src', 'semgrep_rules')}/*`);
-    execSync(`rm -rf ${path.join(__dirname, 'src', 'inputs')}/*`);
+    if (fs.existsSync(path.join(__dirname, 'src', 'outputs'))) {
+      execSync(`rm -rf ${path.join(__dirname, 'src', 'outputs')}/*`);
+    } else {
+      execSync(`mkdir ${path.join(__dirname, 'src', 'outputs')}`);
+    }
+    if (fs.existsSync(path.join(__dirname, 'src', 'semgrep_rules'))) {
+      execSync(`rm -rf ${path.join(__dirname, 'src', 'semgrep_rules')}/*`);
+    } else {
+      execSync(`mkdir ${path.join(__dirname, 'src', 'semgrep_rules')}`);
+    }
+    if (fs.existsSync(path.join(__dirname, 'src', 'inputs'))) {
+      execSync(`rm -rf ${path.join(__dirname, 'src', 'inputs')}/*`);
+    } else {
+      execSync(`mkdir ${path.join(__dirname, 'src', 'inputs')}`);
+    }
     execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'API_calls')}`);
     execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'events')}`);
     execSync(
@@ -104,9 +116,16 @@ const clearFiles = () => {
     );
     execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'code_pattern')}`);
   } else if (isWindows) {
-    execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'inputs')}`);
-    execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'outputs')}`);
-    execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'semgrep_rules')}`);
+    if (fs.existsSync(path.join(__dirname, 'src', 'outputs'))) {
+      execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'outputs')}`);
+    }
+    if (fs.existsSync(path.join(__dirname, 'src', 'semgrep_rules'))) {
+      execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'semgrep_rules')}`);
+    }
+    if (fs.existsSync(path.join(__dirname, 'src', 'inputs'))) {
+      execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'inputs')}`);
+    }
+
     execSync(`mkdir ${path.join(__dirname, 'src', 'inputs')}`);
     execSync(`mkdir ${path.join(__dirname, 'src', 'outputs')}`);
     // create codeCoverage, UICoverage, networkCoverage folders
