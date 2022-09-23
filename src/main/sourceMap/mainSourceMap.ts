@@ -23,7 +23,7 @@ const devideCoverage = (coverage: any, divs: number) => {
 };
 
 const getCoverage = (coverage, files, callback) => {
-  const divs = 10;
+  const divs = 20;
   const results: any[] = [];
 
   let progress = 0;
@@ -40,7 +40,15 @@ const getCoverage = (coverage, files, callback) => {
         });
         const cleanedCode = constrcutTimeLine(coverages, files);
 
-        callback(message.command, cleanedCode);
+        const linkPath = cleanedCode.filesContent[0].file;
+        const localHypothesesLink = linkPath.split(
+          /node_modules|src|webpack/
+        )[0];
+
+        callback(message.command, {
+          newTrace: cleanedCode,
+          link: `${localHypothesesLink}hypotheses.json`,
+        });
       }
     } else if (message.command === 'progress') {
       progress += 1;

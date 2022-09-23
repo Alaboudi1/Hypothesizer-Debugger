@@ -1,8 +1,0 @@
-rules:
-  - id: NETWORK_1
-    pattern: '{"type":"responseReceived","mimeType":"text/html"}'
-    message: NETWORK_1
-    languages:
-      - js
-      - json
-    severity: WARNING

@@ -24,7 +24,9 @@ const initConnector = (setupWindow: SetupWindow, setupDevTools: () => void) => {
       };
 
       if (arg.command === 'launch') {
-        setupWindow(300, 140, true, 0, 100);
+        // set the x and y position of the window to bottom right
+
+        setupWindow(110, 250, true, 0, 0);
         await launchBrowser(arg.payload.targetUrl);
       }
       if (arg.command === 'record') {

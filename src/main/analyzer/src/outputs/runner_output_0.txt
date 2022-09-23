@@ -1,7 +1,0 @@
-Findings:
-
-  inputs/codeCoverage/codeCoverage0.js 
-     semgrep_rules.API_1
-        API_1
-
-        103┆ "preventDefault",

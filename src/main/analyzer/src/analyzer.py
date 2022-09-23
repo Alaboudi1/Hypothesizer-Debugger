@@ -15,8 +15,10 @@ def run_semgrep(rules, target, output_filename):
 
 def analyze():
     files = glob.glob('semgrep_rules/*.yml')
-    with ThreadPoolExecutor(max_workers=len(files)) as executor:
-        futures = [executor.submit(run_semgrep, ruleFile, "inputs/", f'outputs/runner_output_{i}.txt')
+    # get the file name without the extension
+    targets = [f.split('/')[-1].split('.')[0] for f in files]
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = [executor.submit(run_semgrep, ruleFile, f'inputs/{targets[i]}/', f'outputs/{targets[i]}.txt')
                    for i, ruleFile in enumerate(files)]
 
 

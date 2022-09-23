@@ -30,3 +30,7 @@ npm-debug.log.*
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+src/main/analyzer/src/semgrep_rules
+src/main/analyzer/src/outputs
+src/main/analyzer/src/inputs

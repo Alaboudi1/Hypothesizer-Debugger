@@ -69,17 +69,11 @@ const writeCoverageToFiles = (data) => {
     const UICoverage = JSON.stringify(item.UICoverage, null, 2);
     const networkCoverage = JSON.stringify(item.networkCoverage, null, 2);
     fs.writeFileSync(
-      path.join(
-        __dirname,
-        'src',
-        'inputs',
-        'codeCoverage',
-        `codeCoverage${i}.js`
-      ),
+      path.join(__dirname, 'src', 'inputs', 'API_calls', `codeCoverage${i}.js`),
       codeCoverage
     );
     fs.writeFileSync(
-      path.join(__dirname, 'src', 'inputs', 'UICoverage', `UICoverage${i}.js`),
+      path.join(__dirname, 'src', 'inputs', 'events', `UICoverage${i}.js`),
       UICoverage
     );
     fs.writeFileSync(
@@ -87,7 +81,7 @@ const writeCoverageToFiles = (data) => {
         __dirname,
         'src',
         'inputs',
-        'networkCoverage',
+        'network_activites',
         `networkCoverage${i}.js`
       ),
       networkCoverage
@@ -100,19 +94,15 @@ const clearFiles = () => {
   const isLinux = process.platform === 'linux';
   const isWindows = process.platform === 'win32';
   if (isMac || isLinux) {
-    parentPort.postMessage({
-      command: 'hypotheses',
-      payload: [isMac, isLinux, isWindows],
-    });
     execSync(`rm -rf ${path.join(__dirname, 'src', 'outputs')}/*`);
-    execSync(
-      `rm -rf ${path.join(__dirname, 'src', 'inputs', 'codeCoverage')}/*`
-    );
-    execSync(`rm -rf ${path.join(__dirname, 'src', 'inputs', 'UICoverage')}/*`);
-    execSync(
-      `rm -rf ${path.join(__dirname, 'src', 'inputs', 'networkCoverage')}/*`
-    );
     execSync(`rm -rf ${path.join(__dirname, 'src', 'semgrep_rules')}/*`);
+    execSync(`rm -rf ${path.join(__dirname, 'src', 'inputs')}/*`);
+    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'API_calls')}`);
+    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'events')}`);
+    execSync(
+      `mkdir ${path.join(__dirname, 'src', 'inputs', 'network_activites')}`
+    );
+    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'code_pattern')}`);
   } else if (isWindows) {
     execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'inputs')}`);
     execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'outputs')}`);
@@ -120,11 +110,12 @@ const clearFiles = () => {
     execSync(`mkdir ${path.join(__dirname, 'src', 'inputs')}`);
     execSync(`mkdir ${path.join(__dirname, 'src', 'outputs')}`);
     // create codeCoverage, UICoverage, networkCoverage folders
-    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'codeCoverage')}`);
-    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'UICoverage')}`);
+    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'API_calls')}`);
+    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'events')}`);
     execSync(
-      `mkdir ${path.join(__dirname, 'src', 'inputs', 'networkCoverage')}`
+      `mkdir ${path.join(__dirname, 'src', 'inputs', 'network_activites')}`
     );
+    execSync(`mkdir ${path.join(__dirname, 'src', 'code_pattern')}`);
     execSync(`mkdir ${path.join(__dirname, 'src', 'semgrep_rules')}`);
   }
 };
@@ -132,17 +123,13 @@ const clearFiles = () => {
 const semgrepAnalysis = () => {
   try {
     const localPath = `${path.join(__dirname, 'src')}:/src`;
-    const t = execSync(
+    execSync(
       `docker run --rm -v  ${localPath} returntocorp/semgrep python3 analyzer.py`
     );
-    parentPort.postMessage({
-      command: 'hypotheses',
-      payload: [localPath, t.toString()],
-    });
     return true;
   } catch (error) {
     parentPort.postMessage({
-      command: 'hypotheses',
+      command: 'errors',
       payload: [error],
     });
     return false;
@@ -152,73 +139,83 @@ const writeSemgrepRules = (knowledge) => {
   knowledge.forEach((item) => {
     const rules = JSON.parse(item).checks;
 
-    rules.API_calls.forEach((rule) => {
-      const yaml = {
-        rules: [
-          {
-            id: rule.id,
-            message: rule.id,
-            languages: ['js'],
-            severity: 'WARNING',
-            patterns: [
-              {
-                pattern: `"${rule.functionName}"\n`,
-              },
-              {
-                'pattern-inside': '"functionsCoverage": [...]\n',
-              },
-            ],
-          },
-        ],
-      };
-      fs.writeFileSync(
-        path.join(__dirname, 'src', 'semgrep_rules', `${rule.id}.yml`),
-        YAML.stringify(yaml)
-      );
-    });
-    rules.events.forEach((rule) => {
-      const yaml = {
-        rules: [
-          {
-            id: rule.id,
-            message: rule.id,
-            languages: ['js'],
-            severity: 'WARNING',
-            pattern: JSON.stringify({
-              type: rule?.type,
-              InputType: rule?.InputType,
-            }),
-          },
-        ],
-      };
-      fs.writeFileSync(
-        path.join(__dirname, 'src', 'semgrep_rules', `${rule.id}.yml`),
-        YAML.stringify(yaml)
-      );
-    });
-    rules.network_activites.forEach((rule) => {
-      const yaml = {
-        rules: [
-          {
-            id: rule.id,
-            pattern: JSON.stringify({
-              url: rule?.url,
-              type: rule?.type,
-              mimeType: rule?.mimeType,
-              data: rule?.data,
-              method: rule?.method,
-            }),
-            message: rule.id,
-            languages: ['js', 'json'],
-            severity: 'WARNING',
-          },
-        ],
-      };
-      fs.writeFileSync(
-        path.join(__dirname, 'src', 'semgrep_rules', `${rule.id}.yml`),
-        YAML.stringify(yaml)
-      );
-    });
+    const APICalls = {
+      rules: rules.API_calls.map((rule) => {
+        return {
+          id: rule.id,
+          message: rule.id,
+          languages: ['js'],
+          severity: 'WARNING',
+          patterns: [
+            {
+              pattern: `"${rule.functionName}"\n`,
+            },
+            {
+              'pattern-inside': '"functionsCoverage": [...]\n',
+            },
+          ],
+        };
+      }),
+    };
+    fs.writeFileSync(
+      path.join(__dirname, 'src', 'semgrep_rules', 'API_calls.yml'),
+      YAML.stringify(APICalls)
+    );
+
+    const UIEvents = {
+      rules: rules.events.map((rule) => {
+        return {
+          id: rule.id,
+          message: rule.id,
+          languages: ['js'],
+          severity: 'WARNING',
+          pattern: JSON.stringify({
+            type: rule?.type,
+            InputType: rule?.InputType,
+          }),
+        };
+      }),
+    };
+    fs.writeFileSync(
+      path.join(__dirname, 'src', 'semgrep_rules', 'events.yml'),
+      YAML.stringify(UIEvents)
+    );
+    const network = {
+      rules: rules.network_activites.map((rule) => {
+        return {
+          id: rule.id,
+          pattern: JSON.stringify({
+            url: rule?.url,
+            type: rule?.type,
+            mimeType: rule?.mimeType,
+            data: rule?.data,
+            method: rule?.method,
+          }),
+          message: rule.id,
+          languages: ['js', 'json'],
+          severity: 'WARNING',
+        };
+      }),
+    };
+    fs.writeFileSync(
+      path.join(__dirname, 'src', 'semgrep_rules', 'network_activites.yml'),
+      YAML.stringify(network)
+    );
+    const codePattern = {
+      rules: rules.code_pattern.map((rule) => {
+        return {
+          id: rule.id,
+          patterns: rule.patterns,
+          message: rule.id,
+          languages: ['js'],
+          severity: 'WARNING',
+        };
+      }),
+    };
+    fs.writeFileSync(
+      path.join(__dirname, 'src', 'semgrep_rules', 'code_pattern.yml'),
+      YAML.stringify(codePattern)
+    );
   });
 };
 
@@ -234,6 +231,7 @@ const writeCoverageFilesToFiles = (files) => {
         __dirname,
         'src',
         'inputs',
+        'code_pattern',
         `coverageFiles${i}.${fileExtension}`
       ),
       file.content

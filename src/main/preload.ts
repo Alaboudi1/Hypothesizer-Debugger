@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels = 'CDP';
-export type Args = { command: string; payload?: unknown[] };
+export type Args = { command: string; payload?: unknown };
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {

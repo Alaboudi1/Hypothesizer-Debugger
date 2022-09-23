@@ -1,5 +1,10 @@
 import { Channels } from 'main/preload';
 
+type Message = {
+  command: string;
+  payload: unknown;
+};
+
 declare global {
   interface Window {
     electron: {
@@ -8,14 +13,14 @@ declare global {
           channel: Channels,
           args: {
             command: string;
-            payload?: unknown[];
+            payload?: unknown;
           }
         ): void;
         on(
           channel: string,
-          func: (...args: unknown[]) => void
+          func: (args: Message) => void
         ): (() => void) | undefined;
-        once(channel: string, func: (...args: unknown[]) => void): void;
+        once(channel: string, func: (args: Message) => void): void;
       };
     };
   }
