@@ -3,6 +3,7 @@ import Recorder from '../recorder/Recorder';
 import { sendCommand, subscribeToCommand } from '../frontendConnectors';
 import './App.css';
 import icon from './icon.png';
+import Timeline from 'renderer/timeline/Timelines';
 
 type HypothesizerState =
   | 'start'
@@ -22,9 +23,9 @@ const App = (): JSX.Element => {
 
   useEffect(() => {
     subscribeToCommand('finalCoverage', ({ newTrace, link }) => {
+      setHypothesizerState('hypothesize');
       setTrace(newTrace as any[]);
       hypothesesLinks.current.push(link as string);
-      setHypothesizerState('hypothesize');
       sendCommand('hypothesize', {
         coverages: newTrace.mergedCoverageMaps,
         knowledgeURL: hypothesesLinks.current,
@@ -32,8 +33,8 @@ const App = (): JSX.Element => {
       });
     });
     subscribeToCommand('progress', (progress) => {
-      setLoadingMessage(progress as number);
       setHypothesizerState('analyize');
+      setLoadingMessage(progress as number);
     });
     subscribeToCommand('hypotheses', ((hypotheses) => {
       setHypothesizerState('report');
@@ -64,7 +65,6 @@ const App = (): JSX.Element => {
         return (
           <div className="recordContainer">
             <Recorder />
-            <h5>Click record and then reproduce the bug</h5>
           </div>
         );
       case 'analyize':
@@ -99,6 +99,7 @@ const App = (): JSX.Element => {
                   <p>{JSON.stringify(hypothesis)}</p>
                 </div>
               ))}
+              <Timeline trace={trace} />
             </div>
           </div>
         );

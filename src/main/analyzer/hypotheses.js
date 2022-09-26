@@ -65,27 +65,39 @@ const writeCoverageToFiles = (data) => {
 
   coverage.forEach((item, i) => {
     // fomat the json
-    const codeCoverage = JSON.stringify(item.codeCoverage, null, 2);
-    const UICoverage = JSON.stringify(item.UICoverage, null, 2);
-    const networkCoverage = JSON.stringify(item.networkCoverage, null, 2);
-    fs.writeFileSync(
-      path.join(__dirname, 'src', 'inputs', 'API_calls', `codeCoverage${i}.js`),
-      codeCoverage
-    );
-    fs.writeFileSync(
-      path.join(__dirname, 'src', 'inputs', 'events', `UICoverage${i}.js`),
-      UICoverage
-    );
-    fs.writeFileSync(
-      path.join(
-        __dirname,
-        'src',
-        'inputs',
-        'network_activites',
-        `networkCoverage${i}.js`
-      ),
-      networkCoverage
-    );
+    if (item.codeCoverage.length > 0) {
+      const codeCoverage = JSON.stringify(item.codeCoverage, null, 2);
+      fs.writeFileSync(
+        path.join(
+          __dirname,
+          'src',
+          'inputs',
+          'API_calls',
+          `codeCoverage${i}.js`
+        ),
+        codeCoverage
+      );
+    }
+    if (item.UICoverage.length > 0) {
+      const UICoverage = JSON.stringify(item.UICoverage, null, 2);
+      fs.writeFileSync(
+        path.join(__dirname, 'src', 'inputs', 'events', `UICoverage${i}.js`),
+        UICoverage
+      );
+    }
+    if (item.networkCoverage.length > 0) {
+      const networkCoverage = JSON.stringify(item.networkCoverage, null, 2);
+      fs.writeFileSync(
+        path.join(
+          __dirname,
+          'src',
+          'inputs',
+          'network_activites',
+          `networkCoverage${i}.js`
+        ),
+        networkCoverage
+      );
+    }
   });
 };
 
@@ -134,7 +146,7 @@ const clearFiles = () => {
     execSync(
       `mkdir ${path.join(__dirname, 'src', 'inputs', 'network_activites')}`
     );
-    execSync(`mkdir ${path.join(__dirname, 'src', 'code_pattern')}`);
+    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'code_pattern')}`);
     execSync(`mkdir ${path.join(__dirname, 'src', 'semgrep_rules')}`);
   }
 };

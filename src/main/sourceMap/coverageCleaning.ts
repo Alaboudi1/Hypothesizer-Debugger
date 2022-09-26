@@ -102,7 +102,7 @@ const cleanCodeCoverage = (coverage, files) => {
       functionsCoverage.set(func.start.source, [getCoverage(func)]);
     }
   });
-  const cleanCodeCoverage: {
+  const cleanCodeCoverages: {
     file: string;
     functions: any[];
     timeStamp: number;
@@ -110,7 +110,7 @@ const cleanCodeCoverage = (coverage, files) => {
     bundleId: string;
   }[] = [];
   functionsCoverage.forEach((value, key) => {
-    cleanCodeCoverage.push({
+    cleanCodeCoverages.push({
       file: key,
       functions: value,
       timeStamp: coverage.timeStamp,
@@ -118,7 +118,7 @@ const cleanCodeCoverage = (coverage, files) => {
       bundleId: coverage.scriptId,
     });
   });
-  return cleanCodeCoverage;
+  return cleanCodeCoverages;
 };
 
 const constrcutTimeLine = (coverages: any[], files: any) => {

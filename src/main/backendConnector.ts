@@ -11,9 +11,14 @@ type SetupWindow = (
   yPosition: number
 ) => void;
 
-const initConnector = (setupWindow: SetupWindow, setupDevTools: () => void) => {
+const initConnector = (
+  setupWindow: SetupWindow,
+  setupDevTools: () => void,
+  getMainWindowPositions: () => number[]
+) => {
   // let target = undefined;
-
+  let x = 0;
+  let y = 0;
   const setuplisteners = () => {
     ipcMain.on('CDP', async (event, arg) => {
       const send = (channel: string, args: any) => {
@@ -25,16 +30,18 @@ const initConnector = (setupWindow: SetupWindow, setupDevTools: () => void) => {
 
       if (arg.command === 'launch') {
         // set the x and y position of the window to bottom right
+        [x, y] = getMainWindowPositions();
 
-        setupWindow(110, 250, true, 0, 0);
+        setupWindow(200, 130, true, 0, 0);
         await launchBrowser(arg.payload.targetUrl);
       }
       if (arg.command === 'record') {
         await record();
       }
       if (arg.command === 'stopRecording') {
+        send('progress', 0);
         const { coverage, files } = await stopRecording();
-        setupWindow(1024, 728, false, 300, 300);
+        setupWindow(1024, 728, false, x, y);
         getCoverage(coverage, files, send);
       }
       if (arg.command === 'openDevTools') {

@@ -1,19 +1,19 @@
 @keyframes glowing {
   0% {
-    background-color: #a80505;
-    box-shadow: 0 0 2px #a80505;
+    background-color: #fff;
+    box-shadow: 0 0 3px #fff;
   }
   50% {
-    background-color: #e40b0b;
-    box-shadow: 0 0 7px #e40b0b;
+    background-color: #f58484;
+    box-shadow: 0 0 40px #f58484;
   }
   100% {
-    background-color: #a80505;
-    box-shadow: 0 0 2px #a80505;
+    background-color: #fff;
+    box-shadow: 0 0 3px #fff;
   }
 }
 #recording {
-  animation: glowing 1300ms infinite;
+  animation: glowing 1500ms infinite;
 }
 
 /*  make a record button red and glowing */
@@ -30,10 +30,10 @@
   /* make it bold */
   font-weight: bold;
   /* make it colorful */
-  background-color: #ff0000;
-  color: rgb(255, 255, 255);
+  background-color: white;
+  color: #ff0000;
   /* make it pretty */
-  border: 1px solid #ccc;
+  border: 5px solid #ff0000;
   box-shadow: 0 0 5px rgb(0, 0, 0);
   /* make it smooth */
   transition: all 0.1s ease-in-out;

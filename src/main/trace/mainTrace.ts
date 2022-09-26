@@ -134,11 +134,15 @@ const networkEvents = async () => {
   });
   client.on('Network.responseReceived', async (params) => {
     const timeStamp = Date.now();
+    let data;
     if (params.response.mimeType === 'application/json') {
-      const data = await client.send('Network.getResponseBody', {
-        requestId: params.requestId,
-      });
-
+      try {
+        data = await client.send('Network.getResponseBody', {
+          requestId: params.requestId,
+        });
+      } catch (error) {
+        data = null;
+      }
       networkEventsCoverage.push({
         type: 'responseReceived',
         requestId: params.requestId,
@@ -146,7 +150,7 @@ const networkEvents = async () => {
         url: params.response.url,
         status: params.response.status,
         mimeType: params.response.mimeType,
-        data: data.body,
+        data: data?.body,
       });
     } else {
       networkEventsCoverage.push({

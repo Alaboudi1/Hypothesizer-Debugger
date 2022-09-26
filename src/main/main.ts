@@ -14,6 +14,7 @@ import { resolveHtmlPath } from './util';
 import initConnector from './backendConnector';
 
 let mainWindow: BrowserWindow | null = null;
+let mainWindowPosition: number[] = [];
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -38,7 +39,15 @@ const setupDevtools = () => {
     mainWindow?.webContents.openDevTools();
   }
 };
-
+const getMainWindowPositions = () => {
+  return mainWindow?.getPosition();
+};
+// this may hlep in the future for changing the recoding window position
+const getMaxmimXandY = () => {
+  const { width, height } = mainWindow?.getBounds() || { width: 0, height: 0 };
+  const [x, y] = mainWindow?.getPosition() || [0, 0];
+  return [x + width, y + height];
+};
 const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
@@ -122,8 +131,10 @@ app
   .then(() => {
     createWindow();
     app.on('activate', () => {
-      if (mainWindow === null) createWindow();
+      if (mainWindow === null) {
+        createWindow();
+      }
     });
   })
-  .then(() => initConnector(setupWindow, setupDevtools))
+  .then(() => initConnector(setupWindow, setupDevtools, getMainWindowPositions))
   .catch(console.log);

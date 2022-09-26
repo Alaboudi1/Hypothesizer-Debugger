@@ -21,8 +21,12 @@ const Recorder: React.FC = (): React.ReactElement => {
     switch (recordState) {
       case 'ideal':
         return (
-          <button onClick={() => recorder('record')} type="button">
-            Record
+          <button
+            onClick={() => recorder('record')}
+            type="button"
+            title="Click record and then reproduce the bug"
+          >
+            REC
           </button>
         );
       case 'record':
