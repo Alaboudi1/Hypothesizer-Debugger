@@ -1,3 +1,5 @@
+const { parentPort, workerData } = require('worker_threads');
+
 const getFileContent = (coverages, files) => {
   const filesContent = [];
   coverages.forEach((coverage) => {
@@ -16,10 +18,7 @@ const getFileContent = (coverages, files) => {
   return filesContent;
 };
 
-const mergeCoverage = (
-  coverageMaps: { turn: string; values: any[] }[],
-  files: any[]
-) => {
+const mergeCoverage = (coverageMaps, files) => {
   const codeCoverageMerge = (value, codeCoverage) => {
     let mergedCoverage;
     if (codeCoverage.length === 0) {
@@ -102,13 +101,7 @@ const cleanCodeCoverage = (coverage, files) => {
       functionsCoverage.set(func.start.source, [getCoverage(func)]);
     }
   });
-  const cleanCodeCoverages: {
-    file: string;
-    functions: any[];
-    timeStamp: number;
-    type: string;
-    bundleId: string;
-  }[] = [];
+  const cleanCodeCoverages = [];
   functionsCoverage.forEach((value, key) => {
     cleanCodeCoverages.push({
       file: key,
@@ -121,7 +114,7 @@ const cleanCodeCoverage = (coverage, files) => {
   return cleanCodeCoverages;
 };
 
-const constrcutTimeLine = (coverages: any[], files: any) => {
+const constrcutTimeLine = (coverages, files) => {
   const data = coverages
     .map((coverage) => {
       if (coverage.type === 'codeCoverage') {
@@ -140,9 +133,9 @@ const constrcutTimeLine = (coverages: any[], files: any) => {
   const turns = [input, output];
   let item = data.find((c) => c.type !== 'codeCoverage');
   let pointer = input.includes(item?.type) ? 0 : 1;
-  const coverageMaps: any[] = [];
+  const coverageMaps = [];
   let index = 0;
-  data.forEach((coverage: any, i: number) => {
+  data.forEach((coverage, i) => {
     let map = coverageMaps[index];
     if (map === undefined) {
       map = {
@@ -174,4 +167,13 @@ const constrcutTimeLine = (coverages: any[], files: any) => {
   };
 };
 
-export default constrcutTimeLine;
+let { coverages, files } = workerData;
+let i = 0;
+coverages = coverages.flat().sort((a, b) => {
+  return a.index - b.index || a.timeStamp - b.timeStamp;
+});
+const result = constrcutTimeLine(coverages, files);
+parentPort.postMessage({
+  result,
+  command: 'finalCoverage',
+});

@@ -32,7 +32,7 @@ const initConnector = (
         // set the x and y position of the window to bottom right
         [x, y] = getMainWindowPositions();
 
-        setupWindow(200, 130, true, 0, 0);
+        setupWindow(70, 125, true, 0, 0);
         await launchBrowser(arg.payload.targetUrl);
       }
       if (arg.command === 'record') {

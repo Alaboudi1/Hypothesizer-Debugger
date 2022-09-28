@@ -1,6 +1,6 @@
 import path from 'path';
 import { Worker } from 'worker_threads';
-import constrcutTimeLine from './coverageCleaning';
+
 const getTotalCoverage = (coverage) =>
   coverage.flatMap((c) => {
     if (c.type !== 'codeCoverage') {
@@ -34,20 +34,29 @@ const getCoverage = (coverage, files, callback) => {
       if (results.length < divs - 1) {
         results.push(message.payload);
       } else {
+        callback('progress', 100);
         results.push(message.payload);
-        const coverages = results.flat().sort((a, b) => {
-          return a.index - b.index || a.timeStamp - b.timeStamp;
-        });
-        const cleanedCode = constrcutTimeLine(coverages, files);
+        callback('preparingFinalCoverage');
+        new Worker(path.join(__dirname, 'coverageCleaning.js'), {
+          workerData: {
+            coverages: results,
+            files,
+          },
+        }).on('message', (message) => {
+          if (message.command === 'finalCoverage') {
+            const linkPath = message.result.filesContent[0].file;
+            const localHypothesesLink = linkPath.split(
+              /node_modules|src|webpack/
+            )[0];
 
-        const linkPath = cleanedCode.filesContent[0].file;
-        const localHypothesesLink = linkPath.split(
-          /node_modules|src|webpack/
-        )[0];
-
-        callback(message.command, {
-          newTrace: cleanedCode,
-          link: `${localHypothesesLink}hypotheses.json`,
+            callback(message.command, {
+              newTrace: message.result,
+              link: `${localHypothesesLink}hypotheses.json`,
+            });
+          }
+          if (message.command === 'progress') {
+            callback(message.command, message.payload);
+          }
         });
       }
     } else if (message.command === 'progress') {
@@ -57,13 +66,11 @@ const getCoverage = (coverage, files, callback) => {
   };
 
   const coverageDivs = devideCoverage(coverage, divs);
-  const workers = coverageDivs.map((coverage, i) => {
+  coverageDivs.map((coverage, i) => {
     return new Worker(path.join(__dirname, 'sourceMapping.js'), {
       workerData: { record: coverage, files, index: i },
-    });
+    }).on('message', workerCallback);
   });
-
-  workers.forEach((worker) => worker.on('message', workerCallback));
 };
 
 export default getCoverage;

@@ -42,12 +42,7 @@ const setupDevtools = () => {
 const getMainWindowPositions = () => {
   return mainWindow?.getPosition();
 };
-// this may hlep in the future for changing the recoding window position
-const getMaxmimXandY = () => {
-  const { width, height } = mainWindow?.getBounds() || { width: 0, height: 0 };
-  const [x, y] = mainWindow?.getPosition() || [0, 0];
-  return [x + width, y + height];
-};
+
 const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 

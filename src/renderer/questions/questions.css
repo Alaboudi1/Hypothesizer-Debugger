@@ -1,0 +1,43 @@
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  flex-direction: row-reverse;
+}
+.buttons > button {
+  margin-left: 10px;
+  background-color: rgb(0, 139, 185);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+}
+.buttons > button:hover {
+  background-color: rgb(0, 119, 165);
+}
+.buttons > button:disabled {
+  background-color: lightgray;
+  cursor: not-allowed;
+}
+.question {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: rgb(255, 255, 255);
+  border: 1px solid rgb(0, 139, 185);
+  border-radius: 5px;
+  padding: 30px;
+  min-width: 500px;
+  max-width: 500px;
+}
+.question > h2 {
+  margin-top: 0px;
+  margin-bottom: 20px;
+}
+.answer > input {
+  margin-right: 10px;
+}
+.answer {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}

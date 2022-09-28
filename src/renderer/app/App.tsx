@@ -3,11 +3,15 @@ import Recorder from '../recorder/Recorder';
 import { sendCommand, subscribeToCommand } from '../frontendConnectors';
 import './App.css';
 import icon from './icon.png';
-import Timeline from 'renderer/timeline/Timelines';
+import Timeline from '../timeline/Timelines';
+import Spinner from '../loading/spinner';
+import Hypotheses from '../hypotheses/hypotheses';
+import Questions from '../questions/questions';
 
 type HypothesizerState =
   | 'start'
   | 'record'
+  | 'questioning'
   | 'analyize'
   | 'hypothesize'
   | 'report';
@@ -20,10 +24,19 @@ const App = (): JSX.Element => {
   const [hypothesizerState, setHypothesizerState] =
     useState<HypothesizerState>('start');
   const [hypotheses, setHypotheses] = useState<any[]>([]);
+  const finalAnswer = useRef<any[]>([]);
+
+  const setFinalAnswers = (answers: any): void => {
+    finalAnswer.current = answers;
+    if (trace.length === 0) {
+      setHypothesizerState('analyize');
+    } else {
+      setHypothesizerState('hypothesize');
+    }
+  };
 
   useEffect(() => {
     subscribeToCommand('finalCoverage', ({ newTrace, link }) => {
-      setHypothesizerState('hypothesize');
       setTrace(newTrace as any[]);
       hypothesesLinks.current.push(link as string);
       sendCommand('hypothesize', {
@@ -32,12 +45,15 @@ const App = (): JSX.Element => {
         files: newTrace.filesContent,
       });
     });
+
+    subscribeToCommand('preparingFinalCoverage', () => {
+      if (finalAnswer.current.length > 0) setHypothesizerState('hypothesize');
+    });
+
     subscribeToCommand('progress', (progress) => {
-      setHypothesizerState('analyize');
       setLoadingMessage(progress as number);
     });
     subscribeToCommand('hypotheses', ((hypotheses) => {
-      setHypothesizerState('report');
       setHypotheses(hypotheses as any[]);
     }) as any);
   }, []);
@@ -64,9 +80,16 @@ const App = (): JSX.Element => {
       case 'record':
         return (
           <div className="recordContainer">
-            <Recorder />
+            <Recorder setHypothesizerState={setHypothesizerState} />
           </div>
         );
+      case 'questioning':
+        return (
+          <div className="questioningContainer">
+            <Questions setFinalAnswers={setFinalAnswers} />
+          </div>
+        );
+
       case 'analyize':
         return (
           <div className="analyizeContainer">
@@ -81,25 +104,27 @@ const App = (): JSX.Element => {
       case 'hypothesize':
         return (
           <div className="hypothesizeContainer">
-            <h2>Hypotheses</h2>
-            <div className="spinner">
-              <div className="spin" />
-              <div className="loading">Hypothesizing</div>
-            </div>
-          </div>
-        );
-      case 'report':
-        return (
-          <div className="reportContainer">
-            <h2>Report</h2>
-            <h4>Generated hypotheses</h4>
-            <div className="hypotheses">
-              {hypotheses.map((hypothesis) => (
-                <div className="hypothesis">
-                  <p>{JSON.stringify(hypothesis)}</p>
-                </div>
-              ))}
-              <Timeline trace={trace} />
+            {/* <div className="reportContainer">
+              <h2>TimeLine</h2>
+              <div className="hypotheses">
+                {trace.length === 0 ? (
+                  <Spinner text="loading" />
+                ) : (
+                  <Timeline
+                    trace={trace.mergedCoverageMaps}
+                    filesContent={trace.filesContent}
+                  />
+                )}
+              </div>
+            </div> */}
+
+            <div className="hypothesesContainer">
+              <h2>Hypotheses</h2>
+              {hypotheses.length === 0 ? (
+                <Spinner text="loading" />
+              ) : (
+                <Hypotheses hypotheses={hypotheses} />
+              )}
             </div>
           </div>
         );
