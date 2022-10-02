@@ -14,7 +14,8 @@ type SetupWindow = (
 const initConnector = (
   setupWindow: SetupWindow,
   setupDevTools: () => void,
-  getMainWindowPositions: () => number[]
+  getMainWindowPositions: () => number[],
+  isDockerRunning: () => boolean
 ) => {
   // let target = undefined;
   let x = 0;
@@ -54,6 +55,9 @@ const initConnector = (
           arg.payload.knowledgeURL,
           send
         );
+      }
+      if (arg.command === 'isDockerRunning') {
+        send('isDockerRunning', isDockerRunning());
       }
     });
   };

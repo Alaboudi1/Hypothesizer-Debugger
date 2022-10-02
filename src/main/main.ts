@@ -10,7 +10,7 @@
  */
 import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
-import { resolveHtmlPath } from './util';
+import { resolveHtmlPath, isDockerRunning } from './util';
 import initConnector from './backendConnector';
 
 let mainWindow: BrowserWindow | null = null;
@@ -131,5 +131,12 @@ app
       }
     });
   })
-  .then(() => initConnector(setupWindow, setupDevtools, getMainWindowPositions))
+  .then(() =>
+    initConnector(
+      setupWindow,
+      setupDevtools,
+      getMainWindowPositions,
+      isDockerRunning
+    )
+  )
   .catch(console.log);

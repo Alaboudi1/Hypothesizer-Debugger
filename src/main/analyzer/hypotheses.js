@@ -105,49 +105,41 @@ const clearFiles = () => {
   const isMac = process.platform === 'darwin';
   const isLinux = process.platform === 'linux';
   const isWindows = process.platform === 'win32';
+  const getPath = (...subPath) => path.join(__dirname, 'src', ...subPath);
   if (isMac || isLinux) {
-    if (fs.existsSync(path.join(__dirname, 'src', 'outputs'))) {
-      execSync(`rm -rf ${path.join(__dirname, 'src', 'outputs')}/*`);
-    } else {
-      execSync(`mkdir ${path.join(__dirname, 'src', 'outputs')}`);
-    }
-    if (fs.existsSync(path.join(__dirname, 'src', 'semgrep_rules'))) {
-      execSync(`rm -rf ${path.join(__dirname, 'src', 'semgrep_rules')}/*`);
-    } else {
-      execSync(`mkdir ${path.join(__dirname, 'src', 'semgrep_rules')}`);
-    }
-    if (fs.existsSync(path.join(__dirname, 'src', 'inputs'))) {
-      execSync(`rm -rf ${path.join(__dirname, 'src', 'inputs')}/*`);
-    } else {
-      execSync(`mkdir ${path.join(__dirname, 'src', 'inputs')}`);
-    }
-    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'API_calls')}`);
-    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'events')}`);
-    execSync(
-      `mkdir ${path.join(__dirname, 'src', 'inputs', 'network_activites')}`
-    );
-    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'code_pattern')}`);
-  } else if (isWindows) {
-    if (fs.existsSync(path.join(__dirname, 'src', 'outputs'))) {
-      execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'outputs')}`);
-    }
-    if (fs.existsSync(path.join(__dirname, 'src', 'semgrep_rules'))) {
-      execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'semgrep_rules')}`);
-    }
-    if (fs.existsSync(path.join(__dirname, 'src', 'inputs'))) {
-      execSync(`rmdir /s /q ${path.join(__dirname, 'src', 'inputs')}`);
-    }
+    if (fs.existsSync(getPath('outputs')))
+      execSync(`rm -rf ${getPath('outputs')}`);
+    execSync(`mkdir ${getPath('outputs')}`);
 
-    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs')}`);
-    execSync(`mkdir ${path.join(__dirname, 'src', 'outputs')}`);
-    // create codeCoverage, UICoverage, networkCoverage folders
-    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'API_calls')}`);
-    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'events')}`);
-    execSync(
-      `mkdir ${path.join(__dirname, 'src', 'inputs', 'network_activites')}`
-    );
-    execSync(`mkdir ${path.join(__dirname, 'src', 'inputs', 'code_pattern')}`);
-    execSync(`mkdir ${path.join(__dirname, 'src', 'semgrep_rules')}`);
+    if (fs.existsSync(getPath('semgrep_rules')))
+      execSync(`rm -rf ${getPath('semgrep_rules')}`);
+    execSync(`mkdir ${getPath('semgrep_rules')}`);
+
+    if (fs.existsSync(getPath('inputs')))
+      execSync(`rm -rf ${getPath('inputs')}`);
+    execSync(`mkdir ${getPath('inputs')}`);
+
+    execSync(`mkdir ${getPath('inputs', 'API_calls')}`);
+    execSync(`mkdir ${getPath('inputs', 'events')}`);
+    execSync(`mkdir ${getPath('inputs', 'network_activites')}`);
+    execSync(`mkdir ${getPath('inputs', 'code_pattern')}`);
+  } else if (isWindows) {
+    if (fs.existsSync(getPath('outputs')))
+      execSync(`rmdir /s /q ${getPath('outputs')}`);
+
+    if (fs.existsSync(getPath('semgrep_rules')))
+      execSync(`rmdir /s /q ${getPath('semgrep_rules')}`);
+
+    if (fs.existsSync(getPath('inputs')))
+      execSync(`rmdir /s /q ${getPath('inputs')}`);
+
+    execSync(`mkdir ${getPath('inputs')}`);
+    execSync(`mkdir ${getPath('outputs')}`);
+    execSync(`mkdir ${getPath('inputs', 'API_calls')}`);
+    execSync(`mkdir ${getPath('inputs', 'events')}`);
+    execSync(`mkdir ${getPath('inputs', 'network_activites')}`);
+    execSync(`mkdir ${getPath('inputs', 'code_pattern')}`);
+    execSync(`mkdir ${getPath('semgrep_rules')}`);
   }
 };
 
@@ -173,7 +165,7 @@ const writeSemgrepRules = (knowledge) => {
     const APICalls = {
       rules: rules.API_calls.map((rule) => {
         return {
-          id: rule.id,
+          id: `${rule.id}-API_calls`,
           message: rule.id,
           languages: ['js'],
           severity: 'WARNING',
@@ -233,15 +225,40 @@ const writeSemgrepRules = (knowledge) => {
       YAML.stringify(network)
     );
     const codePattern = {
-      rules: rules.code_pattern.map((rule) => {
-        return {
-          id: rule.id,
-          patterns: rule.patterns,
-          message: rule.id,
-          languages: ['js'],
-          severity: 'WARNING',
-        };
-      }),
+      rules: [
+        ...rules.code_pattern.map((rule) => {
+          return {
+            id: rule.id,
+            patterns: rule.patterns,
+            message: rule.id,
+            languages: ['js'],
+            severity: 'WARNING',
+          };
+        }),
+        ...rules.API_calls.map((rule) => {
+          return {
+            id: rule.id,
+            patterns: [
+              {
+                'pattern-either': [
+                  {
+                    pattern: `${rule.functionName}\n`,
+                  },
+                  {
+                    pattern: `${rule.functionName}(...)\n`,
+                  },
+                  {
+                    pattern: `$E.${rule.functionName}()\n`,
+                  },
+                ],
+              },
+            ],
+            message: rule.id,
+            languages: ['js'],
+            severity: 'WARNING',
+          };
+        }),
+      ],
     };
     fs.writeFileSync(
       path.join(__dirname, 'src', 'semgrep_rules', 'code_pattern.yml'),
@@ -255,15 +272,14 @@ const writeCoverageFilesToFiles = (files) => {
   const filteredFiles = files.filter(
     ({ file }) => file.includes('src') && !file.includes('node_modules')
   );
-  filteredFiles.forEach((file, i) => {
-    const fileExtension = file.file.split('.').pop();
+  filteredFiles.forEach((file) => {
     fs.writeFileSync(
       path.join(
         __dirname,
         'src',
         'inputs',
         'code_pattern',
-        `coverageFiles${i}.${fileExtension}`
+        file.file.replace(/\//g, '_')
       ),
       file.content
     );
@@ -284,13 +300,11 @@ const readSemgrepOutput = () => {
 };
 
 const getHypotheses = async (coverages, files, knowledgeURL) => {
-  // TODO: fetch from knowledge url and then write to src/semgrep_rules/*.yaml
   const knowledge = await getKnowledge(knowledgeURL);
   clearFiles();
   writeCoverageToFiles(coverages);
   writeCoverageFilesToFiles(files);
   writeSemgrepRules(knowledge);
-  // const knowledge = await getKnowledge(knowledgeURL);
   semgrepAnalysis();
   const semgrepOutput = readSemgrepOutput();
   parentPort.postMessage({

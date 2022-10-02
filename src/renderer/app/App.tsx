@@ -9,6 +9,7 @@ import Hypotheses from '../hypotheses/hypotheses';
 import Questions from '../questions/questions';
 
 type HypothesizerState =
+  | 'notReady'
   | 'start'
   | 'record'
   | 'questioning'
@@ -28,7 +29,7 @@ const App = (): JSX.Element => {
 
   const setFinalAnswers = (answers: any): void => {
     finalAnswer.current = answers;
-    if (trace.length === 0) {
+    if (trace.length === 0 && hypothesizerState === 'questioning') {
       setHypothesizerState('analyize');
     } else {
       setHypothesizerState('hypothesize');
@@ -36,6 +37,7 @@ const App = (): JSX.Element => {
   };
 
   useEffect(() => {
+    sendCommand('isDockerRunning');
     subscribeToCommand('finalCoverage', ({ newTrace, link }) => {
       setTrace(newTrace as any[]);
       hypothesesLinks.current.push(link as string);
@@ -56,10 +58,31 @@ const App = (): JSX.Element => {
     subscribeToCommand('hypotheses', ((hypotheses) => {
       setHypotheses(hypotheses as any[]);
     }) as any);
+    subscribeToCommand('isDockerRunning', (isDockerRunning) => {
+      if (!isDockerRunning) {
+        setHypothesizerState('notReady');
+      } else {
+        setHypothesizerState('start');
+      }
+    });
   }, []);
 
   const getMainContainer = (): JSX.Element => {
     switch (hypothesizerState) {
+      case 'notReady':
+        return (
+          <div className="notReady">
+            <h1>⚠️ Sorry, Docker is not running on your machine!</h1>
+            <p>
+              Please install Docker and run the Docker desktop app before
+              retrying. for more information please visit:
+              <a href="https://docs.docker.com/get-docker/" target="_blank">
+                https://docs.docker.com/get-docker/
+              </a>
+            </p>
+          </div>
+        );
+
       case 'start':
         return (
           <div className="startContainer">

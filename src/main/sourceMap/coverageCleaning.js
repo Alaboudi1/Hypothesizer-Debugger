@@ -67,11 +67,9 @@ const mergeCoverage = (coverageMaps, files) => {
         codeCoverage = codeCoverageMerge(value, codeCoverage);
       }
       if (['mutation', 'click', 'keydown'].includes(value.type)) {
-        // UICoverageMerge(value, UICoverage);
         UICoverage.push(value);
       }
       if (['responseReceived', 'requestWillBeSent'].includes(value.type)) {
-        // networkCoverageMerge(value, networkCoverage);
         networkCoverage.push(value);
       }
       return value;

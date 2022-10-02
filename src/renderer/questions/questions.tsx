@@ -4,30 +4,30 @@ import './questions.css';
 
 const questions = [
   {
-    question: 'What is the bug?',
+    question: 'Choose one of thes below options to describe the bug:',
     answers: [
       {
-        answer: 'The bug is that the button is not clickable',
+        answer: 'The bug causes the program to crash.',
       },
       {
-        answer: 'The bug is that the button is not visible',
+        answer: 'The bug causes the program to render the UI incorrectly.',
       },
       {
-        answer: 'The bug is that the button is not working',
+        answer: 'The bug causes the program to not respond to user input.',
       },
     ],
   },
   {
-    question: 'What is the expected behavior?',
+    question: 'What is the incorrect about UI?',
     answers: [
       {
-        answer: 'The button should be clickable',
+        answer: 'The style of the UI is incorrect.',
       },
       {
-        answer: 'The button should be visible',
+        answer: 'The content of the UI is incorrect.',
       },
       {
-        answer: 'The button should be working',
+        answer: 'Both the style and the content of the UI are incorrect.',
       },
     ],
   },

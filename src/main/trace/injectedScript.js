@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-restricted-syntax */
 const init = () => {
   document.body.focus();
   const saveEvents = (events) => {
@@ -6,7 +8,18 @@ const init = () => {
   };
 
   const getDataForClick = (event, type, timeStamp = Date.now()) => {
+    // search for reactFiber
+    let reactFiber = { _debugSource: undefined };
+
+    for (const [key, value] of Object.entries(event.target)) {
+      if (key.startsWith('__reactFiber$')) {
+        reactFiber = value;
+        break;
+      }
+    }
+
     const data = {
+      jsx: reactFiber._debugSource,
       target: event.target.tagName,
       InputType: event.target.type,
       type,
