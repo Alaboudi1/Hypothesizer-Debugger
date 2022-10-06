@@ -24,18 +24,26 @@ const Hypotheses: React.FC<any> = ({ hypotheses }): JSX.Element => {
         <ul>
           <li>
             <div className="success">
-              A relvent event has been triggered
+              Relvent <i>Submit</i> event(s) have been triggered
               <span className="info">
                 A submit event is an event that get trigger from a form to send
                 the data to the server.
               </span>
             </div>
             <div className="code">
+              <small>
+                Location: <i>src/components/Search.tsx Line: 22</i>{' '}
+              </small>
               <CodeEditor
                 value={`
-                    <div>
-                      <h1>hello world</h1>
-                    </div>
+                  <form onSubmit={callSearchFunction}>
+                      <input
+                        className="searchInput"
+                        value={searchValue}
+                        onChange={handleSearchInputChanges}
+                        type="text"
+                        placeholder="Search for a movie..."
+                      />
                     `}
                 language="jsx"
                 contentEditable={false}
@@ -44,32 +52,20 @@ const Hypotheses: React.FC<any> = ({ hypotheses }): JSX.Element => {
           </li>
           <li>
             <div className="success">
-              A relvent code has been found
+              Relvent network request(s) / response(s) have been made
               <span className="info">
-                info here about the warning status. Lorem ipsum dolor sit amet,
-                consectetur adipiscing elit. Cras imperdiet eros eu nisl maximus
-                auctor. Aenean tempus ornare urna ultricies lacinia. Duis
-                laoreet pharetra lectus eu maximus. Fusce ut ante convallis,
-                placerat risus in, molestie diam. Nam vitae mollis massa, nec
-                commodo purus
+                There were network activites that might have cuased the entire
+                page to reload.
               </span>
             </div>
-            <div className="code">
-              <CodeEditor
-                value={`
-                    <div>
-                      <h1>hello world</h1>
-                    </div>
-                    `}
-                language="jsx"
-                contentEditable={false}
-              />
-            </div>
           </li>
           <li>
             <div className="success">
-              A relvent network request has been sent
-              <span className="status">succeeded</span>
+              A relvent API useage (preventDefault) was missing.
+              <span className="info">
+                You did not use the preventDefault API call on the submit event
+                handler to prevent the default behavior of the submit event.
+              </span>
             </div>
           </li>
         </ul>

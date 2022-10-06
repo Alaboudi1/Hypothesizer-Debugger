@@ -328,6 +328,7 @@ const groupedEventsOnRule = (evidence) =>
 const extractEventsEvidence = (events, filesMap, coverages, knowledgeMap) => {
   const evidence = events.data.map((event) => {
     const { data, file, rule } = event;
+    data[data.length - 1][1] = data[data.length - 1][1].replace(/['",]/g, '');
     const found = JSON.parse(data.map((e) => e[1]).join(' '));
     // find the rule in the knowledge base
     const ruleInKB = knowledgeMap
@@ -370,6 +371,8 @@ const extractAPICallsEvidence = (
   };
   const evidence = APICalls.data.map((APICall) => {
     const { data, file, rule } = APICall;
+    data[data.length - 1][1] = data[data.length - 1][1].replace(/['",]/g, '');
+
     const apiCall = data
       .map((e) => e[1])
       .join(' ')
@@ -411,8 +414,50 @@ const extractAPICallsEvidence = (
 const extractCodePatternEvidence = (codePattern, filesMap, coverages) => {
   return undefined;
 };
-const extractNetworkEvidence = (network, filesMap, coverages) => {
-  return undefined;
+const extractNetworkEvidence = (
+  network_activites,
+  filesMap,
+  coverages,
+  knowledgeMap
+) => {
+  const evidence = network_activites.data.map((network_activite) => {
+    const { data, file, rule } = network_activite;
+    data[data.length - 1][1] = data[data.length - 1][1].replace(/['",]/g, '');
+    const found = JSON.parse(data.map((e) => e[1]).join(' '));
+    // find the rule in the knowledge base
+    const ruleInKB = knowledgeMap
+      .map(({ checks }) =>
+        checks.network_activites.find((item) => item.id === rule)
+      )
+      .pop();
+    // find the file in the coverage
+    const network_activitesInCoverage = coverages
+      .map((item) => item.values.networkCoverage.find((e) => e.ID === found.ID))
+      .filter(Boolean);
+    let assoisatedRequestsForResponses = [];
+    if (network_activitesInCoverage.length > 0) {
+      const responseReceived = network_activitesInCoverage.filter(
+        (e) => e.type === 'responseReceived'
+      );
+      // get the request of that response
+      assoisatedRequestsForResponses = coverages.map((item) =>
+        item.values.networkCoverage.filter(
+          (e) =>
+            e.type === '"requestWillBeSent"' &&
+            responseReceived.find((r) => r.requestId === e.requestId)
+        )
+      );
+    }
+
+    return {
+      evidance: {
+        network_activites: network_activitesInCoverage,
+        assoisatedRequestsForResponses,
+      },
+      rule: ruleInKB,
+    };
+  });
+  return evidence;
 };
 
 const hypothesize = (coverages, semgrepOutput, files, knowledge) => {
@@ -428,22 +473,24 @@ const hypothesize = (coverages, semgrepOutput, files, knowledge) => {
     coverages,
     knowledgeMap
   );
-  const networkEvidence = extractNetworkEvidence(
-    network_activites,
-    filesMap,
-    coverages,
-    knowledgeMap
-  );
-  const codePatternEvidence = extractCodePatternEvidence(
-    code_pattern,
-    filesMap,
-    coverages
-  );
+
   const APIcallsEvidence = extractAPICallsEvidence(
     API_calls,
     filesMap,
     coverages,
     code_pattern,
+    knowledgeMap
+  );
+  const codePatternEvidence = extractCodePatternEvidence(
+    code_pattern,
+    filesMap,
+    coverages,
+    knowledgeMap
+  );
+  const networkEvidence = extractNetworkEvidence(
+    network_activites,
+    filesMap,
+    coverages,
     knowledgeMap
   );
 
