@@ -22,5 +22,8 @@ const subscribeToCommand = (
     subscribers.get(command)?.push(callback);
   }
 };
+const removeAllListeners = () => {
+  subscribers.clear();
+};
 
-export { initConnector, sendCommand, subscribeToCommand };
+export { initConnector, sendCommand, subscribeToCommand, removeAllListeners };

@@ -4,7 +4,7 @@ import { sendCommand } from '../frontendConnectors';
 
 type RecordState = 'ideal' | 'record' | 'collect';
 
-const Recorder: React.FC = ({ setHypothesizerState }): React.ReactElement => {
+const Recorder: React.FC = ({ nextHypothesizerState }): React.ReactElement => {
   const [recordState, setRecordingState] = React.useState<RecordState>('ideal');
 
   const recorder = async (newRecordState: RecordState): Promise<void> => {
@@ -14,7 +14,7 @@ const Recorder: React.FC = ({ setHypothesizerState }): React.ReactElement => {
     } else if (newRecordState === 'collect') {
       setRecordingState(newRecordState);
       sendCommand('stopRecording');
-      setHypothesizerState('questioning');
+      nextHypothesizerState();
     }
   };
 

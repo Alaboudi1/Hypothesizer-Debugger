@@ -166,7 +166,6 @@ const constrcutTimeLine = (coverages, files) => {
 };
 
 let { coverages, files } = workerData;
-let i = 0;
 coverages = coverages.flat().sort((a, b) => {
   return a.index - b.index || a.timeStamp - b.timeStamp;
 });

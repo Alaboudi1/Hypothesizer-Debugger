@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { parentPort, workerData } = require('worker_threads');
 const YAML = require('yaml');
+const { get } = require('http');
 
 const getKnowledgeFromURL = async (url) => {
   const response = await axios.get(url);
@@ -38,22 +39,24 @@ const writeCoverageToFiles = (data) => {
       };
     });
     const UICoverage = item.values.UICoverage.map((coverage) => {
-      const { InputType, target, type, keyPressed } = coverage;
+      const { InputType, target, type, keyPressed, ID } = coverage;
       return {
         InputType,
         target,
         type,
         keyPressed,
+        ID,
       };
     });
     const networkCoverage = item.values.networkCoverage.map((coverage) => {
-      const { metnod, type, url, mimeType, data } = coverage;
+      const { metnod, type, url, mimeType, data, ID } = coverage;
       return {
         metnod,
         type,
         url,
         mimeType,
         data,
+        ID,
       };
     });
     return {
@@ -64,7 +67,6 @@ const writeCoverageToFiles = (data) => {
   });
 
   coverage.forEach((item, i) => {
-    // fomat the json
     if (item.codeCoverage.length > 0) {
       const codeCoverage = JSON.stringify(item.codeCoverage, null, 2);
       fs.writeFileSync(
@@ -279,14 +281,13 @@ const writeCoverageFilesToFiles = (files) => {
         'src',
         'inputs',
         'code_pattern',
-        file.file.replace(/\//g, '_')
+        file.file.replace(/\//g, '=')
       ),
       file.content
     );
   });
 };
 
-// read all files in src/outputs and then save it to a json file
 const readSemgrepOutput = () => {
   const files = fs.readdirSync(path.join(__dirname, 'src', 'outputs'));
   const semgrepOutput = files.map((file) => {
@@ -294,9 +295,164 @@ const readSemgrepOutput = () => {
       path.join(__dirname, 'src', 'outputs', file),
       'utf8'
     );
-    return { file, data };
+    const result = {
+      type: file.replace('.txt', ''),
+      data: data
+        .split('inputs')
+        .splice(1)
+        .map((item) => {
+          return {
+            rule: item.split('\n')[2].trim(),
+            file: item.split('\n')[0].trim(),
+            data: item
+              .split('\n\n')[1]
+              .split('\n')
+              .map((e) => e.trim().split('┆')),
+          };
+        }),
+    };
+    return result;
   });
+
   return semgrepOutput;
+};
+const groupedEventsOnRule = (evidence) =>
+  evidence.reduce((acc, item) => {
+    const { rule } = item;
+    if (!acc[rule.id]) {
+      acc[rule.id] = [];
+    }
+    acc[rule.id].push(item);
+    return acc;
+  }, {});
+const extractEventsEvidence = (events, filesMap, coverages, knowledgeMap) => {
+  const evidence = events.data.map((event) => {
+    const { data, file, rule } = event;
+    const found = JSON.parse(data.map((e) => e[1]).join(' '));
+    // find the rule in the knowledge base
+    const ruleInKB = knowledgeMap
+      .map(({ checks }) => checks.events.find((item) => item.id === rule))
+      .pop();
+    // find the file in the coverage
+    const eventsInCoverage = coverages
+      .map((item) => item.values.UICoverage.find((e) => e.ID === found.ID))
+      .filter(Boolean);
+
+    return {
+      evidance: eventsInCoverage.map((e) => {
+        return {
+          ...e,
+          jsx: {
+            fileContent: {
+              content: filesMap[e.jsx.fileName],
+              file: e.jsx.fileName,
+            },
+            lineNumber: e.jsx.lineNumber,
+          },
+        };
+      }),
+      rule: ruleInKB,
+    };
+  });
+  return groupedEventsOnRule(evidence);
+};
+const extractAPICallsEvidence = (
+  APICalls,
+  filesMap,
+  coverages,
+  code_pattern,
+  knowledgeMap
+) => {
+  const getOriginalPath = (file) => {
+    const convertedPath = file.split('/code_pattern/')[1].split('=');
+    const OriginalPath = path.join('~', ...convertedPath).substr(1);
+    return OriginalPath;
+  };
+  const evidence = APICalls.data.map((APICall) => {
+    const { data, file, rule } = APICall;
+    const apiCall = data
+      .map((e) => e[1])
+      .join(' ')
+      .replace(/['",]/g, '')
+      .trim();
+    const instances = code_pattern.data.filter((code) => code.rule === rule);
+    const ruleInKB = knowledgeMap
+      .map(({ checks }) => checks.API_calls.find((item) => item.id === rule))
+      .pop();
+    const originalFiles = JSON.parse(
+      fs.readFileSync(path.join(__dirname, 'src', 'inputs', file), 'utf8')
+    ).filter((item) => item.functionsCoverage.indexOf(apiCall) > -1);
+    const fileContent = instances.map((instance) => {
+      const OriginalPath = getOriginalPath(instance.file);
+      const content = filesMap[OriginalPath];
+      return {
+        file: OriginalPath,
+        content,
+      };
+    });
+
+    return {
+      evidance: {
+        originalFiles: originalFiles.map((item) => item.file),
+        instances: instances.map((instance) => {
+          const OriginalPath = getOriginalPath(instance.file);
+          return {
+            fileContent: fileContent.find((item) => item.file === OriginalPath),
+            lineNumber: instance.data.map((e) => e[0]),
+            code: instance.data.map((e) => e[1]),
+          };
+        }),
+      },
+      rule: ruleInKB,
+    };
+  });
+  return groupedEventsOnRule(evidence);
+};
+const extractCodePatternEvidence = (codePattern, filesMap, coverages) => {
+  return undefined;
+};
+const extractNetworkEvidence = (network, filesMap, coverages) => {
+  return undefined;
+};
+
+const hypothesize = (coverages, semgrepOutput, files, knowledge) => {
+  const filesMap = files.reduce((acc, file) => {
+    acc[file.file] = file.content;
+    return acc;
+  }, {});
+  const knowledgeMap = knowledge.map((item) => JSON.parse(item));
+  const [API_calls, code_pattern, events, network_activites] = semgrepOutput;
+  const eventsEvidence = extractEventsEvidence(
+    events,
+    filesMap,
+    coverages,
+    knowledgeMap
+  );
+  const networkEvidence = extractNetworkEvidence(
+    network_activites,
+    filesMap,
+    coverages,
+    knowledgeMap
+  );
+  const codePatternEvidence = extractCodePatternEvidence(
+    code_pattern,
+    filesMap,
+    coverages
+  );
+  const APIcallsEvidence = extractAPICallsEvidence(
+    API_calls,
+    filesMap,
+    coverages,
+    code_pattern,
+    knowledgeMap
+  );
+
+  return {
+    eventsEvidence,
+    networkEvidence,
+    codePatternEvidence,
+    APIcallsEvidence,
+  };
 };
 
 const getHypotheses = async (coverages, files, knowledgeURL) => {
@@ -307,6 +463,7 @@ const getHypotheses = async (coverages, files, knowledgeURL) => {
   writeSemgrepRules(knowledge);
   semgrepAnalysis();
   const semgrepOutput = readSemgrepOutput();
+  const hypotheses = hypothesize(coverages, semgrepOutput, files, knowledge);
   parentPort.postMessage({
     command: 'hypotheses',
     payload: semgrepOutput,

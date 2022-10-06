@@ -1,9 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import Recorder from '../recorder/Recorder';
-import { sendCommand, subscribeToCommand } from '../frontendConnectors';
+import {
+  sendCommand,
+  subscribeToCommand,
+  removeAllListeners,
+} from '../frontendConnectors';
 import './App.css';
 import icon from './icon.png';
-import Timeline from '../timeline/Timelines';
 import Spinner from '../loading/spinner';
 import Hypotheses from '../hypotheses/hypotheses';
 import Questions from '../questions/questions';
@@ -12,34 +15,32 @@ type HypothesizerState =
   | 'notReady'
   | 'start'
   | 'record'
-  | 'questioning'
+  | 'question'
   | 'analyize'
   | 'hypothesize'
   | 'report';
 
 const App = (): JSX.Element => {
-  const [trace, setTrace] = useState<any[]>([]);
-  const [loadingMessage, setLoadingMessage] = useState<number>(0);
-  const hypothesesLinks = useRef<string[]>([]);
-  const [targetUrl, setTargetUrl] = useState<string>('http://localhost:3000');
   const [hypothesizerState, setHypothesizerState] =
     useState<HypothesizerState>('start');
-  const [hypotheses, setHypotheses] = useState<any[]>([]);
+  const [loadingMessage, setLoadingMessage] = useState<number>(0);
+
+  const trace = useRef<any[]>([]);
+  const hypothesesLinks = useRef<string[]>([]);
+  const targetUrl = useRef<string>('http://localhost:3000');
+  const hypotheses = useRef<any[]>([]);
   const finalAnswer = useRef<any[]>([]);
+  const nextHypothesizerState = useRef<HypothesizerState>('analyize');
 
   const setFinalAnswers = (answers: any): void => {
     finalAnswer.current = answers;
-    if (trace.length === 0 && hypothesizerState === 'questioning') {
-      setHypothesizerState('analyize');
-    } else {
-      setHypothesizerState('hypothesize');
-    }
+    setHypothesizerState(nextHypothesizerState.current);
   };
 
   useEffect(() => {
     sendCommand('isDockerRunning');
     subscribeToCommand('finalCoverage', ({ newTrace, link }) => {
-      setTrace(newTrace as any[]);
+      trace.current = newTrace;
       hypothesesLinks.current.push(link as string);
       sendCommand('hypothesize', {
         coverages: newTrace.mergedCoverageMaps,
@@ -49,23 +50,31 @@ const App = (): JSX.Element => {
     });
 
     subscribeToCommand('preparingFinalCoverage', () => {
-      if (finalAnswer.current.length > 0) setHypothesizerState('hypothesize');
+      if (hypothesizerState === 'question') {
+        nextHypothesizerState.current = 'hypothesize';
+      } else {
+        setHypothesizerState('hypothesize');
+      }
     });
 
     subscribeToCommand('progress', (progress) => {
       setLoadingMessage(progress as number);
     });
     subscribeToCommand('hypotheses', ((hypotheses) => {
-      setHypotheses(hypotheses as any[]);
+      hypotheses.current = hypotheses;
+      if (hypothesizerState === 'question') {
+        nextHypothesizerState.current = 'report';
+      } else {
+        setHypothesizerState('report');
+      }
     }) as any);
     subscribeToCommand('isDockerRunning', (isDockerRunning) => {
       if (!isDockerRunning) {
         setHypothesizerState('notReady');
-      } else {
-        setHypothesizerState('start');
       }
     });
-  }, []);
+    return () => removeAllListeners();
+  }, [hypothesizerState]);
 
   const getMainContainer = (): JSX.Element => {
     switch (hypothesizerState) {
@@ -92,7 +101,7 @@ const App = (): JSX.Element => {
             <button
               type="button"
               onClick={() => {
-                sendCommand('launch', { targetUrl });
+                sendCommand('launch', { targetUrl: targetUrl.current });
                 setHypothesizerState('record');
               }}
             >
@@ -103,10 +112,12 @@ const App = (): JSX.Element => {
       case 'record':
         return (
           <div className="recordContainer">
-            <Recorder setHypothesizerState={setHypothesizerState} />
+            <Recorder
+              nextHypothesizerState={() => setHypothesizerState('question')}
+            />
           </div>
         );
-      case 'questioning':
+      case 'question':
         return (
           <div className="questioningContainer">
             <Questions setFinalAnswers={setFinalAnswers} />
@@ -127,28 +138,16 @@ const App = (): JSX.Element => {
       case 'hypothesize':
         return (
           <div className="hypothesizeContainer">
-            {/* <div className="reportContainer">
-              <h2>TimeLine</h2>
-              <div className="hypotheses">
-                {trace.length === 0 ? (
-                  <Spinner text="loading" />
-                ) : (
-                  <Timeline
-                    trace={trace.mergedCoverageMaps}
-                    filesContent={trace.filesContent}
-                  />
-                )}
-              </div>
-            </div> */}
-
             <div className="hypothesesContainer">
-              <h2>Hypotheses</h2>
-              {hypotheses.length === 0 ? (
-                <Spinner text="loading" />
-              ) : (
-                <Hypotheses hypotheses={hypotheses} />
-              )}
+              <h2>Hypothesizing</h2>
+              <Spinner text="loading" />
             </div>
+          </div>
+        );
+      case 'report':
+        return (
+          <div className="reportContainer">
+            <Hypotheses hypotheses={hypotheses} />
           </div>
         );
       default:
@@ -171,9 +170,9 @@ const App = (): JSX.Element => {
         </button>
         {/* <input
           type="text"
-          value={targetUrl}
+          value={targetUrl.current}
           onChange={(e) => {
-            setTargetUrl(e.target.value);
+            targetUrl.current = e.target.value;
           }}
           title="url"
         /> */}

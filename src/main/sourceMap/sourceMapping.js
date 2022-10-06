@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 const { parentPort, workerData } = require('worker_threads');
 const { SourceMapConsumer } = require('source-map');
 
@@ -37,6 +38,7 @@ const getCoverages = (record, files, index) => {
       return {
         ...item,
         index,
+        ID: `${index}-${Math.random()}`,
       };
     }
 
@@ -85,27 +87,55 @@ const getCoverages = (record, files, index) => {
         timeStamp: item.timeStamp,
         type: 'codeCoverage',
         index,
+        ID: `${index}-${Math.random()}`,
       };
     });
     const coverages = await Promise.all(parsedCodeCoverage);
-
     return coverages;
   });
 
   return Promise.all(coverage);
 };
 
-const payload = getCoverages(
-  workerData.record,
-  workerData.files,
-  workerData.index
-)
+const getNetworkCallStack = async (payload, files) => {
+  const result = payload.map(async (item) => {
+    if (item.type === 'requestWillBeSent' && item.stack !== undefined) {
+      return {
+        ...item,
+        stack: {
+          callFrames: await Promise.all(
+            item.stack.callFrames.map(async (frame) => {
+              const { functionName, scriptId, url, lineNumber } = frame;
+              const { content, map } = files.find(
+                (file) => file.scriptId === scriptId
+              );
+              const consumer = await initMapConsumer(map);
+              const { start } = getTraceMap(consumer, lineNumber, lineNumber);
+              destroyMapConsumer(consumer);
+              return {
+                functionName,
+                lineNumber: start.line,
+                file: start.source,
+              };
+            })
+          ),
+        },
+      };
+    }
+    return item;
+  });
+  const finalPayload = await Promise.all(result);
+  return finalPayload;
+};
+
+getCoverages(workerData.record, workerData.files, workerData.index)
+  .then((result) => getNetworkCallStack(result.flat(), workerData.files))
   .then((payload) =>
     parentPort.postMessage({
       command: 'finalCoverage',
-      payload: payload.flat(),
+      payload,
     })
   )
   .catch((err) => {
-    console.log(err);
+    throw err;
   });
