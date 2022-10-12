@@ -11,73 +11,63 @@ import Spinner from '../loading/spinner';
 import Hypotheses from '../hypotheses/hypotheses';
 import Questions from '../questions/questions';
 
-type HypothesizerState =
-  | 'notReady'
-  | 'start'
-  | 'record'
-  | 'question'
-  | 'analyize'
-  | 'hypothesize'
-  | 'report';
-
 const App = (): JSX.Element => {
-  const [hypothesizerState, setHypothesizerState] =
-    useState<HypothesizerState>('start');
-  const [loadingMessage, setLoadingMessage] = useState<number>(0);
-
-  const trace = useRef<any[]>([]);
-  const hypothesesLinks = useRef<string[]>([]);
+  const [unfiltredHypotheses, setUnfiltredHypotheses] = useState<any[]>([]);
   const targetUrl = useRef<string>('http://localhost:3000');
-  const hypotheses = useRef<any[]>([]);
-  const finalAnswer = useRef<any[]>([]);
-  const nextHypothesizerState = useRef<HypothesizerState>('analyize');
-
-  const setFinalAnswers = (answers: any): void => {
-    finalAnswer.current = answers;
-    setHypothesizerState(nextHypothesizerState.current);
-  };
+  const [userAnswers, setUserAnswers] = useState<any[]>([]);
+  const [recordState, setRecordState] = useState<string>('ready');
 
   useEffect(() => {
     sendCommand('isDockerRunning');
-    subscribeToCommand('finalCoverage', ({ newTrace, link }) => {
-      trace.current = newTrace;
-      hypothesesLinks.current.push(link as string);
-      sendCommand('hypothesize', {
-        coverages: newTrace.mergedCoverageMaps,
-        knowledgeURL: hypothesesLinks.current,
-        files: newTrace.filesContent,
-      });
-    });
-
-    subscribeToCommand('preparingFinalCoverage', () => {
-      if (hypothesizerState === 'question') {
-        nextHypothesizerState.current = 'hypothesize';
-      } else {
-        setHypothesizerState('hypothesize');
-      }
-    });
-
-    subscribeToCommand('progress', (progress) => {
-      setLoadingMessage(progress as number);
-    });
-    subscribeToCommand('hypotheses', ((hypotheses) => {
-      hypotheses.current = hypotheses;
-      if (hypothesizerState === 'question') {
-        nextHypothesizerState.current = 'report';
-      } else {
-        setHypothesizerState('report');
-      }
-    }) as any);
     subscribeToCommand('isDockerRunning', (isDockerRunning) => {
       if (!isDockerRunning) {
-        setHypothesizerState('notReady');
+        setRecordState('notReady');
       }
+      subscribeToCommand('hypotheses', (hypotheses) => {
+        setUnfiltredHypotheses(hypotheses);
+      });
     });
     return () => removeAllListeners();
-  }, [hypothesizerState]);
+  }, [recordState, unfiltredHypotheses]);
+
+  const getPotintialHypotheses = () => {
+    return unfiltredHypotheses
+      .filter((hypothesis) => hypothesis.score > 0.5)
+      .filter((hypothesis) => {
+        const { related_defect } = hypothesis;
+        return (
+          userAnswers[0].answer.includes(related_defect.type) &&
+          userAnswers[1].answer.includes(related_defect.incorrectOutput)
+        );
+      })
+      .sort((a, b) => a.score - b.score);
+  };
+
+  const getAnalysisAndHypothesesUI = (): JSX.Element => {
+    if (userAnswers.length === 0) {
+      return (
+        <div className="questioningContainer">
+          <Questions setFinalAnswers={setUserAnswers} />
+        </div>
+      );
+    }
+    if (unfiltredHypotheses.length === 0) {
+      return (
+        <div className="hypothesesContainer">
+          <Spinner text="loading" />
+        </div>
+      );
+    }
+    const potentialHypotheses = getPotintialHypotheses();
+    return (
+      <div className="reportContainer">
+        <Hypotheses hypotheses={potentialHypotheses} />
+      </div>
+    );
+  };
 
   const getMainContainer = (): JSX.Element => {
-    switch (hypothesizerState) {
+    switch (recordState) {
       case 'notReady':
         return (
           <div className="notReady">
@@ -85,14 +75,18 @@ const App = (): JSX.Element => {
             <p>
               Please install Docker and run the Docker desktop app before
               retrying. for more information please visit:
-              <a href="https://docs.docker.com/get-docker/" target="_blank">
+              <a
+                href="https://docs.docker.com/get-docker/"
+                target="_blank"
+                rel="noreferrer"
+              >
                 https://docs.docker.com/get-docker/
               </a>
             </p>
           </div>
         );
 
-      case 'start':
+      case 'ready':
         return (
           <div className="startContainer">
             <img src={icon} alt="icon" />
@@ -102,7 +96,7 @@ const App = (): JSX.Element => {
               type="button"
               onClick={() => {
                 sendCommand('launch', { targetUrl: targetUrl.current });
-                setHypothesizerState('record');
+                setRecordState('record');
               }}
             >
               Start
@@ -112,44 +106,11 @@ const App = (): JSX.Element => {
       case 'record':
         return (
           <div className="recordContainer">
-            <Recorder
-              nextHypothesizerState={() => setHypothesizerState('question')}
-            />
+            <Recorder nextHypothesizerState={() => setRecordState('done')} />
           </div>
         );
-      case 'question':
-        return (
-          <div className="questioningContainer">
-            <Questions setFinalAnswers={setFinalAnswers} />
-          </div>
-        );
-
-      case 'analyize':
-        return (
-          <div className="analyizeContainer">
-            <h2>Analyzing</h2>
-            <h4>Collecting coverage</h4>
-            <div className="loading">
-              <progress value={loadingMessage} max="100" />
-              <p>{loadingMessage}%</p>
-            </div>
-          </div>
-        );
-      case 'hypothesize':
-        return (
-          <div className="hypothesizeContainer">
-            <div className="hypothesesContainer">
-              <h2>Hypothesizing</h2>
-              <Spinner text="loading" />
-            </div>
-          </div>
-        );
-      case 'report':
-        return (
-          <div className="reportContainer">
-            <Hypotheses hypotheses={hypotheses} />
-          </div>
-        );
+      case 'done':
+        return getAnalysisAndHypothesesUI();
       default:
         return <></>;
     }

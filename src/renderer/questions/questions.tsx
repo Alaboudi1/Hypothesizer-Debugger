@@ -13,7 +13,8 @@ const questions = [
         answer: 'The bug causes the program to render the UI incorrectly.',
       },
       {
-        answer: 'The bug causes the program to not respond to user input.',
+        answer:
+          'The bug causes the program to not respond to  clicking or typing.',
       },
     ],
   },

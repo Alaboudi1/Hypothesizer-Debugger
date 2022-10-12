@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { record, stopRecording, launchBrowser } from './trace/mainTrace';
-import getHypotheses from './analyzer/mainAnalyzer';
+import { getEvidance, getHypotheses } from './analyzer/mainAnalyzer';
 import getCoverage from './sourceMap/mainSourceMap';
 
 type SetupWindow = (
@@ -22,11 +22,31 @@ const initConnector = (
   let y = 0;
   const setuplisteners = () => {
     ipcMain.on('CDP', async (event, arg) => {
-      const send = (channel: string, args: any) => {
+      const notifyFrontend = (channel: string, args: any) => {
         event.sender.send('CDP', {
           command: channel,
           payload: args,
         });
+      };
+      const setBackendState = ({ payload, step }) => {
+        switch (step) {
+          case 'trace':
+            getEvidance(
+              payload.trace.mergedCoverageMaps,
+              payload.trace.filesContent,
+              [payload.linkToKnowledge],
+              setBackendState
+            );
+            break;
+          case 'evidance':
+            getHypotheses(payload.evidance, payload.knowledge, setBackendState);
+            break;
+          case 'hypotheses':
+            notifyFrontend('hypotheses', payload);
+            break;
+          default:
+            throw new Error('Unknown step');
+        }
       };
 
       if (arg.command === 'launch') {
@@ -40,24 +60,17 @@ const initConnector = (
         await record();
       }
       if (arg.command === 'stopRecording') {
-        send('progress', 0);
+        notifyFrontend('progress', 0);
         const { coverage, files } = await stopRecording();
         setupWindow(1024, 728, false, x, y);
-        getCoverage(coverage, files, send);
+        getCoverage(coverage, files, setBackendState);
       }
       if (arg.command === 'openDevTools') {
         setupDevTools();
       }
-      if (arg.command === 'hypothesize') {
-        getHypotheses(
-          arg.payload.coverages,
-          arg.payload.files,
-          arg.payload.knowledgeURL,
-          send
-        );
-      }
+
       if (arg.command === 'isDockerRunning') {
-        send('isDockerRunning', isDockerRunning());
+        notifyFrontend('isDockerRunning', isDockerRunning());
       }
     });
   };
@@ -66,3 +79,6 @@ const initConnector = (
 };
 
 export default initConnector;
+function send(arg0: string, arg1: number) {
+  throw new Error('Function not implemented.');
+}

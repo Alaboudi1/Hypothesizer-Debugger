@@ -1,8 +1,8 @@
 import path from 'path';
 import { Worker } from 'worker_threads';
 
-const getHypotheses = (coverages, files, knowledgeURL, callback) => {
-  const worker = new Worker(path.join(__dirname, 'hypotheses.js'), {
+const getEvidance = (coverages, files, knowledgeURL, callback) => {
+  const worker = new Worker(path.join(__dirname, 'analizingEvidance.js'), {
     workerData: {
       coverages,
       files,
@@ -11,10 +11,21 @@ const getHypotheses = (coverages, files, knowledgeURL, callback) => {
   });
 
   worker.on('message', (message) => {
-    if (message.command === 'hypotheses') {
-      callback(message.command, message.payload);
-    }
+    callback({ payload: message, step: 'evidance' });
   });
 };
 
-export default getHypotheses;
+const getHypotheses = (gatheredEvidence, knowledgeMap, callback) => {
+  const worker = new Worker(path.join(__dirname, 'reasoningAboutEvidance.js'), {
+    workerData: {
+      gatheredEvidence,
+      knowledgeMap,
+    },
+  });
+
+  worker.on('message', (message) =>
+    callback({ payload: message, step: 'hypotheses' })
+  );
+};
+
+export { getEvidance, getHypotheses };

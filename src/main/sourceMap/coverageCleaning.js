@@ -30,7 +30,6 @@ const mergeCoverage = (coverageMaps, files) => {
           found = true;
           return {
             ...c,
-            // compine functions with same functionName
             timeStamp: [c.timeStamp, value.timeStamp].flat(),
             functions: [...value.functions, ...c.functions].reduce(
               (acc, cur) => {

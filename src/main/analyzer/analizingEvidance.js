@@ -4,7 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const { parentPort, workerData } = require('worker_threads');
 const YAML = require('yaml');
-const { get } = require('http');
 
 const getKnowledgeFromURL = async (url) => {
   const response = await axios.get(url);
@@ -316,28 +315,43 @@ const readSemgrepOutput = () => {
 
   return semgrepOutput;
 };
+const clearFounds = (data) => {
+  data[data.length - 1][1] = data[data.length - 1][1].replace(/['",]/g, '');
+  if (data.length === 1) {
+    return data[0][1];
+  }
+  const instances = `[${data.map((e) => (e[0] === '⋮' ? '' : e[1])).join('')}]`;
+  return JSON.parse(instances);
+};
+
 const groupedEventsOnRule = (evidence) =>
   evidence.reduce((acc, item) => {
     const { rule } = item;
-    if (!acc[rule.id]) {
-      acc[rule.id] = [];
+    const exist = acc.find((e) => e.rule === rule);
+    if (exist) {
+      exist.instances.push(item);
+    } else {
+      acc.push({
+        rule,
+        instances: [item],
+      });
     }
-    acc[rule.id].push(item);
     return acc;
-  }, {});
+  }, []);
 const extractEventsEvidence = (events, filesMap, coverages, knowledgeMap) => {
   const evidence = events.data.map((event) => {
     const { data, file, rule } = event;
-    data[data.length - 1][1] = data[data.length - 1][1].replace(/['",]/g, '');
-    const found = JSON.parse(data.map((e) => e[1]).join(' '));
+    const found = clearFounds(data);
     // find the rule in the knowledge base
     const ruleInKB = knowledgeMap
       .map(({ checks }) => checks.events.find((item) => item.id === rule))
       .pop();
     // find the file in the coverage
     const eventsInCoverage = coverages
-      .map((item) => item.values.UICoverage.find((e) => e.ID === found.ID))
-      .filter(Boolean);
+      .map((item) =>
+        item.values.UICoverage.filter((e) => found.find((f) => f.ID === e.ID))
+      )
+      .flat();
 
     return {
       evidance: eventsInCoverage.map((e) => {
@@ -357,6 +371,11 @@ const extractEventsEvidence = (events, filesMap, coverages, knowledgeMap) => {
   });
   return groupedEventsOnRule(evidence);
 };
+const getOriginalPath = (file) => {
+  const convertedPath = file.split('/code_pattern/')[1].split('=');
+  const OriginalPath = path.join('~', ...convertedPath).substr(1);
+  return OriginalPath;
+};
 const extractAPICallsEvidence = (
   APICalls,
   filesMap,
@@ -364,27 +383,17 @@ const extractAPICallsEvidence = (
   code_pattern,
   knowledgeMap
 ) => {
-  const getOriginalPath = (file) => {
-    const convertedPath = file.split('/code_pattern/')[1].split('=');
-    const OriginalPath = path.join('~', ...convertedPath).substr(1);
-    return OriginalPath;
-  };
   const evidence = APICalls.data.map((APICall) => {
     const { data, file, rule } = APICall;
-    data[data.length - 1][1] = data[data.length - 1][1].replace(/['",]/g, '');
+    const found = clearFounds(data);
 
-    const apiCall = data
-      .map((e) => e[1])
-      .join(' ')
-      .replace(/['",]/g, '')
-      .trim();
     const instances = code_pattern.data.filter((code) => code.rule === rule);
     const ruleInKB = knowledgeMap
       .map(({ checks }) => checks.API_calls.find((item) => item.id === rule))
       .pop();
     const originalFiles = JSON.parse(
       fs.readFileSync(path.join(__dirname, 'src', 'inputs', file), 'utf8')
-    ).filter((item) => item.functionsCoverage.indexOf(apiCall) > -1);
+    ).filter((item) => item.functionsCoverage.indexOf(found) > -1);
     const fileContent = instances.map((instance) => {
       const OriginalPath = getOriginalPath(instance.file);
       const content = filesMap[OriginalPath];
@@ -411,7 +420,12 @@ const extractAPICallsEvidence = (
   });
   return groupedEventsOnRule(evidence);
 };
-const extractCodePatternEvidence = (codePattern, filesMap, coverages) => {
+const extractCodePatternEvidence = (
+  code_pattern,
+  filesMap,
+  coverages,
+  knowledgeMap
+) => {
   return undefined;
 };
 const extractNetworkEvidence = (
@@ -422,8 +436,7 @@ const extractNetworkEvidence = (
 ) => {
   const evidence = network_activites.data.map((network_activite) => {
     const { data, file, rule } = network_activite;
-    data[data.length - 1][1] = data[data.length - 1][1].replace(/['",]/g, '');
-    const found = JSON.parse(data.map((e) => e[1]).join(' '));
+    const found = clearFounds(data);
     // find the rule in the knowledge base
     const ruleInKB = knowledgeMap
       .map(({ checks }) =>
@@ -432,21 +445,27 @@ const extractNetworkEvidence = (
       .pop();
     // find the file in the coverage
     const network_activitesInCoverage = coverages
-      .map((item) => item.values.networkCoverage.find((e) => e.ID === found.ID))
-      .filter(Boolean);
+      .map((item) =>
+        item.values.networkCoverage.filter((e) =>
+          found.find((f) => f.ID === e.ID)
+        )
+      )
+      .flat();
     let assoisatedRequestsForResponses = [];
     if (network_activitesInCoverage.length > 0) {
       const responseReceived = network_activitesInCoverage.filter(
         (e) => e.type === 'responseReceived'
       );
       // get the request of that response
-      assoisatedRequestsForResponses = coverages.map((item) =>
-        item.values.networkCoverage.filter(
-          (e) =>
-            e.type === '"requestWillBeSent"' &&
-            responseReceived.find((r) => r.requestId === e.requestId)
+      assoisatedRequestsForResponses = coverages
+        .map((item) =>
+          item.values.networkCoverage.filter(
+            (e) =>
+              e.type === 'requestWillBeSent' &&
+              responseReceived.find((r) => r.requestId === e.requestId)
+          )
         )
-      );
+        .flat();
     }
 
     return {
@@ -457,52 +476,51 @@ const extractNetworkEvidence = (
       rule: ruleInKB,
     };
   });
-  return evidence;
+  return groupedEventsOnRule(evidence);
 };
 
-const hypothesize = (coverages, semgrepOutput, files, knowledge) => {
+const extractEvidance = (coverages, semgrepOutput, files, knowledge) => {
   const filesMap = files.reduce((acc, file) => {
     acc[file.file] = file.content;
     return acc;
   }, {});
   const knowledgeMap = knowledge.map((item) => JSON.parse(item));
   const [API_calls, code_pattern, events, network_activites] = semgrepOutput;
-  const eventsEvidence = extractEventsEvidence(
-    events,
-    filesMap,
-    coverages,
-    knowledgeMap
-  );
+  const eventsEvidence =
+    extractEventsEvidence(events, filesMap, coverages, knowledgeMap) || [];
 
-  const APIcallsEvidence = extractAPICallsEvidence(
-    API_calls,
-    filesMap,
-    coverages,
-    code_pattern,
-    knowledgeMap
-  );
-  const codePatternEvidence = extractCodePatternEvidence(
-    code_pattern,
-    filesMap,
-    coverages,
-    knowledgeMap
-  );
-  const networkEvidence = extractNetworkEvidence(
-    network_activites,
-    filesMap,
-    coverages,
-    knowledgeMap
-  );
-
-  return {
-    eventsEvidence,
-    networkEvidence,
-    codePatternEvidence,
-    APIcallsEvidence,
-  };
+  const APIcallsEvidence =
+    extractAPICallsEvidence(
+      API_calls,
+      filesMap,
+      coverages,
+      code_pattern,
+      knowledgeMap
+    ) || [];
+  const codePatternEvidence =
+    extractCodePatternEvidence(
+      code_pattern,
+      filesMap,
+      coverages,
+      knowledgeMap
+    ) || [];
+  const networkEvidence =
+    extractNetworkEvidence(
+      network_activites,
+      filesMap,
+      coverages,
+      knowledgeMap
+    ) || [];
+  const gatheredEvidence = [
+    ...eventsEvidence,
+    ...APIcallsEvidence,
+    ...codePatternEvidence,
+    ...networkEvidence,
+  ];
+  return gatheredEvidence;
 };
 
-const getHypotheses = async (coverages, files, knowledgeURL) => {
+const getEvidance = async (coverages, files, knowledgeURL) => {
   const knowledge = await getKnowledge(knowledgeURL);
   clearFiles();
   writeCoverageToFiles(coverages);
@@ -510,10 +528,10 @@ const getHypotheses = async (coverages, files, knowledgeURL) => {
   writeSemgrepRules(knowledge);
   semgrepAnalysis();
   const semgrepOutput = readSemgrepOutput();
-  const hypotheses = hypothesize(coverages, semgrepOutput, files, knowledge);
+  const evidance = extractEvidance(coverages, semgrepOutput, files, knowledge);
   parentPort.postMessage({
-    command: 'hypotheses',
-    payload: semgrepOutput,
+    evidance,
+    knowledge,
   });
 };
-getHypotheses(workerData.coverages, workerData.files, workerData.knowledgeURL);
+getEvidance(workerData.coverages, workerData.files, workerData.knowledgeURL);

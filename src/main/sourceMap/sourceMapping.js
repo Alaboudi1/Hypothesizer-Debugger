@@ -32,9 +32,6 @@ const getTraceMap = (consumer, lineStart, lineEnd) => {
 const getCoverages = (record, files, index) => {
   const coverage = record.map(async (item, i) => {
     if (item.type !== 'codeCoverage') {
-      parentPort.postMessage({
-        command: 'progress',
-      });
       return {
         ...item,
         index,
@@ -68,9 +65,7 @@ const getCoverages = (record, files, index) => {
 
         let codeCoverage = null;
         codeCoverage = originalFileLines.slice(start.line - 1, end.line);
-        parentPort.postMessage({
-          command: 'progress',
-        });
+
         return {
           start,
           end,
