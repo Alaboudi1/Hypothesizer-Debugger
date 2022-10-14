@@ -351,21 +351,20 @@ const extractEventsEvidence = (events, filesMap, coverages, knowledgeMap) => {
       .map((item) =>
         item.values.UICoverage.filter((e) => found.find((f) => f.ID === e.ID))
       )
-      .flat();
+      .flat()
+      .pop();
 
     return {
-      evidance: eventsInCoverage.map((e) => {
-        return {
-          ...e,
-          jsx: {
-            fileContent: {
-              content: filesMap[e.jsx.fileName],
-              file: e.jsx.fileName,
-            },
-            lineNumber: e.jsx.lineNumber,
+      evidance: {
+        ...eventsInCoverage,
+        jsx: {
+          fileContent: {
+            content: filesMap[eventsInCoverage.jsx.fileName],
+            file: eventsInCoverage.jsx.fileName,
           },
-        };
-      }),
+          lineNumber: eventsInCoverage.jsx.lineNumber,
+        },
+      },
       rule: ruleInKB,
     };
   });

@@ -4,7 +4,7 @@ import './questions.css';
 
 const questions = [
   {
-    question: 'Choose one of thes below options to describe the bug:',
+    question: 'Choose one of the below options to describe the bug:',
     answers: [
       {
         answer: 'The bug causes the program to crash.',
@@ -14,18 +14,20 @@ const questions = [
       },
       {
         answer:
-          'The bug causes the program to not respond to  clicking or typing.',
+          'The bug causes the program to not respond to clicking or typing.',
       },
     ],
   },
   {
-    question: 'What is the incorrect about UI?',
+    question: 'What is incorrect about the UI?',
     answers: [
       {
-        answer: 'The style of the UI is incorrect.',
+        answer:
+          'The style of the UI is incorrect (e.g., color, size, position).',
       },
       {
-        answer: 'The content of the UI is incorrect.',
+        answer:
+          'The content of the UI is incorrect (e.g., text, image is not correct).',
       },
       {
         answer: 'Both the style and the content of the UI are incorrect.',
@@ -33,7 +35,6 @@ const questions = [
     ],
   },
 ];
-
 const Questions: React.FC<any> = ({ setFinalAnswers }): JSX.Element => {
   const [currentQuestion, setCurrentQuestion] = React.useState(0);
   const [answers, setAnswers] = React.useState<any[]>([]);

@@ -1,0 +1,36 @@
+.codeSnipet {
+  display: grid;
+  grid-template-columns: 3fr 5em;
+  grid-template-rows: 3em 2.3em auto 0.5em;
+}
+.expandButton {
+  background: #ccc;
+  border: none;
+  border-radius: 0 0 0 10px;
+  cursor: pointer;
+  color: #000;
+  grid-row: 2;
+  grid-column: 2;
+  z-index: 1;
+  max-width: fit-content;
+  max-height: fit-content;
+  /* start from left */
+  margin-left: auto;
+}
+.codeSnipetBody {
+  width: 100%;
+  height: fit-content;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: white;
+  font-family: monospace;
+  grid-row: 2 / 4;
+  grid-column: 1 / -1;
+}
+.codeSnipet > p {
+  padding: 0.5em;
+  font-size: 1em;
+  text-align: center;
+  grid-row: 1;
+  grid-column: 1 / -1;
+}

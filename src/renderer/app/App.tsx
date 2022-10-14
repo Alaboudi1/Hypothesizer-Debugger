@@ -53,15 +53,23 @@ const App = (): JSX.Element => {
     }
     if (unfiltredHypotheses.length === 0) {
       return (
-        <div className="hypothesesContainer">
-          <Spinner text="loading" />
+        <div>
+          <h1>Hypothesizing...</h1>
+          <div className="thinking">
+            <span>🤔 </span>
+            <span>💭</span>
+            <Spinner />
+          </div>
         </div>
       );
     }
     const potentialHypotheses = getPotintialHypotheses();
     return (
       <div className="reportContainer">
-        <Hypotheses hypotheses={potentialHypotheses} />
+        <Hypotheses
+          hypotheses={potentialHypotheses}
+          userAnswers={userAnswers}
+        />
       </div>
     );
   };
