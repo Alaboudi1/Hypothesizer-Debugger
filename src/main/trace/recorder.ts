@@ -112,6 +112,8 @@ const cleanUpCoverage = (
 };
 
 const DomEvents = async () => {
+  // FIX Error: Execution context was destroyed, most likely because of a navigation.
+  await page?.waitForSelector('body');
   await page.evaluate(injectedCode);
   await client.send('DOM.enable');
   await client.on('DOM.documentUpdated', async () => {
@@ -164,17 +166,32 @@ const networkEvents = async () => {
     }
   });
 };
-const launchBrowser = async (url: string) => {
+const launchBrowser = async (url: string, width: number, height: number) => {
   try {
-    browser = await puppeteer.launch({
-      headless: false,
-      executablePath: getOS(),
-      args: ['--window-size=1920,1080'],
-      defaultViewport: null,
-    });
-
-    page = await browser.newPage();
-    await page.goto(url);
+    if (browser === null) {
+      browser = await puppeteer.launch({
+        headless: false,
+        executablePath: getOS(),
+        args: [
+          `--window-size=${(width - 50) / 2},${height}`,
+          '--disable-web-security',
+          '--disable-features=IsolateOrigins,site-per-process',
+          '--disable-site-isolation-trials',
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+        ],
+        defaultViewport: null,
+      });
+    }
+    if (page === null) {
+      page = await browser.newPage();
+      await page.goto(url);
+    } else {
+      await page.goto(url);
+      await page.evaluate(() => {
+        localStorage.clear();
+      });
+    }
   } catch (error) {
     console.log(error);
   }
@@ -225,15 +242,11 @@ const stopRecording = async () => {
     .filter((coverageInstance) => {
       return coverageInstance.coverage.length > 0;
     });
-  await page.close();
-  await browser.close();
+
   const payload = [...finalCoverage, ...events, ...networkEventsCoverage].sort(
     (a, b) => a.timeStamp - b.timeStamp
   );
-  browser = null;
-  page = null;
-  client = null;
-  setIntervalCallback = undefined;
+
   coverage = [];
 
   networkEventsCoverage = [];

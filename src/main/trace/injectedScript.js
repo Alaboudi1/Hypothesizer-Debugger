@@ -6,9 +6,7 @@ const init = () => {
     const previousEvents = JSON.parse(localStorage.getItem('events')) || [];
     localStorage.setItem('events', JSON.stringify([...previousEvents, events]));
   };
-
-  const getDataForClick = (event, type, timeStamp = Date.now()) => {
-    // search for reactFiber
+  const getReactFiber = (event) => {
     let reactFiber = { _debugSource: undefined };
 
     for (const [key, value] of Object.entries(event.target)) {
@@ -17,6 +15,11 @@ const init = () => {
         break;
       }
     }
+    return reactFiber;
+  };
+  const getDataForClick = (event, type, timeStamp = Date.now()) => {
+    // search for reactFiber
+    const reactFiber = getReactFiber(event);
 
     const data = {
       jsx: reactFiber._debugSource,
@@ -58,9 +61,15 @@ const init = () => {
         const data = {
           type: 'mutation',
           addNode: [...mutation.addedNodes].map((node) => {
+            const reactFiber = getReactFiber(node);
+
             return {
               HTML: node.innerHTML ?? node.textContent,
               tagName: node.tagName ?? node.nodeName,
+              jsx: {
+                fileName: reactFiber._debugSource?.fileName,
+                lineNumber: reactFiber._debugSource?.lineNumber,
+              },
             };
           }),
           removeNode: [...mutation.removedNodes].map((node) => {

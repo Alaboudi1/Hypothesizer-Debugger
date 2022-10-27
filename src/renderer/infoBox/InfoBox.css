@@ -1,0 +1,7 @@
+.timeLine__item__box__content {
+  -moz-border-radius: 10%;
+  -webkit-border-radius: 10%;
+  border-radius: 10px;
+  border: 1px solid lightgray;
+  padding: 5px;
+}

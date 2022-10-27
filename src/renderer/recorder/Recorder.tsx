@@ -27,7 +27,7 @@ const Recorder: React.FC = ({ nextHypothesizerState }): React.ReactElement => {
             type="button"
             title="Click record and then reproduce the bug"
           >
-            REC
+            Start REC
           </button>
         );
       case 'record':
@@ -37,7 +37,8 @@ const Recorder: React.FC = ({ nextHypothesizerState }): React.ReactElement => {
             id="recording"
             type="button"
           >
-            ||
+            <p className="stopRecording" />
+            Stop REC
           </button>
         );
       case 'collect':

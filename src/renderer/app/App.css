@@ -1,7 +1,7 @@
 .appContainer {
   display: grid;
-  grid-template-columns: 1fr 6fr 1fr;
-  grid-template-rows: 0.1fr 2fr 0.1fr;
+  grid-template-columns: 20vmin 60vmin 20vmin;
+  grid-template-rows: 20vmin 60vmin 20vmin;
 }
 
 .toolsBar {
@@ -10,15 +10,31 @@
   justify-self: start;
   align-self: stretch;
 }
+.logo {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  align-self: start;
+  justify-content: center;
+}
+.logo > p {
+  text-align: center;
+  font-size: 0.6em;
+}
 .mainContainer {
   grid-column: 2;
   grid-row: 2;
   justify-self: center;
   align-self: center;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 5px;
+  align-self: stretch;
+  justify-self: stretch;
 }
-.startContainer > img {
-  width: 50%;
-  height: 50%;
+.logo > img {
+  width: 30%;
+  height: 30%;
   margin: 0 auto;
   display: block;
 }
@@ -31,41 +47,57 @@ h6 {
   text-align: center;
 }
 
-.startContainer > button {
-  margin: 0 auto;
-  display: block;
-  /* make it circle */
-  border-radius: 50%;
-  width: 100px;
-  height: 100px;
-  /* make it big */
-  font-size: 2em;
-  /* make it bold */
-  font-weight: bold;
-  /* make it colorful */
-  background-color: #f0f0f0;
-  color: #333;
-  /* make it pretty */
-  border: 1px solid #ccc;
-  box-shadow: 0 0 5px rgb(102, 240, 125);
-  /* make it smooth */
-  transition: all 0.1s ease-in-out;
-}
-.startContainer > button:hover {
-  background-color: rgb(102, 240, 125);
-  color: #f0f0f0;
-  transform: scale(1.1);
-  cursor: pointer;
+.currentSteps {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
 }
 
-.loading > progress {
-  accent-color: coral;
-  height: 20px;
-  width: 250px;
+.doneSteps {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  align-self: flex-end;
+  justify-self: start;
+  /* change bullet style */
+  list-style-type: '✔ ';
+  font-size: 0.9em;
+  color: rgb(13, 101, 8);
 }
-.loading > p {
-  text-align: center;
-  font-size: 1.5em;
-  font-weight: bold;
-  color: #333;
+
+.nextSteps {
+  grid-column: 2 / 3;
+  grid-row: 3 / 4;
+  align-self: center;
+  justify-self: center;
+  color: gray;
+}
+
+.addedAnnimation {
+  animation: 0.5s ease-out 0s 1 slideIn;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(100%);
+  }
+  50% {
+    transform: translateY(-10%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+.reportContainer {
+  grid-column: 1 / -1;
+  grid-row: 2/-1;
+  justify-self: center;
+  align-self: center;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 5px;
+  align-self: stretch;
+  justify-self: stretch;
+  margin: 10px;
+  border-bottom: none;
+  border-end-end-radius: 0px;
+  border-end-start-radius: 0px;
 }

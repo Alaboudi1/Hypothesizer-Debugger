@@ -97,24 +97,22 @@ const getNetworkCallStack = async (payload, files) => {
     if (item.type === 'requestWillBeSent' && item.stack !== undefined) {
       return {
         ...item,
-        stack: {
-          callFrames: await Promise.all(
-            item.stack.callFrames.map(async (frame) => {
-              const { functionName, scriptId, url, lineNumber } = frame;
-              const { content, map } = files.find(
-                (file) => file.scriptId === scriptId
-              );
-              const consumer = await initMapConsumer(map);
-              const { start } = getTraceMap(consumer, lineNumber, lineNumber);
-              destroyMapConsumer(consumer);
-              return {
-                functionName,
-                lineNumber: start.line,
-                file: start.source,
-              };
-            })
-          ),
-        },
+        stack: await Promise.all(
+          item.stack.callFrames.map(async (frame) => {
+            const { functionName, scriptId, url, lineNumber } = frame;
+            const { content, map } = files.find(
+              (file) => file.scriptId === scriptId
+            );
+            const consumer = await initMapConsumer(map);
+            const { start } = getTraceMap(consumer, lineNumber, lineNumber);
+            destroyMapConsumer(consumer);
+            return {
+              functionName,
+              lineNumber: start.line,
+              file: start.source,
+            };
+          })
+        ),
       };
     }
     return item;

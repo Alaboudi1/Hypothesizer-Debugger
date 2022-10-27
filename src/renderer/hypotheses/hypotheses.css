@@ -1,8 +1,7 @@
 .container {
   display: block;
   width: 100%;
-  min-width: 90vmin;
-  max-width: 90vmin;
+
   border: 1px solid #ccc;
   margin: auto;
   border-radius: 10px;
@@ -31,11 +30,14 @@ summary {
   text-align: center;
 }
 
-.hypothesesNotFound {
+.hypothesesNoFound {
   background-color: #ffa50a;
   padding: 0.5em;
   font-size: 1em;
   text-align: center;
+}
+.hypotheses {
+  padding: 0.5em;
 }
 
 .hypotheses > h3 {
@@ -57,12 +59,9 @@ summary {
   margin-bottom: 0px;
   font-weight: 500;
 }
-.hypotheses > details[close] > summary {
-  margin-bottom: 0px;
-  font-weight: 500;
-}
 
-.status {
+.tellMeMore {
+  display: block;
   font-size: 0.7em;
   text-align: right;
   font-weight: bold;
@@ -70,6 +69,10 @@ summary {
   opacity: 1;
   text-decoration: underline;
 }
+.hypotheses > details[open] > summary > .tellMeMore {
+  display: none;
+}
+
 .description {
   font-size: 0.9em;
 }

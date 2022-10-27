@@ -2,22 +2,22 @@ const { parentPort, workerData } = require('worker_threads');
 
 const reasonAboutEvidaence = (gatheredEvidence, knowledgeMap) => {
   return knowledgeMap.map((knowledgeItem) => {
-    const { checks, hypotheses } = JSON.parse(knowledgeItem);
+    const { evidance, hypotheses } = JSON.parse(knowledgeItem);
     const allRules = [];
-    for (const key in checks) {
-      allRules.push(...checks[key]);
+    for (const key in evidance) {
+      allRules.push(...evidance[key]);
     }
-    const potintialHypotheses = hypotheses.map((evidence) => {
-      const { pass, fail } = evidence.checks;
+    const potintialHypotheses = hypotheses.map((hypothesis) => {
+      const { hasToPass, hasToFail } = hypothesis.evidence;
       const supportedEvidaence = [];
       const againstEvidaence = [];
 
-      pass.forEach((rule) => {
+      hasToPass.forEach(({ rule, why }) => {
         const evidenceItem = gatheredEvidence.find(
           (item) => item.rule.id === rule
         );
         if (evidenceItem) {
-          supportedEvidaence.push({ evidenceItem, shouldBeFound: true });
+          supportedEvidaence.push({ evidenceItem, shouldBeFound: true, why });
         } else {
           againstEvidaence.push({
             evidenceItem: {
@@ -25,15 +25,16 @@ const reasonAboutEvidaence = (gatheredEvidence, knowledgeMap) => {
               instances: undefined,
             },
             shouldBeFound: true,
+            why,
           });
         }
       });
-      fail.forEach((rule) => {
+      hasToFail.forEach(({ rule, why }) => {
         const evidenceItem = gatheredEvidence.find(
           (item) => item.rule.id === rule
         );
         if (evidenceItem) {
-          againstEvidaence.push({ evidenceItem, shouldBeFound: false });
+          againstEvidaence.push({ evidenceItem, shouldBeFound: false, why });
         } else {
           supportedEvidaence.push({
             evidenceItem: {
@@ -41,13 +42,14 @@ const reasonAboutEvidaence = (gatheredEvidence, knowledgeMap) => {
               instances: undefined,
             },
             shouldBeFound: false,
+            why,
           });
         }
       });
       return {
         supportedEvidaence,
         againstEvidaence,
-        ...evidence,
+        ...hypothesis,
         score:
           supportedEvidaence.length /
           (supportedEvidaence.length + againstEvidaence.length),

@@ -23,18 +23,18 @@ const getCoverage = (coverage, files, setBackendState) => {
     if (trace.length === divs) {
       new Worker(path.join(__dirname, 'coverageCleaning.js'), {
         workerData: {
-          coverages: trace,
+          coverages: trace.flat(),
           files,
         },
       }).on('message', ({ result }) => {
-        const linkPath = result.filesContent[0].file;
-        const localHypothesesLink = linkPath.split(
+        const localHypothesesLink = result.projectLink?.split(
           /node_modules|src|webpack/
         )[0];
 
         setBackendState({
           payload: {
-            trace: result,
+            trace: result.data,
+            filesContent: result.filesContent,
             linkToKnowledge: `${localHypothesesLink}hypotheses.json`,
           },
           step: 'trace',

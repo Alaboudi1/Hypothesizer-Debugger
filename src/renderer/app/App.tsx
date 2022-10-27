@@ -10,115 +10,154 @@ import icon from './icon.png';
 import Spinner from '../loading/spinner';
 import Hypotheses from '../hypotheses/hypotheses';
 import Questions from '../questions/questions';
+import TimeLine from '../timeLine/TimeLine';
 
 const App = (): JSX.Element => {
-  const [unfiltredHypotheses, setUnfiltredHypotheses] = useState<any[]>([]);
+  const unfiltredHypotheses = useRef([]);
   const targetUrl = useRef<string>('http://localhost:3000');
-  const [userAnswers, setUserAnswers] = useState<any[]>([]);
-  const [recordState, setRecordState] = useState<string>('ready');
+  const userAnswers = useRef<any[]>([]);
+  const futureSteps = useRef<string[]>([
+    'Please record your actions while reproducing the bug.',
+    'Please answer the following questions.',
+    'Please wait while we are analyzing and formulating hypotheses.',
+    'We will offer a list potential hypotheses if we found any.',
+  ]);
+  const doneStepsRef = useRef<string[]>([]);
+  const [currentStep, setCurrentStep] = useState<number>(0);
 
   useEffect(() => {
     sendCommand('isDockerRunning');
     subscribeToCommand('isDockerRunning', (isDockerRunning) => {
-      if (!isDockerRunning) {
-        setRecordState('notReady');
+      if (isDockerRunning) {
+        doneStepsRef.current.push('Dev environment is ready!');
+        setCurrentStep(1);
+        futureSteps.current.shift();
       }
       subscribeToCommand('hypotheses', (hypotheses) => {
-        setUnfiltredHypotheses(hypotheses);
+        unfiltredHypotheses.current = hypotheses;
+        if (userAnswers.current.length > 0) {
+          setCurrentStep(4);
+          futureSteps.current.shift();
+          doneStepsRef.current.push('Analysis is done!');
+        }
       });
     });
+    sendCommand('launch', { targetUrl: targetUrl.current });
     return () => removeAllListeners();
-  }, [recordState, unfiltredHypotheses]);
+  }, []);
 
   const getPotintialHypotheses = () => {
-    return unfiltredHypotheses
+    return unfiltredHypotheses.current
       .filter((hypothesis) => hypothesis.score > 0.5)
       .filter((hypothesis) => {
-        const { related_defect } = hypothesis;
+        const { defect_category } = hypothesis;
         return (
-          userAnswers[0].answer.includes(related_defect.type) &&
-          userAnswers[1].answer.includes(related_defect.incorrectOutput)
+          userAnswers.current[0].answer.includes(defect_category.type) &&
+          userAnswers.current[1].answer.includes(
+            defect_category.incorrectOutput
+          )
         );
       })
       .sort((a, b) => a.score - b.score);
   };
 
-  const getAnalysisAndHypothesesUI = (): JSX.Element => {
-    if (userAnswers.length === 0) {
-      return (
-        <div className="questioningContainer">
-          <Questions setFinalAnswers={setUserAnswers} />
-        </div>
-      );
-    }
-    if (unfiltredHypotheses.length === 0) {
-      return (
-        <div>
-          <h1>Hypothesizing...</h1>
-          <div className="thinking">
-            <span>🤔 </span>
-            <span>💭</span>
-            <Spinner />
-          </div>
-        </div>
-      );
-    }
-    const potentialHypotheses = getPotintialHypotheses();
-    return (
-      <div className="reportContainer">
-        <Hypotheses
-          hypotheses={potentialHypotheses}
-          userAnswers={userAnswers}
-        />
-      </div>
-    );
-  };
-
   const getMainContainer = (): JSX.Element => {
-    switch (recordState) {
-      case 'notReady':
+    switch (currentStep) {
+      case 0:
         return (
-          <div className="notReady">
-            <h1>⚠️ Sorry, Docker is not running on your machine!</h1>
-            <p>
-              Please install Docker and run the Docker desktop app before
-              retrying. for more information please visit:
-              <a
-                href="https://docs.docker.com/get-docker/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                https://docs.docker.com/get-docker/
-              </a>
-            </p>
+          <div className="mainContainer">
+            <div className="notReady addedAnnimation">
+              <h1>⚠️ Sorry, Docker is not running on your machine!</h1>
+              <p>
+                Please install Docker and run the Docker desktop app before
+                retrying. for more information please visit:
+                <a
+                  href="https://docs.docker.com/get-docker/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  https://docs.docker.com/get-docker/
+                </a>
+              </p>
+            </div>
           </div>
         );
 
-      case 'ready':
+      case 1:
         return (
-          <div className="startContainer">
-            <img src={icon} alt="icon" />
-            <h2>Hypothesizer</h2>
-            <h4> Your Second Brain Debugger</h4>
-            <button
-              type="button"
-              onClick={() => {
-                sendCommand('launch', { targetUrl: targetUrl.current });
-                setRecordState('record');
-              }}
+          <div className="mainContainer">
+            <div className="recordContainer addedAnnimation" key={currentStep}>
+              <h3>Please record your actions while reproducing the bug.</h3>
+              <ol>
+                <li>
+                  <b>Start recording.</b>
+                </li>
+                <li>
+                  <b>Reproduce the bug.</b> (do the actions that cause the bug.)
+                </li>
+                <li>
+                  <b>Stop recording.</b>
+                </li>
+              </ol>
+              <Recorder
+                nextHypothesizerState={() => {
+                  setCurrentStep(2);
+                  futureSteps.current.shift();
+                  doneStepsRef.current.push('Recording is done!');
+                }}
+              />
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="mainContainer">
+            <div
+              className="questioningContainer addedAnnimation"
+              key={currentStep}
             >
-              Start
-            </button>
+              <Questions
+                setFinalAnswers={(answers) => {
+                  userAnswers.current = answers;
+                  setCurrentStep(3);
+                  futureSteps.current.shift();
+                  doneStepsRef.current.push(
+                    `We know that ${answers[0].answer}`
+                  );
+                  doneStepsRef.current.push(
+                    `We also know that ${answers[1].answer}`
+                  );
+                  if (unfiltredHypotheses.current.length > 0) {
+                    setCurrentStep(4);
+                    futureSteps.current.shift();
+                    doneStepsRef.current.push('Analysis is done!');
+                  }
+                }}
+              />
+            </div>
           </div>
         );
-      case 'record':
+      case 3:
         return (
-          <div className="recordContainer">
-            <Recorder nextHypothesizerState={() => setRecordState('done')} />
+          <div className="mainContainer">
+            <div className="addedAnnimation" key={currentStep}>
+              <h1>Hypothesizing...</h1>
+              <div className="thinking">
+                <span>🤔 </span>
+                <span>💭</span>
+                <Spinner />
+              </div>
+            </div>
           </div>
         );
-      case 'done':
-        return getAnalysisAndHypothesesUI();
+      case 4:
+        return (
+          <div className="reportContainer addedAnnimation">
+            {/* <Hypotheses hypotheses={getPotintialHypotheses()} /> */}
+            <TimeLine hypotheses={getPotintialHypotheses()} />
+          </div>
+        );
       default:
         return <></>;
     }
@@ -146,7 +185,29 @@ const App = (): JSX.Element => {
           title="url"
         /> */}
       </div>
-      <div className="mainContainer">{getMainContainer()}</div>
+      <div className="logo">
+        <img src={icon} alt="icon" />
+        <p>Hypothesizer</p>
+        <p> Your Second Brain Debugger</p>
+      </div>
+      <ul className="doneSteps" key={currentStep + Math.random()}>
+        {doneStepsRef.current.map((step) => (
+          <li className="doneStep addedAnnimation" key={step + Math.random()}>
+            {step}
+          </li>
+        ))}
+      </ul>
+      {getMainContainer()}
+      {futureSteps.current.length > 0 && (
+        <ul className="nextSteps" key={currentStep + Math.random()}>
+          <h3>What is next?</h3>
+          {futureSteps.current.map((step) => (
+            <li className="nextStep addedAnnimation" key={step + Math.random()}>
+              {step}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

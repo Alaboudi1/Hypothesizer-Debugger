@@ -1,47 +1,45 @@
 @keyframes glowing {
   0% {
-    background-color: #fff;
-    box-shadow: 0 0 3px #fff;
+    background-color: rgba(253, 33, 4, 0.1);
+    box-shadow: 0 0 3px rgba(255, 179, 80, 0.1);
   }
   50% {
-    background-color: #f58484;
-    box-shadow: 0 0 40px #f58484;
+    background-color: rgba(255, 89, 80, 0.3);
+    box-shadow: 0 0 40px rgba(255, 179, 80, 0.1);
   }
   100% {
-    background-color: #fff;
-    box-shadow: 0 0 3px #fff;
+    background-color: rgba(253, 33, 4, 0.1);
+    box-shadow: 0 0 3px rgba(255, 179, 80, 0.1);
   }
 }
 #recording {
-  animation: glowing 1500ms infinite;
+  animation: glowing 1s infinite;
+  border: 2px solid #ff0000;
 }
-
-/*  make a record button red and glowing */
 
 .record > button {
   margin: 0 auto;
   display: block;
-  /* make it circle */
   border-radius: 50%;
-  width: 70px;
-  height: 70px;
-  /* make it big */
+  width: 100px;
+  height: 100px;
   font-size: 1em;
-  /* make it bold */
   font-weight: bold;
-  /* make it colorful */
   background-color: white;
   color: #ff0000;
-  /* make it pretty */
-  border: 5px solid #ff0000;
+  border: 2px solid black;
   box-shadow: 0 0 5px rgb(0, 0, 0);
-  /* make it smooth */
   transition: all 0.1s ease-in-out;
   cursor: pointer;
 }
 .record > button:hover {
   background-color: rgb(196, 0, 0);
-  color: #f0f0f0;
   transform: scale(1.1);
   cursor: pointer;
+}
+.stopRecording {
+  background-color: #ff0000;
+  transform: scale(1.1);
+  cursor: pointer;
+  font-size: 0.1em;
 }

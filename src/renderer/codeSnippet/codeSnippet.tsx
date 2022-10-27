@@ -29,16 +29,19 @@ const CodeSnipet: React.FC<any> = ({
 
   return (
     <div className="codeSnipet">
-      <p>
-        <b>Location</b>: src{fileName.split('src').pop()} : {lineNumber}{' '}
-      </p>
+      {fileName && (
+        <p>
+          <b>Location</b>: src{fileName.split('src').pop()} : {lineNumber}{' '}
+        </p>
+      )}
+
       <button type="button" onClick={handleExpand} className="expandButton">
         {expand ? '⤪ Collapse' : '⤢ Expand'}
       </button>
       <div className={`codeSnipetBody ${expand ? 'expanded' : ' collapsed'}`}>
         <CopyBlock
           text={sourceCode}
-          language={`${fileName.split('.').pop()}`}
+          language={`${fileName?.split('.').pop()}`}
           showLineNumbers
           theme={dracula}
           startingLineNumber={expand ? 1 : lineNumber - 4}

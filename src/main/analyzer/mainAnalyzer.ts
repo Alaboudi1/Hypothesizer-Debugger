@@ -2,7 +2,7 @@ import path from 'path';
 import { Worker } from 'worker_threads';
 
 const getEvidance = (coverages, files, knowledgeURL, callback) => {
-  const worker = new Worker(path.join(__dirname, 'analizingEvidance.js'), {
+  const worker = new Worker(path.join(__dirname, 'analyzingEvidence.js'), {
     workerData: {
       coverages,
       files,

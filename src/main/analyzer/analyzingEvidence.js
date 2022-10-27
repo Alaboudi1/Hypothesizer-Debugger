@@ -25,89 +25,57 @@ const getKnowledge = (urls) => {
   return Promise.all(knowledge);
 };
 
-const writeCoverageToFiles = (data) => {
-  const coverage = data.map((item) => {
-    const codeCoverage = item.values.codeCoverage.map((coverage) => {
-      const { file, functions } = coverage;
-      const functionsCoverage = functions.map(
-        (functionItem) => functionItem.functionName
-      );
-      return {
-        file,
-        functionsCoverage,
-      };
-    });
-    const UICoverage = item.values.UICoverage.map((coverage) => {
-      const { InputType, target, type, keyPressed, ID } = coverage;
-      return {
-        InputType,
-        target,
-        type,
-        keyPressed,
-        ID,
-      };
-    });
-    const networkCoverage = item.values.networkCoverage.map((coverage) => {
-      const { metnod, type, url, mimeType, data, ID } = coverage;
-      return {
-        metnod,
-        type,
-        url,
-        mimeType,
-        data,
-        ID,
-      };
-    });
-    return {
-      codeCoverage,
-      UICoverage,
-      networkCoverage,
-    };
+const writeCoverageToFiles = (coverage) => {
+  // devide the coverage to 50 elements each
+  const coverageTyped = {
+    codeCoverage: [],
+    otherCoverage: [],
+  };
+  coverage.reduce((acc, curr) => {
+    if (curr.type === 'codeCoverage') {
+      acc.codeCoverage.push(curr);
+    } else {
+      acc.otherCoverage.push(curr);
+    }
+    return acc;
+  }, coverageTyped);
+  const { codeCoverage, otherCoverage } = coverageTyped;
+  const dividedCodeCoverage = [];
+  for (let i = 0; i < codeCoverage.length; i += 100) {
+    dividedCodeCoverage.push(codeCoverage.slice(i, i + 100));
+  }
+  dividedCodeCoverage.forEach((item, index) => {
+    fs.writeFileSync(
+      path.join(__dirname, 'src', 'inputs', 'Code', `coverage${index}.js`),
+      JSON.stringify(item, null, 2)
+    );
   });
-
-  coverage.forEach((item, i) => {
-    if (item.codeCoverage.length > 0) {
-      const codeCoverage = JSON.stringify(item.codeCoverage, null, 2);
-      fs.writeFileSync(
-        path.join(
-          __dirname,
-          'src',
-          'inputs',
-          'API_calls',
-          `codeCoverage${i}.js`
-        ),
-        codeCoverage
-      );
-    }
-    if (item.UICoverage.length > 0) {
-      const UICoverage = JSON.stringify(item.UICoverage, null, 2);
-      fs.writeFileSync(
-        path.join(__dirname, 'src', 'inputs', 'events', `UICoverage${i}.js`),
-        UICoverage
-      );
-    }
-    if (item.networkCoverage.length > 0) {
-      const networkCoverage = JSON.stringify(item.networkCoverage, null, 2);
-      fs.writeFileSync(
-        path.join(
-          __dirname,
-          'src',
-          'inputs',
-          'network_activites',
-          `networkCoverage${i}.js`
-        ),
-        networkCoverage
-      );
-    }
-  });
+  fs.writeFileSync(
+    path.join(__dirname, 'src', 'inputs', 'Events', 'otherCoverage.js'),
+    JSON.stringify(otherCoverage, null, 2)
+  );
 };
 
 const clearFiles = () => {
-  const isMac = process.platform === 'darwin';
-  const isLinux = process.platform === 'linux';
   const isWindows = process.platform === 'win32';
   const getPath = (...subPath) => path.join(__dirname, 'src', ...subPath);
-  if (isMac || isLinux) {
+  if (isWindows) {
+    if (fs.existsSync(getPath('outputs')))
+      execSync(`rmdir /s /q ${getPath('outputs')}`);
+
+    if (fs.existsSync(getPath('semgrep_rules')))
+      execSync(`rmdir /s /q ${getPath('semgrep_rules')}`);
+
+    if (fs.existsSync(getPath('inputs')))
+      execSync(`rmdir /s /q ${getPath('inputs')}`);
+
+    execSync(`mkdir ${getPath('inputs')}`);
+    execSync(`mkdir ${getPath('outputs')}`);
+    execSync(`mkdir ${getPath('inputs', 'Events')}`);
+    execSync(`mkdir ${getPath('inputs', 'Code')}`);
+    execSync(`mkdir ${getPath('semgrep_rules')}`);
+  } else {
+    // linux or mac
     if (fs.existsSync(getPath('outputs')))
       execSync(`rm -rf ${getPath('outputs')}`);
     execSync(`mkdir ${getPath('outputs')}`);
@@ -120,27 +88,8 @@ const clearFiles = () => {
       execSync(`rm -rf ${getPath('inputs')}`);
     execSync(`mkdir ${getPath('inputs')}`);
 
-    execSync(`mkdir ${getPath('inputs', 'API_calls')}`);
-    execSync(`mkdir ${getPath('inputs', 'events')}`);
-    execSync(`mkdir ${getPath('inputs', 'network_activites')}`);
-    execSync(`mkdir ${getPath('inputs', 'code_pattern')}`);
-  } else if (isWindows) {
-    if (fs.existsSync(getPath('outputs')))
-      execSync(`rmdir /s /q ${getPath('outputs')}`);
-
-    if (fs.existsSync(getPath('semgrep_rules')))
-      execSync(`rmdir /s /q ${getPath('semgrep_rules')}`);
-
-    if (fs.existsSync(getPath('inputs')))
-      execSync(`rmdir /s /q ${getPath('inputs')}`);
-
-    execSync(`mkdir ${getPath('inputs')}`);
-    execSync(`mkdir ${getPath('outputs')}`);
-    execSync(`mkdir ${getPath('inputs', 'API_calls')}`);
-    execSync(`mkdir ${getPath('inputs', 'events')}`);
-    execSync(`mkdir ${getPath('inputs', 'network_activites')}`);
-    execSync(`mkdir ${getPath('inputs', 'code_pattern')}`);
-    execSync(`mkdir ${getPath('semgrep_rules')}`);
+    execSync(`mkdir ${getPath('inputs', 'Events')}`);
+    execSync(`mkdir ${getPath('inputs', 'Code')}`);
   }
 };
 
@@ -148,7 +97,7 @@ const semgrepAnalysis = () => {
   try {
     const localPath = `${path.join(__dirname, 'src')}:/src`;
     execSync(
-      `docker run --rm -v  ${localPath} returntocorp/semgrep python3 analyzer.py`
+      `docker run --rm -v  ${localPath} returntocorp/semgrep:latest python3 analyzer.py`
     );
     return true;
   } catch (error) {
@@ -161,51 +110,46 @@ const semgrepAnalysis = () => {
 };
 const writeSemgrepRules = (knowledge) => {
   knowledge.forEach((item) => {
-    const rules = JSON.parse(item).checks;
+    const rules = JSON.parse(item).evidance;
 
     const APICalls = {
       rules: rules.API_calls.map((rule) => {
         return {
-          id: `${rule.id}-API_calls`,
-          message: rule.id,
+          id: rule.id,
+          message: 'call',
           languages: ['js'],
+          pattern: JSON.stringify({
+            functionName: rule.functionName,
+          }),
           severity: 'WARNING',
-          patterns: [
-            {
-              pattern: `"${rule.functionName}"\n`,
-            },
-            {
-              'pattern-inside': '"functionsCoverage": [...]\n',
-            },
-          ],
         };
       }),
     };
     fs.writeFileSync(
-      path.join(__dirname, 'src', 'semgrep_rules', 'API_calls.yml'),
+      path.join(__dirname, 'src', 'semgrep_rules', 'Code_API_calls.yml'),
       YAML.stringify(APICalls)
     );
 
     const UIEvents = {
-      rules: rules.events.map((rule) => {
+      rules: rules.DOM_events.map((rule) => {
         return {
           id: rule.id,
-          message: rule.id,
           languages: ['js'],
-          severity: 'WARNING',
           pattern: JSON.stringify({
             type: rule?.type,
             InputType: rule?.InputType,
           }),
+          message: 'event',
+          severity: 'WARNING',
         };
       }),
     };
     fs.writeFileSync(
-      path.join(__dirname, 'src', 'semgrep_rules', 'events.yml'),
+      path.join(__dirname, 'src', 'semgrep_rules', 'Events_DOM.yml'),
       YAML.stringify(UIEvents)
     );
     const network = {
-      rules: rules.network_activites.map((rule) => {
+      rules: rules.Network_events.map((rule) => {
         return {
           id: rule.id,
           pattern: JSON.stringify({
@@ -215,54 +159,30 @@ const writeSemgrepRules = (knowledge) => {
             data: rule?.data,
             method: rule?.method,
           }),
-          message: rule.id,
-          languages: ['js', 'json'],
+          message: 'Network event',
+          languages: ['js'],
           severity: 'WARNING',
         };
       }),
     };
     fs.writeFileSync(
-      path.join(__dirname, 'src', 'semgrep_rules', 'network_activites.yml'),
+      path.join(__dirname, 'src', 'semgrep_rules', 'Events_Network.yml'),
       YAML.stringify(network)
     );
     const codePattern = {
-      rules: [
-        ...rules.code_pattern.map((rule) => {
-          return {
-            id: rule.id,
-            patterns: rule.patterns,
-            message: rule.id,
-            languages: ['js'],
-            severity: 'WARNING',
-          };
-        }),
-        ...rules.API_calls.map((rule) => {
-          return {
-            id: rule.id,
-            patterns: [
-              {
-                'pattern-either': [
-                  {
-                    pattern: `${rule.functionName}\n`,
-                  },
-                  {
-                    pattern: `${rule.functionName}(...)\n`,
-                  },
-                  {
-                    pattern: `$E.${rule.functionName}()\n`,
-                  },
-                ],
-              },
-            ],
-            message: rule.id,
-            languages: ['js'],
-            severity: 'WARNING',
-          };
-        }),
-      ],
+      rules: rules.API_calls.map((rule) => {
+        if (rule.pattern === undefined || rule.pattern === null) return null;
+        return {
+          id: rule.id,
+          pattern: rule.pattern,
+          message: 'pattern',
+          languages: ['js'],
+          severity: 'WARNING',
+        };
+      }),
     };
     fs.writeFileSync(
-      path.join(__dirname, 'src', 'semgrep_rules', 'code_pattern.yml'),
+      path.join(__dirname, 'src', 'semgrep_rules', 'Code_pattern.yml'),
       YAML.stringify(codePattern)
     );
   });
@@ -279,7 +199,7 @@ const writeCoverageFilesToFiles = (files) => {
         __dirname,
         'src',
         'inputs',
-        'code_pattern',
+        'Code',
         file.file.replace(/\//g, '=')
       ),
       file.content
@@ -297,16 +217,23 @@ const readSemgrepOutput = () => {
     const result = {
       type: file.replace('.txt', ''),
       data: data
-        .split('inputs')
+        .split('semgrep_rules.')
         .splice(1)
         .map((item) => {
           return {
-            rule: item.split('\n')[2].trim(),
-            file: item.split('\n')[0].trim(),
+            file: data.split('\n')[2].trim(),
+            rule: item.split('\n')[0].trim(),
             data: item
-              .split('\n\n')[1]
               .split('\n')
-              .map((e) => e.trim().split('┆')),
+              .splice(1)
+              .map((a) =>
+                a
+                  .split('⋮┆')
+                  .map((b) => b.split('\n').filter((c) => c.includes('┆')))
+                  .filter((d) => d.length)
+              )
+              .filter((d) => d.length)
+              .flat(2),
           };
         }),
     };
@@ -316,54 +243,61 @@ const readSemgrepOutput = () => {
   return semgrepOutput;
 };
 const clearFounds = (data) => {
-  data[data.length - 1][1] = data[data.length - 1][1].replace(/['",]/g, '');
-  if (data.length === 1) {
-    return data[0][1];
+  if (data[0].includes('{')) {
+    const cleanedItem = `[${data
+      .map((a) => {
+        return a.split('┆')[1].trim();
+      })
+      .join('')}]`;
+    // remove the last comma then parse it
+    const cleanedData = JSON.parse(cleanedItem.replace(/,(?=\s*?])/g, ''));
+    return cleanedData;
   }
-  const instances = `[${data.map((e) => (e[0] === '⋮' ? '' : e[1])).join('')}]`;
-  return JSON.parse(instances);
+  const cleanedData = `[${data
+    .map((e) => {
+      const [lineNumber, functionName] = e.split('┆');
+      return `{ "lineNumber": ${lineNumber}, "functionName": ${functionName.replace(
+        ',',
+        ''
+      )} }`;
+    })
+    .join('')}]`;
+
+  return JSON.parse(cleanedData);
 };
 
 const groupedEventsOnRule = (evidence) =>
   evidence.reduce((acc, item) => {
-    const { rule } = item;
+    const { rule, evidance } = item;
     const exist = acc.find((e) => e.rule === rule);
     if (exist) {
-      exist.instances.push(item);
+      exist.instances.push(evidance);
     } else {
       acc.push({
         rule,
-        instances: [item],
+        instances: [evidance],
       });
     }
     return acc;
   }, []);
 const extractEventsEvidence = (events, filesMap, coverages, knowledgeMap) => {
   const evidence = events.data.map((event) => {
-    const { data, file, rule } = event;
+    const { data, rule } = event;
     const found = clearFounds(data);
     // find the rule in the knowledge base
     const ruleInKB = knowledgeMap
-      .map(({ checks }) => checks.events.find((item) => item.id === rule))
+      .map(({ evidance }) => evidance.events.find((item) => item.id === rule))
       .pop();
     // find the file in the coverage
     const eventsInCoverage = coverages
       .map((item) =>
         item.values.UICoverage.filter((e) => found.find((f) => f.ID === e.ID))
       )
-      .flat()
-      .pop();
+      .flat();
 
     return {
       evidance: {
         ...eventsInCoverage,
-        jsx: {
-          fileContent: {
-            content: filesMap[eventsInCoverage.jsx.fileName],
-            file: eventsInCoverage.jsx.fileName,
-          },
-          lineNumber: eventsInCoverage.jsx.lineNumber,
-        },
       },
       rule: ruleInKB,
     };
@@ -388,10 +322,12 @@ const extractAPICallsEvidence = (
 
     const instances = code_pattern.data.filter((code) => code.rule === rule);
     const ruleInKB = knowledgeMap
-      .map(({ checks }) => checks.API_calls.find((item) => item.id === rule))
+      .map(({ evidance }) =>
+        evidance.API_calls.find((item) => item.id === rule)
+      )
       .pop();
     const originalFiles = JSON.parse(
-      fs.readFileSync(path.join(__dirname, 'src', 'inputs', file), 'utf8')
+      fs.readFileSync(path.join(__dirname, 'src', file), 'utf8')
     ).filter((item) => item.functionsCoverage.indexOf(found) > -1);
     const fileContent = instances.map((instance) => {
       const OriginalPath = getOriginalPath(instance.file);
@@ -438,8 +374,8 @@ const extractNetworkEvidence = (
     const found = clearFounds(data);
     // find the rule in the knowledge base
     const ruleInKB = knowledgeMap
-      .map(({ checks }) =>
-        checks.network_activites.find((item) => item.id === rule)
+      .map(({ evidance }) =>
+        evidance.network_activites.find((item) => item.id === rule)
       )
       .pop();
     // find the file in the coverage
@@ -469,8 +405,8 @@ const extractNetworkEvidence = (
 
     return {
       evidance: {
-        network_activites: network_activitesInCoverage,
-        assoisatedRequestsForResponses,
+        network_activites: network_activitesInCoverage.pop(),
+        assoisatedRequestsForResponses: assoisatedRequestsForResponses.pop(),
       },
       rule: ruleInKB,
     };
@@ -519,7 +455,7 @@ const extractEvidance = (coverages, semgrepOutput, files, knowledge) => {
   return gatheredEvidence;
 };
 
-const getEvidance = async (coverages, files, knowledgeURL) => {
+const analyzeEvidence = async (coverages, files, knowledgeURL) => {
   const knowledge = await getKnowledge(knowledgeURL);
   clearFiles();
   writeCoverageToFiles(coverages);
@@ -533,4 +469,8 @@ const getEvidance = async (coverages, files, knowledgeURL) => {
     knowledge,
   });
 };
-getEvidance(workerData.coverages, workerData.files, workerData.knowledgeURL);
+analyzeEvidence(
+  workerData.coverages,
+  workerData.files,
+  workerData.knowledgeURL
+);

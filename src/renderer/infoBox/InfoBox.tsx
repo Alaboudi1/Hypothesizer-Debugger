@@ -1,8 +1,8 @@
 import React from 'react';
-import './hypotheses.css';
+import './InfoBox.css';
 import CodeSnipet from '../codeSnippet/codeSnippet';
 
-const Hypotheses: React.FC<any> = ({ hypotheses }): JSX.Element => {
+const InfoBox: React.FC<any> = ({ hypotheses }): JSX.Element => {
   const getEventEvidence = (evidence: any) => {
     const { instances } = evidence.evidenceItem;
     const snippet = instances.reduce((acc: any, instance: any) => {
@@ -121,82 +121,28 @@ const Hypotheses: React.FC<any> = ({ hypotheses }): JSX.Element => {
     );
   };
 
-  const getEvidenceList = (evidence) => {
-    switch (evidence.evidenceItem.rule.id.split('_')[0]) {
-      // if it start with EVENT
-      case 'EVENT':
-        return getEventEvidence(evidence);
-      case 'API':
-        return getApiEvidence(evidence);
-      case 'NETWORK':
-        return getNetworkEvidence(evidence);
-      default:
-        <> Found an evidnace but could not regonize its type</>;
-    }
-  };
-
   return (
-    <div className="container">
-      <div className="defectDescription">
-        {hypotheses.length > 0 ? (
-          <p className="hypothesesFound">
-            🎉 We found {hypotheses.length} potential hypothese(s) that may
-            explain what causes the bug!
-          </p>
-        ) : (
-          <p className="hypothesesNoFound">
-            🫤 We couldn't find any potential hypotheses that might explain what
-            causes the bug!
-          </p>
-        )}
-      </div>
-      <div className="hypotheses">
-        <h3>💡 Hypotheses</h3>
-        {hypotheses.map((hypothesis, index) => (
-          <details key={index}>
-            <summary>
-              <b>
-                <i>H{index + 1}:</i>
-              </b>
-              <span> {hypothesis.hypothesis} </span>
-              <span className="tellMeMore">Tell me more!</span>
-            </summary>
-            <div className="description">
-              <b>Description: </b>
-              {hypothesis.description}{' '}
-            </div>
-            <details className="evidanceList">
-              <summary>
-                <b>Why do we think this hypothesis is correct?</b>
-              </summary>
-              {hypothesis.supportedEvidaence.map((evidence, index) => (
-                <details key={index}>{getEvidenceList(evidence)}</details>
-              ))}
-            </details>
-            <details className="fix">
-              <summary>
-                <b>How can I fix this bug?</b>
-              </summary>
-              <div className="description">
-                <b>Description: </b>
-                {hypothesis.howToFix.description}{' '}
-              </div>
-
-              <ul className="Links">
-                {hypothesis.howToFix.links.map((link, index) => (
-                  <li key={index}>
-                    <a href={link.url} target="_blank" rel="noreferrer">
-                      {link.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </details>
-          </details>
-        ))}
-      </div>
+    <div className="timeLine__item__box__content">
+      <h3>Item 1</h3>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quae.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+        quae.
+      </p>
     </div>
   );
 };
 
-export default Hypotheses;
+export default InfoBox;

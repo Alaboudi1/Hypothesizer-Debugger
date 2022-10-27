@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { record, stopRecording, launchBrowser } from './trace/mainTrace';
+import { record, stopRecording, launchBrowser } from './trace/recorder';
 import { getEvidance, getHypotheses } from './analyzer/mainAnalyzer';
 import getCoverage from './sourceMap/mainSourceMap';
 
@@ -11,15 +11,26 @@ type SetupWindow = (
   yPosition: number
 ) => void;
 
+// this connects the backend to the frontend
+// The first command is to check if the docker is running, the frontend sends this command on startup
+// The second command is to launch the browser, the frontend sends this command when the docker is running
+// The third command is to record the trace, the frontend sends this command when the user clicks on the record button
+// The fourth command is to stop the recording, the frontend sends this command when the user clicks on the stop button
+// after the recording is stopped, the frontend sends the trace to the backend to analyze it
+// To analyze the trace, the backend first devide the trace to x number of arrays (currently 20) inside sourceMap/mainSourceMap.ts
+// For each array, the backend spawns a new worker to do the mapping inside sourceMap/sourceMapping.js
+// After the mapping is done, the backend clean the data inside sourceMap/coverageCleaning.js most of the cleaning is done to the function coverage
+// After the cleaning is done, the backend sends the data to analyzer to run the queries inside analyzer/mainAnalyzer.ts
+// the first setp is to write the queries and the trace to files inside analyzer/src
+// the second step is to run the queries inside analyzer/src using semgrep with python and docker
+// the third step is to write the results to files inside analyzer/src/output
+// Finally, the result files are read by reasoninAboutEvidance.js and sent to the frontend
 const initConnector = (
   setupWindow: SetupWindow,
   setupDevTools: () => void,
-  getMainWindowPositions: () => number[],
+  getMainWindowPositions: () => { width: number; height: number },
   isDockerRunning: () => boolean
 ) => {
-  // let target = undefined;
-  let x = 0;
-  let y = 0;
   const setuplisteners = () => {
     ipcMain.on('CDP', async (event, arg) => {
       const notifyFrontend = (channel: string, args: any) => {
@@ -32,8 +43,8 @@ const initConnector = (
         switch (step) {
           case 'trace':
             getEvidance(
-              payload.trace.mergedCoverageMaps,
-              payload.trace.filesContent,
+              payload.trace,
+              payload.filesContent,
               [payload.linkToKnowledge],
               setBackendState
             );
@@ -48,29 +59,34 @@ const initConnector = (
             throw new Error('Unknown step');
         }
       };
+      const { command, payload } = arg;
+      switch (command) {
+        case 'launch': {
+          const { width, height } = getMainWindowPositions();
+          await launchBrowser(payload.targetUrl, width, height);
+          break;
+        }
 
-      if (arg.command === 'launch') {
-        // set the x and y position of the window to bottom right
-        [x, y] = getMainWindowPositions();
+        case 'record':
+          await record();
+          break;
 
-        setupWindow(70, 125, true, 0, 0);
-        await launchBrowser(arg.payload.targetUrl);
-      }
-      if (arg.command === 'record') {
-        await record();
-      }
-      if (arg.command === 'stopRecording') {
-        notifyFrontend('progress', 0);
-        const { coverage, files } = await stopRecording();
-        setupWindow(1024, 728, false, x, y);
-        getCoverage(coverage, files, setBackendState);
-      }
-      if (arg.command === 'openDevTools') {
-        setupDevTools();
-      }
+        case 'stopRecording': {
+          const { coverage, files } = await stopRecording();
+          getCoverage(coverage, files, setBackendState);
+          break;
+        }
 
-      if (arg.command === 'isDockerRunning') {
-        notifyFrontend('isDockerRunning', isDockerRunning());
+        case 'openDevTools':
+          setupDevTools();
+          break;
+
+        case 'isDockerRunning':
+          notifyFrontend('isDockerRunning', isDockerRunning());
+          break;
+
+        default:
+          throw new Error('Unknown command');
       }
     });
   };

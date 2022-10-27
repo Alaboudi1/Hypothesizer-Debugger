@@ -40,7 +40,9 @@ const setupDevtools = () => {
   }
 };
 const getMainWindowPositions = () => {
-  return mainWindow?.getPosition();
+  const { width, height } =
+    require('electron').screen.getPrimaryDisplay().workAreaSize;
+  return { width, height };
 };
 
 const isDebug =
@@ -72,10 +74,15 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+  // get the display size
+  const { width, height } = getMainWindowPositions();
+
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: width / 2,
+    height,
+    x: width / 2,
+    y: 0,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       sandbox: false,
