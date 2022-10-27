@@ -1,24 +1,30 @@
-import subprocess
 import glob
 from concurrent.futures import ThreadPoolExecutor
+import os
 
 
 def run_semgrep(rules, target, output_filename):
-    process = subprocess.Popen(
-        f'semgrep --config={rules} {target}', shell=True, stdout=subprocess.PIPE)
-    output = process.stdout.read().strip()
-    output = output.decode('UTF-8')
-    # write to a json file
-    with open(output_filename, 'w') as f:
-        f.write(output)
+    print(output_filename)
+    os.system(
+        f'semgrep --config={rules} {target} --max-chars-per-line 100000 --max-lines-per-finding 0 --json --output {output_filename} --timeout 120')
+
+
+def get_targets(path, type):
+    # get the file name without the extension
+    outputFolder = path.split('/')[1].split('.')[0]
+    # get the first part of the file name before the underscore
+    inputFolder = outputFolder.split('_')[0]
+    # remove duplicates
+    if type == 'input':
+        return inputFolder
+    else:
+        return outputFolder
 
 
 def analyze():
     files = glob.glob('semgrep_rules/*.yml')
-    # get the file name without the extension
-    targets = [f.split('/')[-1].split('.')[0] for f in files]
     with ThreadPoolExecutor(max_workers=4) as executor:
-        futures = [executor.submit(run_semgrep, ruleFile, f'inputs/{targets[i]}/', f'outputs/{targets[i]}.txt')
+        futures = [executor.submit(run_semgrep, ruleFile, f'inputs/{get_targets(ruleFile,"input")}/', f'outputs/{get_targets(ruleFile,"output")}.json')
                    for i, ruleFile in enumerate(files)]
 
 
