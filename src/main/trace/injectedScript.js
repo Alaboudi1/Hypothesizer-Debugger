@@ -8,6 +8,7 @@ const init = () => {
   };
   const getReactFiber = (event) => {
     let reactFiber = { _debugSource: undefined };
+    if (event.target === undefined) return reactFiber;
 
     for (const [key, value] of Object.entries(event.target)) {
       if (key.startsWith('__reactFiber$')) {
@@ -17,7 +18,7 @@ const init = () => {
     }
     return reactFiber;
   };
-  const getDataForClick = (event, type, timeStamp = Date.now()) => {
+  const getDataForClick = (event, type, timeStamp) => {
     // search for reactFiber
     const reactFiber = getReactFiber(event);
 
@@ -40,20 +41,26 @@ const init = () => {
 
   // attach click event to all input elements
   document.querySelectorAll('input').forEach((input) => {
-    input.addEventListener('click', (e) => getDataForClick(e, 'click'));
+    input.addEventListener('click', (e, timeStamp = Date.now()) =>
+      getDataForClick(e, 'click', timeStamp)
+    );
   });
   // attach click event to all button elements
   document.querySelectorAll('button').forEach((button) => {
-    button.addEventListener('click', (e) => getDataForClick(e, 'click'));
+    button.addEventListener('click', (e, timeStamp = Date.now()) =>
+      getDataForClick(e, 'click', timeStamp)
+    );
   });
 
   // attach keyup event to keypress input elements
   document.querySelectorAll('input[type="text"]').forEach((input) => {
-    input.addEventListener('keydown', (e) => getDataForClick(e, 'keydown'));
+    input.addEventListener('keydown', (e, timeStamp = Date.now()) =>
+      getDataForClick(e, 'keydown', timeStamp)
+    );
   });
 
   const callback = (mutationsList) => {
-    const timeStamp = Date.now();
+    const timeStamp = Date.now() + 1;
     mutationsList.forEach((mutation) => {
       if (
         !['BODY', 'SCRIPT', 'STYLE', 'HEAD'].includes(mutation.target.tagName)
