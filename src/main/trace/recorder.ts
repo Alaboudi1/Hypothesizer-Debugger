@@ -207,7 +207,7 @@ const record = async () => {
     detailed: true,
   });
   setIntervalCallback = setInterval(async () => {
-    const timeStamp = Date.now() + 1;
+    const timeStamp = Date.now() + 3;
     const result = await client.send('Profiler.takePreciseCoverage');
     await client.send('Profiler.setSamplingInterval', {
       interval: 0,

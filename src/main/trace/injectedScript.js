@@ -65,7 +65,7 @@ const init = () => {
   });
 
   const callback = (mutationsList) => {
-    const timeStamp = Date.now() + 1;
+    const timeStamp = Date.now() + 3;
     mutationsList.forEach((mutation) => {
       if (
         !['BODY', 'SCRIPT', 'STYLE', 'HEAD'].includes(mutation.target.tagName)

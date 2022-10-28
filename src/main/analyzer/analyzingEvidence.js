@@ -191,14 +191,7 @@ const writeSemgrepRules = (knowledge) => {
 const writeCoverageFilesToFiles = (files) => {
   files.forEach((file) => {
     fs.writeFileSync(
-      path.join(
-        __dirname,
-        'src',
-        'inputs',
-        'Code',
-        // replace all / or \ with = to avoid errors
-        file.file
-      ),
+      path.join(__dirname, 'src', 'inputs', 'Code', file.file),
       file.content
     );
   });
