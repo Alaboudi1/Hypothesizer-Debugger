@@ -189,18 +189,15 @@ const writeSemgrepRules = (knowledge) => {
 };
 
 const writeCoverageFilesToFiles = (files) => {
-  // only if the files are not node_modules
-  const filteredFiles = files.filter(
-    ({ file }) => file.includes('src') && !file.includes('node_modules')
-  );
-  filteredFiles.forEach((file) => {
+  files.forEach((file) => {
     fs.writeFileSync(
       path.join(
         __dirname,
         'src',
         'inputs',
         'Code',
-        file.file.replace(/\//g, '=')
+        // replace all / or \ with = to avoid errors
+        file.file.replace(/[/\\]/g, '=')
       ),
       file.content
     );
