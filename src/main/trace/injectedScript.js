@@ -23,7 +23,12 @@ const init = () => {
     const reactFiber = getReactFiber(event);
 
     const data = {
-      jsx: reactFiber._debugSource,
+      jsx: {
+        fileName: reactFiber._debugSource?.fileName
+          .split('src')[1]
+          .replace(/[\/\\]/g, '='),
+        lineNumber: reactFiber._debugSource?.lineNumber,
+      },
       target: event.target.tagName,
       InputType: event.target.type,
       type,
@@ -74,7 +79,9 @@ const init = () => {
               HTML: node.innerHTML ?? node.textContent,
               tagName: node.tagName ?? node.nodeName,
               jsx: {
-                fileName: reactFiber._debugSource?.fileName,
+                fileName: reactFiber._debugSource?.fileName
+                  .split('src')[1]
+                  .replace(/[\/\\]/g, '='),
                 lineNumber: reactFiber._debugSource?.lineNumber,
               },
             };

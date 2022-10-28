@@ -197,7 +197,7 @@ const writeCoverageFilesToFiles = (files) => {
         'inputs',
         'Code',
         // replace all / or \ with = to avoid errors
-        file.file.replace(/[/\\]/g, '=')
+        file.file
       ),
       file.content
     );

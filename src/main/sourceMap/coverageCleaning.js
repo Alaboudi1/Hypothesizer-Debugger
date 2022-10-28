@@ -9,7 +9,10 @@ const getFileContent = (coverages, files) => {
         return;
       if (filesContent.findIndex((f) => f.file === filePath) === -1) {
         const file = files.find((f) => f.scriptId === coverage.scriptId);
-        const orginalFileIndex = file.map.sources.indexOf(filePath);
+        const paths = file.map.sources.map((s) =>
+          s.split('src')[1].replace(/[\/\\]/g, '=')
+        );
+        const orginalFileIndex = paths.indexOf(filePath);
         const originalFile = file.map.sourcesContent[orginalFileIndex];
         filesContent.push({
           file: filePath,
@@ -27,7 +30,9 @@ const cleanCodeCoverage = (coverage, files) => {
     count: func.count,
     ranges: [func.start.line, func.end.line],
     type: 'codeCoverage',
-    file: func.start.source,
+    file: func.start.source.includes('src')
+      ? func.start.source.split('src')[1].replace(/[\/\\]/g, '=')
+      : func.start.source,
     timeStamp: coverage.timeStamp,
     scriptId: coverage.scriptId,
   });
