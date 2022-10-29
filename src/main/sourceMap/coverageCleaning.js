@@ -9,9 +9,10 @@ const getFileContent = (coverages, files) => {
         return;
       if (filesContent.findIndex((f) => f.file === filePath) === -1) {
         const file = files.find((f) => f.scriptId === coverage.scriptId);
-        const paths = file.map.sources.map((s) =>
-          s.split('src')[1].replace(/[\/\\]/g, '=')
-        );
+        const paths = file.map.sources.map((s) => {
+          if (!(s.includes('node_modules') || s.includes('webpack')))
+            return s.split('src')[1].replace(/[\/\\]/g, '=');
+        });
         const orginalFileIndex = paths.indexOf(filePath);
         const originalFile = file.map.sourcesContent[orginalFileIndex];
         filesContent.push({

@@ -1,7 +1,7 @@
 import path from 'path';
 import { Worker } from 'worker_threads';
 
-const getEvidance = (coverages, files, knowledgeURL, callback) => {
+const getEvidence = (coverages, files, knowledgeURL, callback) => {
   const worker = new Worker(path.join(__dirname, 'analyzingEvidence.js'), {
     workerData: {
       coverages,
@@ -11,15 +11,16 @@ const getEvidance = (coverages, files, knowledgeURL, callback) => {
   });
 
   worker.on('message', (message) => {
-    callback({ payload: message, step: 'evidance' });
+    callback({ payload: message, step: 'evidence' });
   });
 };
 
-const getHypotheses = (gatheredEvidence, knowledgeMap, callback) => {
-  const worker = new Worker(path.join(__dirname, 'reasoningAboutEvidance.js'), {
+const getHypotheses = (gatheredEvidence, knowledgeMap, files, callback) => {
+  const worker = new Worker(path.join(__dirname, 'reasoningAboutEvidence.js'), {
     workerData: {
       gatheredEvidence,
       knowledgeMap,
+      files,
     },
   });
 
@@ -28,4 +29,4 @@ const getHypotheses = (gatheredEvidence, knowledgeMap, callback) => {
   );
 };
 
-export { getEvidance, getHypotheses };
+export { getEvidence, getHypotheses };

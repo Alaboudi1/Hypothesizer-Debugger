@@ -165,7 +165,7 @@ const Hypotheses: React.FC<any> = ({ hypotheses }): JSX.Element => {
               <b>Description: </b>
               {hypothesis.description}{' '}
             </div>
-            <details className="evidanceList">
+            <details className="evidenceList">
               <summary>
                 <b>Why do we think this hypothesis is correct?</b>
               </summary>

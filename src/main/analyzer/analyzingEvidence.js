@@ -110,7 +110,7 @@ const semgrepAnalysis = () => {
 };
 const writeSemgrepRules = (knowledge) => {
   knowledge.forEach((item) => {
-    const rules = item.evidance;
+    const rules = item.evidence;
 
     const APICalls = {
       rules: rules.API_calls.map((rule) => {
@@ -206,30 +206,30 @@ const readSemgrepOutput = () => {
     );
     return JSON.parse(content).results.map((result) => {
       return {
-        rule: result.check_id,
+        rule: result.check_id.split('semgrep_rules.')[1],
         file: result.path.split('/')[2].replace(/=/g, '/'),
         lines: [result.start.line, result.end.line],
         message: result.extra.message,
-        evidance:
+        evidence:
           result.extra.message === 'pattern'
             ? result.extra.lines
             : JSON.parse(result.extra.lines.replace(/,$/, '')),
       };
     });
   });
-  // .sort((a, b) => a.evidance.timeStamp - b.evidance.timeStamp);
+  // .sort((a, b) => a.evidence.timeStamp - b.evidence.timeStamp);
 };
 
-const extractEvidance = (semgrepOutput, files, knowledge) => {
+const extractEvidence = (semgrepOutput) => {
   const patters = semgrepOutput.filter((item) => item.message === 'pattern');
-  const evidance = semgrepOutput
+  const evidence = semgrepOutput
     .map((item) => {
       if (item.message === 'call') {
         const pattern = patters.find((pattern) => pattern.rule === item.rule);
         item = {
           ...item,
-          evidance: {
-            ...item.evidance,
+          evidence: {
+            ...item.evidence,
             callee: {
               file: pattern.file,
               lines: pattern.lines,
@@ -240,8 +240,7 @@ const extractEvidance = (semgrepOutput, files, knowledge) => {
       return item;
     })
     .filter((item) => item.message !== 'pattern');
-  // sort timeStamps from the smallest to the biggest
-  return evidance.sort((a, b) => a.evidance.timeStamp - b.evidance.timeStamp);
+  return evidence.sort((a, b) => a.evidence.timeStamp - b.evidence.timeStamp);
 };
 
 const analyzeEvidence = async (coverages, files, knowledgeURL) => {
@@ -253,10 +252,11 @@ const analyzeEvidence = async (coverages, files, knowledgeURL) => {
   writeSemgrepRules(knowledge);
   semgrepAnalysis();
   const semgrepOutput = readSemgrepOutput();
-  const evidance = extractEvidance(semgrepOutput, files, knowledge);
+  const evidence = extractEvidence(semgrepOutput);
   parentPort.postMessage({
-    evidance,
+    evidence,
     knowledge,
+    files,
   });
 };
 analyzeEvidence(
