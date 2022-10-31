@@ -230,7 +230,7 @@ const extractEvidence = (semgrepOutput) => {
           ...item,
           evidence: {
             ...item.evidence,
-            callee: {
+            caller: {
               file: pattern.file,
               lines: pattern.lines,
             },

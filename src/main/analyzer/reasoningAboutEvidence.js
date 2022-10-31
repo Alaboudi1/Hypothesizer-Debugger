@@ -25,7 +25,7 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
           return true;
         });
 
-      const evidence = hypothesis.evidence.map((evidence) => {
+      const evidence = hypothesis.evidence.map((evidence, evidenceIndex) => {
         // for each evidence in the hypothesis, it contains a list of gatheredEvidence that support it
         evidence.matched = [];
         // we removed all gatheredEvidence that is before the evidencePointer
@@ -41,13 +41,12 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
             evidence.matched.push(gatheredEvidenceItem);
             return true;
           }
-          if (
-            evidence.matched.find(
-              (matchedEvidence) =>
-                matchedEvidence.rule === gatheredEvidenceItem.rule
-            )
-          ) {
-            // if the gatheredEvidenceItem is already in the matchedEvidence, we don't skip the evidence
+          // does this gatheredEvidenceItem match a previous evidence in the hypothesis?
+          // if it does, we need to move the evidencePointer forward without adding it to the evidence.matched
+          const isFoundBefore = hypothesis.evidence
+            .slice(0, evidenceIndex)
+            .find((evi) => evi.rule === gatheredEvidenceItem.rule);
+          if (isFoundBefore) {
             return true;
           }
           return false;
@@ -61,8 +60,109 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
     });
   });
 };
+const cleanEventKeyPressAndClickEvidence = (events, files) => {
+  const cleanedEvent = events.map((event) => {
+    const { evidence } = event;
+    const fileContent = files.find(
+      ({ file }) => file === evidence.jsx.fileName
+    )?.content;
+    return {
+      file: evidence.jsx.fileName.replace(/=/g, '/'),
+      line: evidence.jsx.lineNumber,
+      fileContent,
+      keyPressed: evidence.keyPressed,
+      inputType: evidence.InputType,
+      type: evidence.type,
+    };
+  });
+  // group the events by file and line
+  const groupedEvents = cleanedEvent.reduce((acc, e) => {
+    const found = acc.find((a) => a.file === e.file && a.line === e.line);
+    if (!found) {
+      acc.push({
+        ...e,
+        count: 1,
+      });
+    } else {
+      found.count += 1;
 
-const cleanningUpHypotheses = (hypotheses, files) => {};
+      found.keyPressed += ` ${e.keyPressed}`;
+    }
+    return acc;
+  }, []);
+  return groupedEvents;
+};
+
+const cleanCodeCoverageEvidence = (codeCoverages, files) => {
+  const cleanedCodeCoverage = codeCoverages.map((codeCoverage) => {
+    const { evidence } = codeCoverage;
+    const callee = files.find(
+      ({ file }) => file.replace(/=/g, '/') === evidence.file
+    )?.content;
+    const caller = files.find(
+      ({ file }) => file.replace(/=/g, '/') === evidence.caller.file
+    )?.content;
+    return {
+      callee: {
+        file: evidence.file,
+        ranges: evidence.ranges,
+      },
+      caller: {
+        file: evidence.caller.file,
+        ranges: evidence.caller.lines,
+      },
+      calleeContent: callee,
+      callerContent: caller,
+      type: evidence.type,
+      count: evidence.count,
+      functionName: evidence.functionName,
+    };
+  });
+  return cleanedCodeCoverage;
+};
+
+const cleanningUpEvidence = (hypotheses, files) => {
+  return hypotheses.map((hypothesis) => {
+    return {
+      ...hypothesis,
+      evidence: hypothesis.evidence.map((evidence) => {
+        const { matched } = evidence;
+        if (matched.length === 0) {
+          return evidence;
+        }
+        const oneMatch = matched[0];
+
+        if (oneMatch.evidence.keyPressed || oneMatch.evidence.type === 'click')
+          return {
+            ...evidence,
+            matched: cleanEventKeyPressAndClickEvidence(matched, files),
+          };
+
+        if (oneMatch.evidence.type === 'codeCoverage')
+          return {
+            ...evidence,
+            matched: cleanCodeCoverageEvidence(matched, files),
+          };
+        if (oneMatch.evidence.type === 'network') return evidence;
+
+        if (oneMatch.evidence.type === 'mutation')
+          return {
+            ...evidence,
+            matched: matched.map((m) => {
+              const { removeNode, addNode, timeStamp } = m.evidence;
+              return {
+                removeNode,
+                addNode,
+                timeStamp,
+              };
+            }),
+          };
+
+        return evidence;
+      }),
+    };
+  });
+};
 
 // parentPort.postMessage(potintialHypotheses);
 
@@ -72,6 +172,6 @@ const hypotheses = reasonAboutEvidence(
   workerData.files
 );
 
-const cleanedEvidence = cleanningUpHypotheses(hypotheses, workerData.files);
+const cleanedEvidence = cleanningUpEvidence(hypotheses, workerData.files);
 
 parentPort.postMessage(cleanedEvidence);

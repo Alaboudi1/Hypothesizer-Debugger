@@ -24,9 +24,9 @@ const init = () => {
 
     const data = {
       jsx: {
-        fileName: reactFiber._debugSource?.fileName
+        fileName: `src${reactFiber._debugSource?.fileName
           .split('src')[1]
-          .replace(/[\/\\]/g, '='),
+          .replace(/[\/\\]/g, '=')}`,
         lineNumber: reactFiber._debugSource?.lineNumber,
       },
       target: event.target.tagName,
@@ -79,9 +79,9 @@ const init = () => {
               HTML: node.innerHTML ?? node.textContent,
               tagName: node.tagName ?? node.nodeName,
               jsx: {
-                fileName: reactFiber._debugSource?.fileName
+                fileName: `src${reactFiber._debugSource?.fileName
                   .split('src')[1]
-                  .replace(/[\/\\]/g, '='),
+                  .replace(/[\/\\]/g, '=')}`,
                 lineNumber: reactFiber._debugSource?.lineNumber,
               },
             };

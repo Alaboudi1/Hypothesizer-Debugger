@@ -5,20 +5,24 @@ const getFileContent = (coverages, files) => {
   coverages.forEach((coverage) => {
     if (coverage.type === 'codeCoverage') {
       const filePath = coverage.file;
-      if (filePath.includes('node_modules') || filePath.includes('webpack'))
-        return;
-      if (filesContent.findIndex((f) => f.file === filePath) === -1) {
-        const file = files.find((f) => f.scriptId === coverage.scriptId);
-        const paths = file.map.sources.map((s) => {
-          if (!(s.includes('node_modules') || s.includes('webpack')))
-            return s.split('src')[1].replace(/[\/\\]/g, '=');
-        });
-        const orginalFileIndex = paths.indexOf(filePath);
-        const originalFile = file.map.sourcesContent[orginalFileIndex];
-        filesContent.push({
-          file: filePath,
-          content: originalFile,
-        });
+      if (
+        filePath.includes('src') &&
+        !filePath.includes('node_modules') &&
+        !filePath.includes('webpack')
+      ) {
+        if (filesContent.findIndex((f) => f.file === filePath) === -1) {
+          const file = files.find((f) => f.scriptId === coverage.scriptId);
+          const paths = file.map.sources.map((s) => {
+            if (s.includes('src'))
+              return `src${s.split('src')[1].replace(/[\/\\]/g, '=')}`;
+          });
+          const orginalFileIndex = paths.indexOf(filePath);
+          const originalFile = file.map.sourcesContent[orginalFileIndex];
+          filesContent.push({
+            file: filePath,
+            content: originalFile,
+          });
+        }
       }
     }
   });
@@ -31,9 +35,11 @@ const cleanCodeCoverage = (coverage, files) => {
     count: func.count,
     ranges: [func.start.line, func.end.line],
     type: 'codeCoverage',
-    file: func.start.source.includes('src')
-      ? func.start.source.split('src')[1].replace(/[\/\\]/g, '=')
-      : func.start.source,
+    file:
+      func.start.source.includes('src') &&
+      !func.start.source.includes('node_modules')
+        ? `src${func.start.source.split('src')[1].replace(/[\/\\]/g, '=')}`
+        : func.start.source,
     timeStamp: coverage.timeStamp,
     scriptId: coverage.scriptId,
   });
