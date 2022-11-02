@@ -29,25 +29,38 @@ const CodeSnipet: React.FC<any> = ({
 
   return (
     <div className="codeSnipet">
-      {fileName && (
-        <p>
-          <b>Location</b>: src{fileName.split('src').pop()} : {lineNumber}{' '}
-        </p>
-      )}
+      {lineNumber > 0 ? (
+        <>
+          {fileName && (
+            <p>
+              <b>Location</b>: src{fileName.split('src').pop()} : {lineNumber}{' '}
+            </p>
+          )}
 
-      <button type="button" onClick={handleExpand} className="expandButton">
-        {expand ? '⤪ Collapse' : '⤢ Expand'}
-      </button>
-      <div className={`codeSnipetBody ${expand ? 'expanded' : ' collapsed'}`}>
-        <CopyBlock
-          text={sourceCode}
-          language={`${fileName?.split('.').pop()}`}
-          showLineNumbers
-          theme={dracula}
-          startingLineNumber={expand ? 1 : lineNumber - 4}
-          highlight={`${expand ? lineNumber : 5}`}
-        />
-      </div>
+          <button type="button" onClick={handleExpand} className="expandButton">
+            {expand ? '⤪ Collapse' : '⤢ Expand'}
+          </button>
+          <div
+            className={`codeSnipetBody ${expand ? 'expanded' : ' collapsed'}`}
+          >
+            <CopyBlock
+              text={sourceCode}
+              language={`${fileName?.split('.').pop()}`}
+              showLineNumbers
+              theme={dracula}
+              startingLineNumber={expand ? 1 : lineNumber - 4}
+            />
+          </div>
+        </>
+      ) : (
+        <div className="codeSnipetBody">
+          <CopyBlock
+            text={sourceCode}
+            language={`${fileName?.split('.').pop()}`}
+            theme={dracula}
+          />
+        </div>
+      )}
     </div>
   );
 };

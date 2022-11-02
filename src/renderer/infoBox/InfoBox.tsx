@@ -2,147 +2,109 @@ import React from 'react';
 import './InfoBox.css';
 import CodeSnipet from '../codeSnippet/codeSnippet';
 
-const InfoBox: React.FC<any> = ({ hypotheses }): JSX.Element => {
-  const getEventEvidence = (evidence: any) => {
-    const { instances } = evidence.evidenceItem;
-    const snippet = instances.reduce((acc: any, instance: any) => {
-      const { content, file } = instance.jsx?.fileContent;
-      const { lineNumber } = instance.jsx;
-      if (
-        acc.find((snipt: any) => snipt.fileName === file) &&
-        acc.find((snipt: any) => snipt.lineNumber === lineNumber)
-      )
-        return acc;
-      acc.push({ code: content, lineNumber, fileName: file });
-      return acc;
-    }, []);
-    return (
-      <>
-        <summary className="eventItem">
-          {evidence.shouldBeFound
-            ? `You ${instances[0].type}ed (${
-                instances.length
-              }) time(s) on an ${instances[0].target.toLowerCase()} element, which triggerd ${
-                instances[0].InputType
-              }  event(s).`
-            : `You did not trigger any ${evidence.evidenceItem.rule.InputType}`}{' '}
-        </summary>
-        <div className="description">
-          <b>Description: </b>
-          {evidence.why}
-        </div>
-        {snippet.map((snipt: any) => (
-          <CodeSnipet
-            code={snipt.code}
-            lineNumber={snipt.lineNumber}
-            fileName={snipt.fileName}
-          />
-        ))}
-      </>
-    );
-  };
-
-  const getApiEvidence = (evidence: any) => {
-    const { instances } = evidence.evidenceItem;
-    const snippet = instances?.reduce((acc: any, instance: any) => {
-      const { content, file } = instance.jsx?.fileContent;
-      const { lineNumber } = instance.jsx;
-      if (
-        acc.find((snipt: any) => snipt.fileName === file) &&
-        acc.find((snipt: any) => snipt.lineNumber === lineNumber)
-      )
-        return acc;
-      acc.push({ code: content, lineNumber, fileName: file });
-      return acc;
-    }, []);
-    return (
-      <>
-        <summary className="eventItem">
-          {evidence.shouldBeFound
-            ? `You ${instances[0].type}ed (${
-                instances.length
-              }) time(s) on an ${instances[0].target.toLowerCase()} element, which triggerd ${
-                instances[0].InputType
-              }  event(s).`
-            : `You did not use ${evidence.evidenceItem.rule.functionName} API`}{' '}
-        </summary>
-        <div className="description">
-          <b>Description: </b>
-          {evidence.why}
-        </div>
-        {snippet?.map((snipt: any) => (
-          <CodeSnipet
-            code={snipt.code}
-            lineNumber={snipt.lineNumber}
-            fileName={snipt.fileName}
-          />
-        ))}
-      </>
-    );
-
-    return <summary className="eventItem" />;
-  };
-
-  const getNetworkEvidence = (evidence: any) => {
-    const { instances } = evidence.evidenceItem;
-    const snippet = instances.reduce((acc: any, instance: any) => {
-      const { functionName, file, lineNumber } =
-        // potintial bug here? not sure if this is the correct way to access the file content
-        instance.assoisatedRequestsForResponses?.stack || {};
-      if (
-        file === undefined ||
-        (acc.find((snipt: any) => snipt.file === file) &&
-          acc.find((snipt: any) => snipt.lineNumber === lineNumber))
-      )
-        return acc;
-      acc.push({ code: functionName, lineNumber, fileName: file });
-      return acc;
-    }, []);
-    return (
-      <>
-        <summary className="eventItem">
-          {evidence.shouldBeFound
-            ? `You made (${instances.length}) ${instances[0].assoisatedRequestsForResponses.method} network request(s) to ${instances[0].assoisatedRequestsForResponses?.url}.`
-            : `You did not make any network request`}
-        </summary>
-
-        <div className="description">
-          <b>Description: </b>
-          {evidence.why}
-        </div>
-        {snippet.map((snipt: any) => (
-          <CodeSnipet
-            code={snipt.code}
-            lineNumber={snipt.lineNumber}
-            fileName={snipt.fileName}
-          />
-        ))}
-      </>
-    );
-  };
-
+const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
   return (
     <div className="timeLine__item__box__content">
-      <h3>Item 1</h3>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quae.
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae.Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-        quae.
-      </p>
+      <h3>{evidence.type}</h3>
+      <p>{evidence.description}</p>
+      {evidence.matched.map((match) => {
+        if (evidence.type === 'keydown') {
+          return (
+            <p key={match + Math.random()}>
+              <p>
+                You typed: <i>{match.keyPressed}</i>
+              </p>
+              <p>The typing was handled by the code in the following file: </p>
+              <CodeSnipet
+                code={match.fileContent}
+                lineNumber={match.line}
+                fileName={match.file}
+              />
+            </p>
+          );
+        }
+        if (evidence.type === 'click') {
+          return (
+            <p key={match + Math.random()}>
+              <p>You clicked on the element in the following file: </p>
+              <CodeSnipet
+                code={match.fileContent}
+                lineNumber={match.line}
+                fileName={match.file}
+              />
+            </p>
+          );
+        }
+
+        if (evidence.type === 'mutation') {
+          if (match.removeNode.length > 0) {
+            return (
+              <>
+                <p> this html node was removed</p>
+                <CodeSnipet
+                  code={match.removeNode.map((node) => node.HTML).join('')}
+                  lineNumber={0}
+                  fileName={'.html'}
+                />
+              </>
+            );
+          }
+
+          if (match.addNode.length > 0)
+            return (
+              <>
+                <p> this html node was added</p>
+                <CodeSnipet
+                  code={match.addNode.map((node) => node.HTML).join('')}
+                  lineNumber={0}
+                  fileName={'.html'}
+                />
+              </>
+            );
+        }
+      })}
+      {evidence.DoesContainTheDefect && (
+        <>
+          <p>
+            <b>How To Fix?</b>
+            {evidence.CodeExample && (
+              <p> Here is an example of how to fix the defect: </p>
+            )}
+            <CodeSnipet
+              code={evidence.CodeExample}
+              lineNumber={0}
+              fileName={'.js'}
+            />
+          </p>
+          <p> Here are some external Documentation: </p>
+          <ul>
+            {evidence.links.map((doc) => (
+              <li key={doc + Math.random()}>
+                <a href={doc.url} target="_blank" rel="noreferrer">
+                  {doc.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p>
+            Where to start?
+            {hypotheses.evidence
+              .filter((e) =>
+                evidence.relatedEvidenceFix.find((ev) => ev === e.rule)
+              )
+              .map((e) => {
+                return (
+                  <CodeSnipet
+                    code={e.matched[0].fileContent}
+                    lineNumber={e.matched[0].line}
+                    fileName={e.matched[0].file}
+                  />
+                );
+              })}
+          </p>
+        </>
+      )}
     </div>
   );
 };
-
 export default InfoBox;

@@ -10,12 +10,31 @@ import missing from './icons/missing.png';
 
 function TimeLine({ hypotheses }) {
   const boxRef = useRef(null);
-  const [infoBoxData, setInfoBoxData] = useState('');
+  const [infoBoxData, setInfoBoxData] = useState(hypotheses[0].evidence[0]);
+  const [hypotheseUnderInvestigation, setHypotheseUnderInvestigation] =
+    useState(0);
 
   const selectedDot = (e) => {
-    const dot = e.currentTarget.id;
-    boxRef.current.style.transform = `translateY(${dot * 92 + 2}px)`;
-    setInfoBoxData(hypotheses[dot]);
+    // id to number
+    const id = parseInt(e.currentTarget.id, 10);
+    boxRef.current.style.transform = `translateY(${id * 92 + 2}px)`;
+    setInfoBoxData(hypotheses[hypotheseUnderInvestigation].evidence[id]);
+  };
+  const getIcon = (type) => {
+    switch (type) {
+      case 'click':
+        return click;
+      case 'keydown':
+        return typing;
+      case 'responseReceived':
+        return network;
+      case 'mutation':
+        return render;
+      case 'codeCoverage':
+        return code;
+      default:
+        return missing;
+    }
   };
 
   return (
@@ -35,28 +54,32 @@ function TimeLine({ hypotheses }) {
       </div>
       <div className="App">
         <div className="timeLine">
-          <button className="timeLine__item__dot" id="0" onClick={selectedDot}>
-            <img src={click} alt="click" />
-            <span className="timeLine__item__dot__badges">!</span>
-          </button>
-          <button className="timeLine__item__dot" id={1} onClick={selectedDot}>
-            <img src={typing} alt="typing" />
-          </button>
-          <button className="timeLine__item__dot" id={2} onClick={selectedDot}>
-            <img src={network} alt="network" />
-          </button>
-          <button className="timeLine__item__dot" id={3} onClick={selectedDot}>
-            <img src={render} alt="render" />
-          </button>
-          <button className="timeLine__item__dot" id={4} onClick={selectedDot}>
-            <img src={code} alt="code" />
-          </button>
-          <button className="timeLine__item__dot" id={5} onClick={selectedDot}>
-            <img src={missing} alt="missing" />
-          </button>
+          {hypotheses.length > 0 &&
+            hypotheses[hypotheseUnderInvestigation].evidence.map(
+              (evidence, index) => (
+                <button
+                  className={
+                    evidence.type === 'no evidence'
+                      ? 'timeLine__item__dot timeLine__item__dot--noEvidence'
+                      : 'timeLine__item__dot'
+                  }
+                  id={index}
+                  onClick={selectedDot}
+                  type="button"
+                >
+                  <img src={getIcon(evidence.type)} alt="click" />
+                  {evidence.type === 'no evidence' && (
+                    <span className="timeLine__item__dot__badges">!</span>
+                  )}
+                </button>
+              )
+            )}
         </div>
         <div className="timeLine__item__box" ref={boxRef}>
-          <InfoBox hypotheses={hypotheses} />
+          <InfoBox
+            evidence={infoBoxData}
+            hypotheses={hypotheses[hypotheseUnderInvestigation]}
+          />
         </div>
       </div>
     </>

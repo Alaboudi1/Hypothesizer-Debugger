@@ -47,18 +47,18 @@ const App = (): JSX.Element => {
   }, []);
 
   const getPotintialHypotheses = () => {
-    return unfiltredHypotheses.current
-      .filter((hypothesis) => hypothesis.score > 0.5)
-      .filter((hypothesis) => {
-        const { defect_category } = hypothesis;
-        return (
-          userAnswers.current[0].answer.includes(defect_category.type) &&
-          userAnswers.current[1].answer.includes(
-            defect_category.incorrectOutput
-          )
-        );
-      })
-      .sort((a, b) => a.score - b.score);
+    return unfiltredHypotheses.current;
+    // .filter((hypothesis) => hypothesis.score > 0.5)
+    // .filter((hypothesis) => {
+    //   const { defect_category } = hypothesis;
+    //   return (
+    //     userAnswers.current[0].answer.includes(defect_category.type) &&
+    //     userAnswers.current[1].answer.includes(
+    //       defect_category.incorrectOutput
+    //     )
+    //   );
+    // })
+    // .sort((a, b) => a.score - b.score);
   };
 
   const getMainContainer = (): JSX.Element => {

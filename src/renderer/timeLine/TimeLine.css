@@ -48,6 +48,9 @@
   justify-content: center;
   transition: all 0.5s ease-in-out;
 }
+.timeLine__item__dot--noEvidence {
+  opacity: 0.5;
+}
 
 .timeLine__item__box::before {
   content: '';
@@ -79,14 +82,16 @@
 @keyframes glowing {
   0% {
     background-color: rgb(245, 244, 176);
-    box-shadow: 0 0 3px rgb(186, 183, 0);
+    box-shadow: 0 0 10px rgb(90, 0, 0);
   }
+
   50% {
     background-color: rgb(255, 255, 255);
-    box-shadow: 0 0 15px rgb(255, 255, 255);
+    box-shadow: 0 0 40px rgb(255, 255, 255);
   }
+
   100% {
     background-color: rgb(245, 244, 176);
-    box-shadow: 0 0 3px rgb(186, 183, 0);
+    box-shadow: 0 0 10px rgb(90, 0, 0);
   }
 }

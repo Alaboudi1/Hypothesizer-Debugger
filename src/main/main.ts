@@ -14,23 +14,12 @@ import { resolveHtmlPath, isDockerRunning } from './util';
 import initConnector from './backendConnector';
 
 let mainWindow: BrowserWindow | null = null;
-let mainWindowPosition: number[] = [];
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
-const setupWindow = (
-  width: number,
-  height: number,
-  onTop: boolean,
-  xPosition: number,
-  yPosition: number
-) => {
-  mainWindow?.setSize(width, height, true);
-  mainWindow?.setPosition(xPosition, yPosition, true);
-  mainWindow?.setAlwaysOnTop(onTop);
-};
+
 const setupDevtools = () => {
   // chek if dev tools are open
   if (mainWindow?.webContents.isDevToolsOpened()) {
@@ -139,11 +128,6 @@ app
     });
   })
   .then(() =>
-    initConnector(
-      setupWindow,
-      setupDevtools,
-      getMainWindowPositions,
-      isDockerRunning
-    )
+    initConnector(setupDevtools, getMainWindowPositions, isDockerRunning)
   )
   .catch(console.log);

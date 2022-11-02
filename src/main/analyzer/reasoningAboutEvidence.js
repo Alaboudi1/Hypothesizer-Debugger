@@ -128,7 +128,10 @@ const cleanningUpEvidence = (hypotheses, files) => {
       evidence: hypothesis.evidence.map((evidence) => {
         const { matched } = evidence;
         if (matched.length === 0) {
-          return evidence;
+          return {
+            ...evidence,
+            type: 'no evidence',
+          };
         }
         const oneMatch = matched[0];
 
@@ -136,14 +139,21 @@ const cleanningUpEvidence = (hypotheses, files) => {
           return {
             ...evidence,
             matched: cleanEventKeyPressAndClickEvidence(matched, files),
+            type: oneMatch.evidence.type,
           };
 
         if (oneMatch.evidence.type === 'codeCoverage')
           return {
             ...evidence,
             matched: cleanCodeCoverageEvidence(matched, files),
+            type: oneMatch.evidence.type,
           };
-        if (oneMatch.evidence.type === 'network') return evidence;
+        if (oneMatch.evidence.type === 'responseReceived')
+          return {
+            ...evidence,
+            matched: matched.map((m) => m.evidence),
+            type: oneMatch.evidence.type,
+          };
 
         if (oneMatch.evidence.type === 'mutation')
           return {
@@ -156,6 +166,7 @@ const cleanningUpEvidence = (hypotheses, files) => {
                 timeStamp,
               };
             }),
+            type: oneMatch.evidence.type,
           };
 
         return evidence;

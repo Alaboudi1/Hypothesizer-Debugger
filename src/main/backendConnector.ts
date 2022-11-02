@@ -26,7 +26,6 @@ type SetupWindow = (
 // the third step is to write the results to files inside analyzer/src/output
 // Finally, the result files are read by reasoninAboutEvidence.js and sent to the frontend
 const initConnector = (
-  setupWindow: SetupWindow,
   setupDevTools: () => void,
   getMainWindowPositions: () => { width: number; height: number },
   isDockerRunning: () => boolean
