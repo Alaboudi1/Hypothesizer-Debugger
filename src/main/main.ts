@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell, globalShortcut } from 'electron';
 import { resolveHtmlPath, isDockerRunning } from './util';
 import initConnector from './backendConnector';
 
@@ -20,22 +20,27 @@ if (process.env.NODE_ENV === 'production') {
   sourceMapSupport.install();
 }
 
+const focusOnMainWindow = (flag: boolean) => {
+  if (mainWindow) {
+    mainWindow.setAlwaysOnTop(flag);
+  }
+};
 const setupDevtools = () => {
-  // chek if dev tools are open
   if (mainWindow?.webContents.isDevToolsOpened()) {
     mainWindow?.webContents.closeDevTools();
   } else {
     mainWindow?.webContents.openDevTools();
   }
 };
+
+const searchInPage = (searchTerm: string) => {
+  mainWindow?.webContents.findInPage(searchTerm);
+};
 const getMainWindowPositions = () => {
   const { width, height } =
     require('electron').screen.getPrimaryDisplay().workAreaSize;
   return { width, height };
 };
-
-const isDebug =
-  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
@@ -51,9 +56,7 @@ const installExtensions = async () => {
 };
 
 const createWindow = async () => {
-  if (isDebug) {
-    await installExtensions();
-  }
+  await installExtensions();
 
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
@@ -66,6 +69,7 @@ const createWindow = async () => {
   // get the display size
   const { width, height } = getMainWindowPositions();
 
+  // enable search
   mainWindow = new BrowserWindow({
     show: false,
     width: width / 2,
@@ -80,7 +84,9 @@ const createWindow = async () => {
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
+    acceptFirstMouse: true,
   });
+
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
@@ -127,7 +133,13 @@ app
       }
     });
   })
-  .then(() =>
-    initConnector(setupDevtools, getMainWindowPositions, isDockerRunning)
-  )
+  .then(() => {
+    initConnector(
+      setupDevtools,
+      getMainWindowPositions,
+      isDockerRunning,
+      searchInPage,
+      focusOnMainWindow
+    );
+  })
   .catch(console.log);

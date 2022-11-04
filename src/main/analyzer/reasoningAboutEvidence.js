@@ -60,6 +60,23 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
     });
   });
 };
+const getStartAndEndLineForJSX = (start, fileContent) => {
+  const lines = fileContent.split('\n');
+  const startContent = lines[start - 1];
+  // does this line contain an opening tag?
+  const openingTag = startContent.includes('<');
+  let end = start;
+  if (openingTag) {
+    for (let i = start; i < lines.length; i++) {
+      if (lines[i - 1].includes('</') || lines[i - 1].includes('/>')) {
+        end = i;
+        break;
+      }
+    }
+  }
+  return [start, end];
+};
+
 const cleanEventKeyPressAndClickEvidence = (events, files) => {
   const cleanedEvent = events.map((event) => {
     const { evidence } = event;
@@ -68,7 +85,7 @@ const cleanEventKeyPressAndClickEvidence = (events, files) => {
     )?.content;
     return {
       file: evidence.jsx.fileName.replace(/=/g, '/'),
-      line: evidence.jsx.lineNumber,
+      ranges: getStartAndEndLineForJSX(evidence.jsx.lineNumber, fileContent),
       fileContent,
       keyPressed: evidence.keyPressed,
       inputType: evidence.InputType,
@@ -77,7 +94,9 @@ const cleanEventKeyPressAndClickEvidence = (events, files) => {
   });
   // group the events by file and line
   const groupedEvents = cleanedEvent.reduce((acc, e) => {
-    const found = acc.find((a) => a.file === e.file && a.line === e.line);
+    const found = acc.find(
+      (a) => a.file === e.file && a.ranges[0] === e.ranges[0]
+    );
     if (!found) {
       acc.push({
         ...e,

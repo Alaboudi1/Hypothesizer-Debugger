@@ -6,11 +6,9 @@ import {
   removeAllListeners,
 } from '../frontendConnectors';
 import './App.css';
-import icon from './icon.png';
 import Spinner from '../loading/spinner';
 import Hypotheses from '../hypotheses/hypotheses';
 import Questions from '../questions/questions';
-import TimeLine from '../timeLine/TimeLine';
 
 const App = (): JSX.Element => {
   const unfiltredHypotheses = useRef([]);
@@ -24,8 +22,16 @@ const App = (): JSX.Element => {
   ]);
   const doneStepsRef = useRef<string[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
+  const searchButtonRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'f' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        searchButtonRef.current?.focus();
+        searchButtonRef.current?.select();
+      }
+    });
     sendCommand('isDockerRunning');
     subscribeToCommand('isDockerRunning', (isDockerRunning) => {
       if (isDockerRunning) {
@@ -154,8 +160,7 @@ const App = (): JSX.Element => {
       case 4:
         return (
           <div className="reportContainer addedAnnimation">
-            {/* <Hypotheses hypotheses={getPotintialHypotheses()} /> */}
-            <TimeLine hypotheses={getPotintialHypotheses()} />
+            <Hypotheses hypotheses={getPotintialHypotheses()} />
           </div>
         );
       default:
@@ -186,9 +191,24 @@ const App = (): JSX.Element => {
         /> */}
       </div>
       <div className="logo">
-        <img src={icon} alt="icon" />
+        {/* <img src={icon} alt="icon" />
         <p>Hypothesizer</p>
-        <p> Your Second Brain Debugger</p>
+        <p> Your Second Brain Debugger</p> */}
+        {/* search */}
+        <div className="search">
+          <input
+            ref={searchButtonRef}
+            type="text"
+            placeholder="Search..."
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                sendCommand('search', {
+                  searchTerm: searchButtonRef.current?.value,
+                });
+              }
+            }}
+          />
+        </div>
       </div>
       <ul className="doneSteps" key={currentStep + Math.random()}>
         {doneStepsRef.current.map((step) => (

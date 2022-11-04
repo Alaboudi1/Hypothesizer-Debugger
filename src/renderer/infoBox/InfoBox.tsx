@@ -1,4 +1,5 @@
 import React from 'react';
+import htmlBeautify from 'html-beautify';
 import './InfoBox.css';
 import CodeSnipet from '../codeSnippet/codeSnippet';
 
@@ -17,7 +18,7 @@ const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
               <p>The typing was handled by the code in the following file: </p>
               <CodeSnipet
                 code={match.fileContent}
-                lineNumber={match.line}
+                lineNumbers={match.ranges}
                 fileName={match.file}
               />
             </p>
@@ -29,7 +30,7 @@ const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
               <p>You clicked on the element in the following file: </p>
               <CodeSnipet
                 code={match.fileContent}
-                lineNumber={match.line}
+                lineNumbers={match.ranges}
                 fileName={match.file}
               />
             </p>
@@ -42,8 +43,10 @@ const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
               <>
                 <p> this html node was removed</p>
                 <CodeSnipet
-                  code={match.removeNode.map((node) => node.HTML).join('')}
-                  lineNumber={0}
+                  code={htmlBeautify(
+                    match.removeNode.map((node) => node.HTML).join('')
+                  )}
+                  lineNumbers={[]}
                   fileName={'.html'}
                 />
               </>
@@ -55,8 +58,10 @@ const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
               <>
                 <p> this html node was added</p>
                 <CodeSnipet
-                  code={match.addNode.map((node) => node.HTML).join('')}
-                  lineNumber={0}
+                  code={htmlBeautify(
+                    match.addNode.map((node) => node.HTML).join('')
+                  )}
+                  lineNumbers={[]}
                   fileName={'.html'}
                 />
               </>
@@ -72,7 +77,7 @@ const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
             )}
             <CodeSnipet
               code={evidence.CodeExample}
-              lineNumber={0}
+              lineNumbers={[]}
               fileName={'.js'}
             />
           </p>
@@ -88,15 +93,18 @@ const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
           </ul>
           <p>
             Where to start?
+            <p>{evidence.whereToStart.description}</p>
             {hypotheses.evidence
               .filter((e) =>
-                evidence.relatedEvidenceFix.find((ev) => ev === e.rule)
+                evidence.whereToStart.relatedEvidenceFix.find(
+                  (ev) => ev === e.rule
+                )
               )
               .map((e) => {
                 return (
                   <CodeSnipet
                     code={e.matched[0].fileContent}
-                    lineNumber={e.matched[0].line}
+                    lineNumbers={[0, 0]}
                     fileName={e.matched[0].file}
                   />
                 );

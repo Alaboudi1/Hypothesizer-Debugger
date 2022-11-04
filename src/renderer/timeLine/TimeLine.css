@@ -1,38 +1,23 @@
-.App {
+.hypothesis-time-line {
   display: grid;
-  grid-template-columns: 1fr 4fr;
-  grid-template-rows: 63px;
+  grid-template-columns: 5.5rem 2rem auto;
+  grid-template-rows: 1fr;
+  padding: 10px;
 }
 .timeLine {
-  display: grid;
   grid-template-columns: 1fr;
-  row-gap: 28px;
+  overflow-y: auto;
+  max-height: 90vh;
+  padding: 10px;
 }
 
 .timeLine__item__dot {
   width: 4rem;
   height: 4rem;
   cursor: pointer;
-  align-self: center;
-  justify-self: right;
-  grid-column: 1;
-  margin: 0 2rem;
 }
 .timeLine__item__dot:hover {
   background-color: lightgray;
-}
-.timeLine__item__dot::after {
-  content: '';
-  display: block;
-  width: 0.2rem;
-  height: 30px;
-  background-color: rgb(0, 0, 0);
-  margin: 0 auto;
-  margin-top: 9px;
-}
-/* last dot */
-.timeLine__item__dot:last-child::after {
-  display: none;
 }
 
 .timeLine__item__dot > img {
@@ -41,57 +26,69 @@
   object-fit: cover;
 }
 .timeLine__item__box {
-  height: 100%;
-  grid-column: 2;
+  max-height: 90vh;
+  min-height: 90vh;
+  overflow: auto;
+  grid-column: 3;
   position: relative;
   align-items: center;
   justify-content: center;
-  transition: all 0.5s ease-in-out;
 }
 .timeLine__item__dot--noEvidence {
-  opacity: 0.5;
+  opacity: 0.2;
 }
 
-.timeLine__item__box::before {
+.timeLine__item__box_arrow {
+  grid-column: 2;
   content: '';
-  position: absolute;
-  right: 100%;
-  top: 25%;
+  position: relative;
   width: 0;
   height: 0;
   border-top: 15px solid transparent;
-  border-right: 30px solid lightgray;
+  border-right: 30px solid rgb(2, 2, 2);
   border-bottom: 15px solid transparent;
+  transition: all 0.5s ease-in-out;
 }
 
 .timeLine__item__dot__badges {
   position: relative;
-  top: -65px;
-  left: 15px;
-  display: inline;
+  left: 2px;
+  top: -70px;
   float: right;
-  z-index: 1;
-  background-color: rgb(245, 244, 176);
+  background-color: red;
+  color: white;
   border-radius: 50%;
-  padding: 0.2rem;
-  border: 1px solid #000;
-  /* animation for badges background color */
+  border: 2px solid #000;
   animation: glowing 2s infinite;
+}
+
+.timeLine__item__line {
+  content: '';
+  display: inline-block;
+  width: 0.2rem;
+  height: 25px;
+  background-color: rgb(0, 0, 0);
+  margin: 0 auto;
+  display: block;
+}
+/* last dot */
+.timeLine__item__line:last-child {
+  display: none;
 }
 
 @keyframes glowing {
   0% {
-    background-color: rgb(245, 244, 176);
-    box-shadow: 0 0 10px rgb(90, 0, 0);
+    background-color: red;
+    color: white;
   }
 
   50% {
-    background-color: rgb(255, 255, 255);
-    box-shadow: 0 0 40px rgb(255, 255, 255);
+    background-color: white;
+    color: red;
   }
 
   100% {
-    background-color: rgb(245, 244, 176);
-    box-shadow: 0 0 10px rgb(90, 0, 0);
+    background-color: red;
+    color: white;
   }
 }

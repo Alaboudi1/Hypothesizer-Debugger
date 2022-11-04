@@ -193,7 +193,7 @@ const launchBrowser = async (url: string, width: number, height: number) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    throw new Error(error);
   }
 };
 
@@ -219,9 +219,13 @@ const record = async () => {
 
 const stopRecording = async () => {
   const timeStamp = Date.now();
-  const result = await client.send('Profiler.takePreciseCoverage');
-  coverage.push({ result, timeStamp, type: 'codeCoverage' });
-  clearInterval(setIntervalCallback);
+  try {
+    const result = await client.send('Profiler.takePreciseCoverage');
+    coverage.push({ result, timeStamp, type: 'codeCoverage' });
+    clearInterval(setIntervalCallback);
+  } catch (error) {
+    throw new Error(error);
+  }
 
   await client.send('Profiler.stopPreciseCoverage');
   const events = await page.evaluate(() => {

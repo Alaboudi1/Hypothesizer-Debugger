@@ -2,6 +2,7 @@
   -moz-border-radius: 10%;
   -webkit-border-radius: 10%;
   border-radius: 10px;
-  border: 1px solid lightgray;
+  border: 1px solid black;
   padding: 5px;
+  min-height: 90vh;
 }

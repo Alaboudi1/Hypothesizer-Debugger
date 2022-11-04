@@ -28,7 +28,9 @@ type SetupWindow = (
 const initConnector = (
   setupDevTools: () => void,
   getMainWindowPositions: () => { width: number; height: number },
-  isDockerRunning: () => boolean
+  isDockerRunning: () => boolean,
+  searchInPage: (searchTerm: string) => void,
+  focusOnMainWindow: (flag: boolean) => void
 ) => {
   const setuplisteners = () => {
     ipcMain.on('CDP', async (event, arg) => {
@@ -68,11 +70,13 @@ const initConnector = (
         case 'launch': {
           const { width, height } = getMainWindowPositions();
           await launchBrowser(payload.targetUrl, width, height);
+          focusOnMainWindow(true);
           break;
         }
 
         case 'record':
           await record();
+          focusOnMainWindow(false);
           break;
 
         case 'stopRecording': {
@@ -83,6 +87,10 @@ const initConnector = (
 
         case 'openDevTools':
           setupDevTools();
+          break;
+
+        case 'search':
+          searchInPage(payload.searchTerm);
           break;
 
         case 'isDockerRunning':
@@ -99,6 +107,3 @@ const initConnector = (
 };
 
 export default initConnector;
-function send(arg0: string, arg1: number) {
-  throw new Error('Function not implemented.');
-}

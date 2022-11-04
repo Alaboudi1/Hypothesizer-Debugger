@@ -8,17 +8,14 @@ import render from './icons/render.png';
 import code from './icons/code.png';
 import missing from './icons/missing.png';
 
-function TimeLine({ hypotheses }) {
+function TimeLine({ hypothesis }) {
   const boxRef = useRef(null);
-  const [infoBoxData, setInfoBoxData] = useState(hypotheses[0].evidence[0]);
-  const [hypotheseUnderInvestigation, setHypotheseUnderInvestigation] =
-    useState(0);
+  const [infoBoxData, setInfoBoxData] = useState(hypothesis.evidence[0]);
 
   const selectedDot = (e) => {
-    // id to number
     const id = parseInt(e.currentTarget.id, 10);
-    boxRef.current.style.transform = `translateY(${id * 92 + 2}px)`;
-    setInfoBoxData(hypotheses[hypotheseUnderInvestigation].evidence[id]);
+    boxRef.current.style.transform = `translateY(${id * 88 + 30}px)`;
+    setInfoBoxData(hypothesis.evidence[id]);
   };
   const getIcon = (type) => {
     switch (type) {
@@ -39,24 +36,11 @@ function TimeLine({ hypotheses }) {
 
   return (
     <>
-      <div className="defectDescription">
-        {hypotheses.length > 0 ? (
-          <p className="hypothesesFound">
-            🎉 We found {hypotheses.length} potential hypothese(s) that may
-            explain what causes the bug!
-          </p>
-        ) : (
-          <p className="hypothesesNoFound">
-            🫤 We couldn't find any potential hypotheses that might explain what
-            causes the bug!
-          </p>
-        )}
-      </div>
-      <div className="App">
+      <div className="hypothesis-time-line ">
         <div className="timeLine">
-          {hypotheses.length > 0 &&
-            hypotheses[hypotheseUnderInvestigation].evidence.map(
-              (evidence, index) => (
+          {hypothesis.evidence.map((evidence, index) => (
+            <>
+              <div key={`${evidence.type}-${index}`}>
                 <button
                   className={
                     evidence.type === 'no evidence'
@@ -68,18 +52,21 @@ function TimeLine({ hypotheses }) {
                   type="button"
                 >
                   <img src={getIcon(evidence.type)} alt="click" />
-                  {evidence.type === 'no evidence' && (
-                    <span className="timeLine__item__dot__badges">!</span>
-                  )}
                 </button>
-              )
-            )}
+                {evidence.type === 'no evidence' ? (
+                  <div className="timeLine__item__dot__badges">?</div>
+                ) : (
+                  <></>
+                )}
+              </div>
+
+              <div className="timeLine__item__line" />
+            </>
+          ))}
         </div>
-        <div className="timeLine__item__box" ref={boxRef}>
-          <InfoBox
-            evidence={infoBoxData}
-            hypotheses={hypotheses[hypotheseUnderInvestigation]}
-          />
+        <div className="timeLine__item__box_arrow" ref={boxRef} />
+        <div className="timeLine__item__box">
+          <InfoBox evidence={infoBoxData} hypotheses={hypothesis} />
         </div>
       </div>
     </>
