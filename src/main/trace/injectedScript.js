@@ -21,13 +21,14 @@ const init = () => {
   const getDataForClick = (event, type, timeStamp) => {
     // search for reactFiber
     const reactFiber = getReactFiber(event);
-
+    const debugSource =
+      reactFiber._debugSource || reactFiber._debugOwner?._debugSource;
     const data = {
       jsx: {
-        fileName: `src${reactFiber._debugSource?.fileName
+        fileName: `src${debugSource?.fileName
           .split('src')[1]
           .replace(/[\/\\]/g, '=')}`,
-        lineNumber: reactFiber._debugSource?.lineNumber,
+        lineNumber: debugSource?.lineNumber,
       },
       target: event.target.tagName,
       InputType: event.target.type,
@@ -57,12 +58,10 @@ const init = () => {
     );
   });
 
-  // attach keyup event to keypress input elements
-  document.querySelectorAll('input[type="text"]').forEach((input) => {
-    input.addEventListener('keydown', (e, timeStamp = Date.now()) =>
-      getDataForClick(e, 'keydown', timeStamp)
-    );
-  });
+  // attach keydown event
+  document.addEventListener('keydown', (e, timeStamp = Date.now()) =>
+    getDataForClick(e, 'keydown', timeStamp)
+  );
 
   const callback = (mutationsList) => {
     const timeStamp = Date.now() + 3;
@@ -103,7 +102,7 @@ const init = () => {
   };
 
   new MutationObserver(callback).observe(document, {
-    attributes: false,
+    attributes: true,
     childList: true,
     subtree: true,
   });

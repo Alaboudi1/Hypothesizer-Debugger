@@ -29,7 +29,14 @@ const Hypotheses: React.FC<any> = ({ hypotheses }): JSX.Element => {
               <span> {hypothesis.hypothesis} </span>
               <span className="tellMeMore">Tell me more!</span>
             </summary>
-            <TimeLine hypothesis={hypothesis} />
+            <div className="hypothesis_Description">
+              <b>Description: </b>
+              <p>{hypothesis.description}</p>
+            </div>
+            <div className="hypothesis_Evidence">
+              <b>Where is what happened exactly: </b>
+              <TimeLine hypothesis={hypothesis} />
+            </div>
           </details>
         ))}
       </div>

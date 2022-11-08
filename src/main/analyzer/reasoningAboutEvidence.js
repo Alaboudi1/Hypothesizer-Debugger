@@ -1,58 +1,63 @@
 const { parentPort, workerData } = require('worker_threads');
 
+const getFirstAfter = (evidence, evidenceIndex) => {
+  const afterEv = evidence.slice(evidenceIndex + 1);
+
+  return (
+    afterEv
+      .find((ev) => ev.matched.length > 0)
+      ?.matched.sort((a, b) => a.evidence.timeStamp - b.evidence.timeStamp) || [
+      {
+        evidence: {
+          timeStamp: Infinity,
+        },
+      },
+    ]
+  );
+};
+
+const getFirstBefore = (evidence, evidenceIndex) => {
+  const beforeEv = evidence.slice(0, evidenceIndex);
+
+  return (
+    beforeEv
+      .reverse()
+      .find((ev) => ev.matched.length > 0)
+      ?.matched.sort((a, b) => b.evidence.timeStamp - a.evidence.timeStamp) || [
+      { evidence: { timeStamp: -Infinity } },
+    ]
+  );
+};
+
 const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
   // knowledgeMap is an array of knowledge that pulled from multiple sources
   return knowledgeMap.flatMap((knowledgeItem) => {
     // knowledgeItem is a single knowledge source with multiple hypotheses
     return knowledgeItem.hypotheses.map((hypothesis) => {
-      // For each hypothesis, we need collect the evidence that support it
-      // a hypothesis contains a list of evidence in occurence order
-      // for each evidence in the hypothesis, we need to check if it is in the gatheredEvidence
-      // first, we have a pointer that points at the gatheredEvidence that has not been matched with any evidence in the hypothesis
-      // this pointer moves forward when we find a match
-      let evidencePointer = 0;
-      const gatheredEvidenceRelatedToCurrentHypothesis =
-        gatheredEvidence.filter((evidence) => {
-          // if the evidence is not in the hypothesis, we don't need to check it
-          if (
-            hypothesis.evidence.findIndex(
-              (evidenceInHypothesis) =>
-                evidenceInHypothesis.rule === evidence.rule
-            ) === -1
-          ) {
-            return false;
-          }
-          return true;
-        });
-
-      const evidence = hypothesis.evidence.map((evidence, evidenceIndex) => {
-        // for each evidence in the hypothesis, it contains a list of gatheredEvidence that support it
+      // match all gathered evidence to the hypothesis evidence
+      let evidence = hypothesis.evidence.map((evidence) => {
         evidence.matched = [];
-        // we removed all gatheredEvidence that is before the evidencePointer
-        const currentGatheredEvidence =
-          gatheredEvidenceRelatedToCurrentHypothesis.slice(evidencePointer);
-        // we loop through the currentGatheredEvidence to find a match
-        // add the match to the evidence.gatheredEvidence and move the evidencePointer forward
-
-        // Todo: test if the evidencePointer is out of bound
-        currentGatheredEvidence.every((gatheredEvidenceItem) => {
+        gatheredEvidence.forEach((gatheredEvidenceItem, index) => {
           if (gatheredEvidenceItem.rule === evidence.rule) {
-            evidencePointer += 1;
             evidence.matched.push(gatheredEvidenceItem);
-            return true;
           }
-          // does this gatheredEvidenceItem match a previous evidence in the hypothesis?
-          // if it does, we need to move the evidencePointer forward without adding it to the evidence.matched
-          const isFoundBefore = hypothesis.evidence
-            .slice(0, evidenceIndex)
-            .find((evi) => evi.rule === gatheredEvidenceItem.rule);
-          if (isFoundBefore) {
-            return true;
-          }
-          return false;
         });
         return evidence;
       });
+      // for each evidence in the hypothesis, check the time stamp if a is after b, then remove a
+      evidence = evidence.map((ev, evidenceIndex) => {
+        const after = getFirstAfter(evidence, evidenceIndex);
+        const before = getFirstBefore(evidence, evidenceIndex);
+        return {
+          ...ev,
+          matched: ev.matched.filter(
+            (m) =>
+              after.some((a) => m.evidence.timeStamp <= a.evidence.timeStamp) &&
+              before.some((b) => m.evidence.timeStamp >= b.evidence.timeStamp)
+          ),
+        };
+      });
+
       return {
         ...hypothesis,
         evidence,
@@ -60,6 +65,7 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
     });
   });
 };
+
 const getStartAndEndLineForJSX = (start, fileContent) => {
   const lines = fileContent.split('\n');
   const startContent = lines[start - 1];
@@ -67,11 +73,12 @@ const getStartAndEndLineForJSX = (start, fileContent) => {
   const openingTag = startContent.includes('<');
   let end = start;
   if (openingTag) {
-    for (let i = start; i < lines.length; i++) {
-      if (lines[i - 1].includes('</') || lines[i - 1].includes('/>')) {
-        end = i;
-        break;
-      }
+    while (
+      end < lines.length &&
+      !lines[end - 1].includes('>') &&
+      !lines[end - 1].includes('/>')
+    ) {
+      end += 1;
     }
   }
   return [start, end];

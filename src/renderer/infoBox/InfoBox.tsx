@@ -72,47 +72,56 @@ const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
         <>
           <p>
             <b>How To Fix?</b>
-            {evidence.CodeExample && (
-              <p> Here is an example of how to fix the defect: </p>
-            )}
-            <CodeSnipet
-              code={evidence.CodeExample}
-              lineNumbers={[]}
-              fileName={'.js'}
-            />
-          </p>
-          <p> Here are some external Documentation: </p>
-          <ul>
-            {evidence.links.map((doc) => (
-              <li key={doc + Math.random()}>
-                <a href={doc.url} target="_blank" rel="noreferrer">
-                  {doc.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <p>
-            Where to start?
-            <p>{evidence.whereToStart.description}</p>
-            {hypotheses.evidence
-              .filter((e) =>
-                evidence.whereToStart.relatedEvidenceFix.find(
-                  (ev) => ev === e.rule
-                )
-              )
-              .map((e) => {
+            <ol>
+              {evidence.HowToFix.steps.map((step) => {
+                const { description, codeExample, relatedEvidenceLocation } =
+                  step;
                 return (
-                  <CodeSnipet
-                    code={e.matched[0].fileContent}
-                    lineNumbers={[0, 0]}
-                    fileName={e.matched[0].file}
-                  />
+                  <>
+                    <li key={step + Math.random()}>{description}</li>
+                    {codeExample && (
+                      <CodeSnipet
+                        code={codeExample}
+                        lineNumbers={[]}
+                        fileName={'.js'}
+                      />
+                    )}
+
+                    {relatedEvidenceLocation &&
+                      hypotheses.evidence
+                        .filter((e) => relatedEvidenceLocation === e.rule)
+                        .map((e) => {
+                          return (
+                            <CodeSnipet
+                              code={e.matched[0].fileContent}
+                              lineNumbers={[0, 0]}
+                              fileName={e.matched[0].file}
+                            />
+                          );
+                        })}
+                  </>
                 );
               })}
+            </ol>
+            {evidence.HowToFix.links && (
+              <p>
+                <b>Please read these links if need further information:</b>
+                <ul>
+                  {evidence.HowToFix.links.map(({ url, title }) => {
+                    return (
+                      <li key={url + Math.random()}>
+                        <a href={url}>{title}</a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </p>
+            )}
           </p>
         </>
       )}
     </div>
   );
 };
+
 export default InfoBox;

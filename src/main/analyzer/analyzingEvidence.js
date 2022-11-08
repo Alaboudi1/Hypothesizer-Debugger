@@ -131,14 +131,11 @@ const writeSemgrepRules = (knowledge) => {
     );
 
     const UIEvents = {
-      rules: rules.DOM_events.map((rule) => {
+      rules: rules.DOM_events.map(({ objectShape, ...rule }) => {
         return {
           id: rule.id,
           languages: ['js'],
-          pattern: JSON.stringify({
-            type: rule?.type,
-            InputType: rule?.InputType,
-          }),
+          pattern: JSON.stringify(objectShape),
           message: 'event',
           severity: 'WARNING',
         };
@@ -149,16 +146,10 @@ const writeSemgrepRules = (knowledge) => {
       YAML.stringify(UIEvents)
     );
     const network = {
-      rules: rules.Network_events.map((rule) => {
+      rules: rules.Network_events.map(({ objectShape, ...rule }) => {
         return {
           id: rule.id,
-          pattern: JSON.stringify({
-            url: rule?.url,
-            type: rule?.type,
-            mimeType: rule?.mimeType,
-            data: rule?.data,
-            method: rule?.method,
-          }),
+          pattern: JSON.stringify(objectShape),
           message: 'Network event',
           languages: ['js'],
           severity: 'WARNING',
@@ -170,11 +161,11 @@ const writeSemgrepRules = (knowledge) => {
       YAML.stringify(network)
     );
     const codePattern = {
-      rules: rules.API_calls.map((rule) => {
-        if (rule.pattern === undefined || rule.pattern === null) return null;
+      rules: rules.API_calls.map(({ patterns, pattern, ...rule }) => {
         return {
           id: rule.id,
-          pattern: rule.pattern,
+          patterns,
+          pattern,
           message: 'pattern',
           languages: ['js'],
           severity: 'WARNING',
