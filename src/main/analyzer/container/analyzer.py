@@ -10,10 +10,12 @@ def run_semgrep(rules, target, output_filename):
 
 
 def get_targets(path, type):
+    target = path.split('/')[-1].split('_')[0]
+    rule = path.split('/')[-1].split('.')[0]
     # get the file name without the extension
-    outputFolder = path.split('/')[1].split('.')[0]
+    outputFolder = path.split('semgrep_rules')[0] + 'outputs/' + rule
     # get the first part of the file name before the underscore
-    inputFolder = outputFolder.split('_')[0]
+    inputFolder = path.split('semgrep_rules')[0] + 'inputs/'+target+'/'
     # remove duplicates
     if type == 'input':
         return inputFolder
@@ -22,10 +24,17 @@ def get_targets(path, type):
 
 
 def analyze():
-    files = glob.glob('semgrep_rules/*.yml')
+    # get the director path
+    path = os.path.dirname(os.path.realpath(__file__)) + '/'
+    print(path)
+
+    # get the list of all the files in the directory
+    ruleFiles = glob.glob(
+        path + 'semgrep_rules/*')
+
     with ThreadPoolExecutor(max_workers=4) as executor:
-        futures = [executor.submit(run_semgrep, ruleFile, f'inputs/{get_targets(ruleFile,"input")}/', f'outputs/{get_targets(ruleFile,"output")}.json')
-                   for i, ruleFile in enumerate(files)]
+        [executor.submit(run_semgrep, ruleFile, f'{get_targets(ruleFile,"input")}', f'{get_targets(ruleFile,"output")}.json')
+         for i, ruleFile in enumerate(ruleFiles)]
 
 
 analyze()

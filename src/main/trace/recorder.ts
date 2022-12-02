@@ -123,7 +123,7 @@ const DomEvents = async () => {
 const networkEvents = async () => {
   await client.send('Network.enable');
 
-  client.on('Network.requestWillBeSent', async (params) => {
+  client.on('Network.requestWillBeSent', (params) => {
     const timeStamp = Date.now();
     networkEventsCoverage.push({
       type: 'requestWillBeSent',
@@ -136,24 +136,35 @@ const networkEvents = async () => {
   });
   client.on('Network.responseReceived', async (params) => {
     const timeStamp = Date.now();
-    let data;
     if (params.response.mimeType === 'application/json') {
-      try {
-        data = await client.send('Network.getResponseBody', {
-          requestId: params.requestId,
-        });
-      } catch (error) {
-        data = null;
-      }
-      networkEventsCoverage.push({
-        type: 'responseReceived',
-        requestId: params.requestId,
-        timeStamp,
-        url: params.response.url,
-        status: params.response.status,
-        mimeType: params.response.mimeType,
-        data: data?.body,
-      });
+      setTimeout(async () => {
+        client
+          ?.send('Network.getResponseBody', {
+            requestId: params.requestId,
+          })
+          .then((res) => {
+            return networkEventsCoverage.push({
+              type: 'responseReceived',
+              requestId: params.requestId,
+              timeStamp,
+              url: params.response.url,
+              status: params.response.status,
+              mimeType: params.response.mimeType,
+              data: res.body,
+            });
+          })
+          .catch((error) => {
+            networkEventsCoverage.push({
+              type: 'responseReceived',
+              requestId: params.requestId,
+              timeStamp,
+              url: params.response.url,
+              status: params.response.status,
+              mimeType: params.response.mimeType,
+              data: '{}',
+            });
+          });
+      }, 100);
     } else {
       networkEventsCoverage.push({
         type: 'responseReceived',
@@ -199,6 +210,9 @@ const launchBrowser = async (url: string, width: number, height: number) => {
 
 const record = async () => {
   client = await page?.target().createCDPSession();
+  if (client === null) {
+    throw new Error('client is null');
+  }
   await DomEvents();
   await networkEvents();
   await client?.send('Profiler.enable');

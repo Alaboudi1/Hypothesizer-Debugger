@@ -16,13 +16,15 @@ const init = () => {
         break;
       }
     }
-    return reactFiber;
-  };
-  const getDataForClick = (event, type, timeStamp) => {
-    // search for reactFiber
-    const reactFiber = getReactFiber(event);
+
     const debugSource =
       reactFiber._debugSource || reactFiber._debugOwner?._debugSource;
+    return debugSource;
+  };
+  const getDataForEvent = (event, type, timeStamp) => {
+    // search for reactFiber
+    const debugSource = getReactFiber(event);
+
     const data = {
       jsx: {
         fileName: `src${debugSource?.fileName
@@ -38,7 +40,10 @@ const init = () => {
         tagName: event.target.tagName,
       },
       keyPressed: event.key,
-      HTML: event.srcElement.outerHTML,
+      HTML:
+        type === 'mouseover' || type === 'mouseout'
+          ? undefined
+          : event.srcElement.outerHTML,
       timeStamp,
     };
 
@@ -48,41 +53,48 @@ const init = () => {
   // attach click event to all input elements
   document.querySelectorAll('input').forEach((input) => {
     input.addEventListener('click', (e, timeStamp = Date.now()) =>
-      getDataForClick(e, 'click', timeStamp)
+      getDataForEvent(e, 'click', timeStamp)
     );
   });
   // attach click event to all button elements
   document.querySelectorAll('button').forEach((button) => {
     button.addEventListener('click', (e, timeStamp = Date.now()) =>
-      getDataForClick(e, 'click', timeStamp)
+      getDataForEvent(e, 'click', timeStamp)
     );
   });
 
   // attach keydown event
   document.addEventListener('keydown', (e, timeStamp = Date.now()) =>
-    getDataForClick(e, 'keydown', timeStamp)
+    getDataForEvent(e, 'keydown', timeStamp)
   );
 
+  // attach mouseover event
+  document.addEventListener('mouseover', (e, timeStamp = Date.now()) =>
+    getDataForEvent(e, 'mouseover', timeStamp)
+  );
+  document.addEventListener('mouseout', (e, timeStamp = Date.now()) =>
+    getDataForEvent(e, 'mouseout', timeStamp)
+  );
   const callback = (mutationsList) => {
     const timeStamp = Date.now() + 3;
     mutationsList.forEach((mutation) => {
       if (
         !['BODY', 'SCRIPT', 'STYLE', 'HEAD'].includes(mutation.target.tagName)
       ) {
+        const debugSource = getReactFiber(mutation);
+        const fileName = debugSource?.fileName ?? undefined;
+        const jsx = {
+          fileName: fileName
+            ? `src${fileName.split('src')[1].replace(/[\/\\]/g, '=')}`
+            : undefined,
+          lineNumber: debugSource?.lineNumber,
+        };
         const data = {
-          type: 'mutation',
+          type: mutation.type,
           addNode: [...mutation.addedNodes].map((node) => {
-            const reactFiber = getReactFiber(node);
-
             return {
               HTML: node.innerHTML ?? node.textContent,
               tagName: node.tagName ?? node.nodeName,
-              jsx: {
-                fileName: `src${reactFiber._debugSource?.fileName
-                  .split('src')[1]
-                  .replace(/[\/\\]/g, '=')}`,
-                lineNumber: reactFiber._debugSource?.lineNumber,
-              },
             };
           }),
           removeNode: [...mutation.removedNodes].map((node) => {
@@ -95,6 +107,7 @@ const init = () => {
           value: mutation.target.value,
           tagName: mutation.target.tagName,
           timeStamp,
+          jsx,
         };
         saveEvents(data);
       }

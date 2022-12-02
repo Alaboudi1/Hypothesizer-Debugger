@@ -31,6 +31,7 @@ npm-debug.log.*
 /playwright-report/
 /playwright/.cache/
 
-src/main/analyzer/src/semgrep_rules
-src/main/analyzer/src/outputs
-src/main/analyzer/src/inputs
+src/main/analyzer/container/semgrep_rules
+src/main/analyzer/container/outputs
+src/main/analyzer/container/inputs
+src/main/analyzer/container/diff

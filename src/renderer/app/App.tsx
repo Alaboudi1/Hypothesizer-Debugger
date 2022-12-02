@@ -6,9 +6,9 @@ import {
   removeAllListeners,
 } from '../frontendConnectors';
 import './App.css';
-import Spinner from '../loading/spinner';
-import Hypotheses from '../hypotheses/hypotheses';
-import Questions from '../questions/questions';
+import Spinner from '../loading/Spinner';
+import Hypotheses from '../hypotheses/Hypotheses';
+import Questions from '../questions/Questions';
 
 const App = (): JSX.Element => {
   const unfiltredHypotheses = useRef([]);

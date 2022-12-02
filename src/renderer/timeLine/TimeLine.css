@@ -57,8 +57,9 @@
   float: right;
   background-color: red;
   color: white;
-  border-radius: 50%;
-  border: 2px solid #000;
+  border-radius: 20%;
+  padding: 0.5px;
+  border: 1px solid #000;
   animation: glowing 2s infinite;
 }
 

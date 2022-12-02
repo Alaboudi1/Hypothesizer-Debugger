@@ -1,8 +1,20 @@
-.codeSnipet {
+.codeSnippet {
   font-size: 12px;
   overflow: auto;
   max-width: 40rem;
+  max-height: 40rem;
 }
+
 .highlight {
   background-color: rgb(97, 2, 2);
+}
+
+.fileName {
+  background-color: rgb(42, 45, 57);
+  max-width: fit-content;
+  margin: 1px;
+  padding: 5px;
+  color: white;
+  font-size: 12px;
+  border-bottom: 1px solid rgb(124 123 123);
 }

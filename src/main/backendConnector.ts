@@ -1,15 +1,9 @@
 import { ipcMain } from 'electron';
+import fs from 'fs';
+import path from 'path';
 import { record, stopRecording, launchBrowser } from './trace/recorder';
 import { getEvidence, getHypotheses } from './analyzer/mainAnalyzer';
 import getCoverage from './sourceMap/mainSourceMap';
-
-type SetupWindow = (
-  width: number,
-  height: number,
-  onTop: boolean,
-  xPosition: number,
-  yPosition: number
-) => void;
 
 // this connects the backend to the frontend
 // The first command is to check if the docker is running, the frontend sends this command on startup
@@ -25,6 +19,7 @@ type SetupWindow = (
 // the second step is to run the queries inside analyzer/src using semgrep with python and docker
 // the third step is to write the results to files inside analyzer/src/output
 // Finally, the result files are read by reasoninAboutEvidence.js and sent to the frontend
+
 const initConnector = (
   setupDevTools: () => void,
   getMainWindowPositions: () => { width: number; height: number },
@@ -39,6 +34,25 @@ const initConnector = (
           command: channel,
           payload: args,
         });
+      };
+      const readFromCache = () => {
+        try {
+          const data = fs.readFileSync(
+            path.join(__dirname, 'cache.json'),
+            'utf8'
+          );
+          notifyFrontend('hypotheses', JSON.parse(data));
+          return true;
+        } catch (error) {
+          return false;
+        }
+      };
+
+      const writeToCache = (data: any) => {
+        fs.writeFileSync(
+          path.join(__dirname, 'cache.json'),
+          JSON.stringify(data)
+        );
       };
       const setBackendState = ({ payload, step }) => {
         switch (step) {
@@ -58,9 +72,11 @@ const initConnector = (
               setBackendState
             );
             break;
-          case 'hypotheses':
+          case 'hypotheses': {
+            // writeToCache(payload);
             notifyFrontend('hypotheses', payload);
             break;
+          }
           default:
             throw new Error('Unknown step');
         }
@@ -74,10 +90,13 @@ const initConnector = (
           break;
         }
 
-        case 'record':
+        case 'record': {
+          // if (!readFromCache()) {
           await record();
           focusOnMainWindow(false);
+          // }
           break;
+        }
 
         case 'stopRecording': {
           const { coverage, files } = await stopRecording();

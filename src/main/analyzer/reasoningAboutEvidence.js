@@ -32,8 +32,16 @@ const getFirstBefore = (evidence, evidenceIndex) => {
 const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
   // knowledgeMap is an array of knowledge that pulled from multiple sources
   return knowledgeMap.flatMap((knowledgeItem) => {
+    const { evidence, hypotheses } = knowledgeItem;
+    const allRules = [];
+    Object.entries(evidence).forEach(([key, values]) => {
+      allRules.push(
+        ...values.flatMap((value) => ({ ...value, evidenceType: key }))
+      );
+    });
+
     // knowledgeItem is a single knowledge source with multiple hypotheses
-    return knowledgeItem.hypotheses.map((hypothesis) => {
+    return hypotheses.map((hypothesis) => {
       // match all gathered evidence to the hypothesis evidence
       let evidence = hypothesis.evidence.map((evidence) => {
         evidence.matched = [];
@@ -50,13 +58,33 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
         const before = getFirstBefore(evidence, evidenceIndex);
         return {
           ...ev,
-          matched: ev.matched.filter(
-            (m) =>
-              after.some((a) => m.evidence.timeStamp <= a.evidence.timeStamp) &&
-              before.some((b) => m.evidence.timeStamp >= b.evidence.timeStamp)
-          ),
+          matched: ev.matched.filter((m) => {
+            if (m.evidence.timeStamp === -1) {
+              return true;
+            }
+            return before.some(
+              (b) => m.evidence.timeStamp >= b.evidence.timeStamp
+            );
+            //   &&
+            //   after.some((a) => m.evidence.timeStamp <= a.evidence.timeStamp)
+            // );
+          }),
+          rule: allRules.find((r) => r.id === ev.rule),
         };
       });
+      // remove matches that occurs in mutiple evidence
+      // evidence = evidence.map((ev, index) => {
+      //   const evidenceToCheck = evidence.slice(0, index);
+      //   return {
+      //     ...ev,
+      //     matched: ev.matched.filter((m) => {
+      //       return !evidenceToCheck.some((e) =>
+      //         e.matched.some((m2) => m2.evidence.ID === m.evidence.ID)
+      //       );
+      //     }),
+      //
+      //   };
+      // });
 
       return {
         ...hypothesis,
@@ -67,7 +95,10 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
 };
 
 const getStartAndEndLineForJSX = (start, fileContent) => {
-  const lines = fileContent.split('\n');
+  const lines = fileContent?.split('\n');
+  if (!lines) {
+    return [];
+  }
   const startContent = lines[start - 1];
   // does this line contain an opening tag?
   const openingTag = startContent.includes('<');
@@ -84,22 +115,53 @@ const getStartAndEndLineForJSX = (start, fileContent) => {
   return [start, end];
 };
 
-const cleanEventKeyPressAndClickEvidence = (events, files) => {
+const cleanNetworkEvidence = (evidence, matched, files) => {
+  return {
+    ...evidence,
+    matched: matched.map((m) => {
+      const location = m.evidence.stack?.find((s) => s.file.includes('src'));
+      if (!location) return m;
+      const file = files.find(
+        (f) =>
+          f.file.replace(/=/g, '/').split('src')[1] ===
+          location.file.split('src')[1]
+      );
+      return {
+        ...m.evidence,
+        functionName: location.functionName,
+        file: `src${file?.file.replace(/=/g, '/').split('src')[1]}`,
+        ranges: [location.lineNumber + 1, location.lineNumber + 1],
+        fileContent: file?.content,
+      };
+    }),
+    type: matched[0]?.evidence.type,
+  };
+};
+const cleanDOMEvidence = (events, files) => {
   const cleanedEvent = events.map((event) => {
     const { evidence } = event;
     const fileContent = files.find(
       ({ file }) => file === evidence.jsx.fileName
     )?.content;
     return {
-      file: evidence.jsx.fileName.replace(/=/g, '/'),
+      file: evidence.jsx.fileName?.replace(/=/g, '/'),
       ranges: getStartAndEndLineForJSX(evidence.jsx.lineNumber, fileContent),
       fileContent,
       keyPressed: evidence.keyPressed,
       inputType: evidence.InputType,
       type: evidence.type,
+      removeNode: evidence.removeNode,
+      addNode: evidence.addNode,
+      timeStamp: evidence.timeStamp,
+      attributeName: evidence.attributeName,
     };
   });
-  // group the events by file and line
+  return cleanedEvent;
+};
+const cleanEventKeyPressAndClickEvidence = (events, files) => {
+  const cleanedEvent = cleanDOMEvidence(events, files).sort(
+    (a, b) => a.timeStamp - b.timeStamp
+  );
   const groupedEvents = cleanedEvent.reduce((acc, e) => {
     const found = acc.find(
       (a) => a.file === e.file && a.ranges[0] === e.ranges[0]
@@ -119,6 +181,28 @@ const cleanEventKeyPressAndClickEvidence = (events, files) => {
   return groupedEvents;
 };
 
+const cleanMutationEvidence = (evidence, files) => {
+  const cleanedEvent = cleanDOMEvidence(evidence, files);
+  const groupedEvents = cleanedEvent.reduce((acc, e) => {
+    const found = acc.find(
+      (a) => a.file === e.file && a.ranges[0] === e.ranges[0]
+    );
+    if (!found) {
+      acc.push({
+        ...e,
+        count: 1,
+      });
+    } else {
+      found.addNode.push(...e.addNode);
+      found.removeNode.push(...e.removeNode);
+      found.count += 1;
+      found.attributeName += ` ${e.attributeName}`;
+    }
+    return acc;
+  }, []);
+  return groupedEvents;
+};
+
 const cleanCodeCoverageEvidence = (codeCoverages, files) => {
   const cleanedCodeCoverage = codeCoverages.map((codeCoverage) => {
     const { evidence } = codeCoverage;
@@ -126,7 +210,7 @@ const cleanCodeCoverageEvidence = (codeCoverages, files) => {
       ({ file }) => file.replace(/=/g, '/') === evidence.file
     )?.content;
     const caller = files.find(
-      ({ file }) => file.replace(/=/g, '/') === evidence.caller.file
+      ({ file }) => file.replace(/=/g, '/') === evidence.caller?.file
     )?.content;
     return {
       callee: {
@@ -134,8 +218,8 @@ const cleanCodeCoverageEvidence = (codeCoverages, files) => {
         ranges: evidence.ranges,
       },
       caller: {
-        file: evidence.caller.file,
-        ranges: evidence.caller.lines,
+        file: evidence.caller?.file,
+        ranges: evidence.caller?.lines,
       },
       calleeContent: callee,
       callerContent: caller,
@@ -149,6 +233,7 @@ const cleanCodeCoverageEvidence = (codeCoverages, files) => {
 
 const cleanningUpEvidence = (hypotheses, files) => {
   return hypotheses.map((hypothesis) => {
+    const requestsCache = [];
     return {
       ...hypothesis,
       evidence: hypothesis.evidence.map((evidence) => {
@@ -174,34 +259,43 @@ const cleanningUpEvidence = (hypotheses, files) => {
             matched: cleanCodeCoverageEvidence(matched, files),
             type: oneMatch.evidence.type,
           };
+
+        if (
+          oneMatch.evidence.type === 'childList' ||
+          oneMatch.evidence.type === 'attributes'
+        )
+          return {
+            ...evidence,
+            matched: cleanMutationEvidence(matched, files),
+            type: oneMatch.evidence.type,
+          };
+        if (oneMatch.evidence.type === 'requestWillBeSent') {
+          const request = cleanNetworkEvidence(evidence, matched, files);
+          requestsCache.push(...request.matched);
+          return request;
+        }
         if (oneMatch.evidence.type === 'responseReceived')
           return {
             ...evidence,
-            matched: matched.map((m) => m.evidence),
-            type: oneMatch.evidence.type,
-          };
-
-        if (oneMatch.evidence.type === 'mutation')
-          return {
-            ...evidence,
             matched: matched.map((m) => {
-              const { removeNode, addNode, timeStamp } = m.evidence;
+              const request = requestsCache.find(
+                (r) => r.requestId === m.evidence.requestId
+              );
               return {
-                removeNode,
-                addNode,
-                timeStamp,
+                ...m.evidence,
+                ranges: request?.ranges,
+                functionName: request?.functionName,
+                file: request?.file,
+                fileContent: request?.fileContent,
               };
             }),
             type: oneMatch.evidence.type,
           };
-
         return evidence;
       }),
     };
   });
 };
-
-// parentPort.postMessage(potintialHypotheses);
 
 const hypotheses = reasonAboutEvidence(
   workerData.gatheredEvidence,

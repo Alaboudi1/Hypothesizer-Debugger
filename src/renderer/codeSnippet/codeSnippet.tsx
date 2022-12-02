@@ -2,11 +2,10 @@ import React, { useEffect } from 'react';
 import { CopyBlock, CodeBlock, dracula } from 'react-code-blocks';
 import './codeSnippet.css';
 
-const CodeSnipet: React.FC<any> = ({
+const CodeSnippet: React.FC<any> = ({
   code,
   lineNumbers,
   fileName,
-  title,
 }): JSX.Element => {
   const divRef = React.createRef<HTMLDivElement>();
   const linesHighlighted = (codeLines) => {
@@ -26,21 +25,29 @@ const CodeSnipet: React.FC<any> = ({
       if (codeLines?.length === 1)
         setTimeout(() => linesHighlighted(codeLines), 100);
       else linesHighlighted(codeLines);
+      divRef.current?.scrollBy({
+        top: lineNumbers[0] * 17 - 50,
+        behavior: 'smooth',
+      });
     }
   }, [lineNumbers, divRef]);
   return (
-    <div className="codeSnipet" key={code + Math.random()}>
-      <p>{title}</p>
-      <div ref={divRef}>
-        {lineNumbers.length > 0 ? (
-          <CopyBlock
-            text={code}
-            language={`${fileName?.split('.').pop()}`}
-            showLineNumbers
-            theme={dracula}
-            highlight={`${lineNumbers[0]}-${lineNumbers[1]}`}
-          />
-        ) : (
+    <div key={code + Math.random()}>
+      {lineNumbers.length > 0 ? (
+        <>
+          <p className="fileName"> {fileName}</p>
+          <div ref={divRef} className="codeSnippet">
+            <CopyBlock
+              text={code}
+              language={`${fileName?.split('.').pop()}`}
+              showLineNumbers
+              theme={dracula}
+              highlight={`${lineNumbers[0]}-${lineNumbers[1]}`}
+            />
+          </div>
+        </>
+      ) : (
+        <div className="codeSnippet">
           <CodeBlock
             text={code}
             language={`${fileName?.split('.').pop()}`}
@@ -48,10 +55,10 @@ const CodeSnipet: React.FC<any> = ({
             showLineNumbers={false}
             wrapLines
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default CodeSnipet;
+export default CodeSnippet;
