@@ -8,21 +8,21 @@ import {
 import './App.css';
 import Spinner from '../loading/Spinner';
 import Hypotheses from '../hypotheses/Hypotheses';
-import Questions from '../questions/Questions';
+import Tags from '../tags/Tags';
 
 const App = (): JSX.Element => {
-  const unfiltredHypotheses = useRef([]);
+  const potentialHypotheses = useRef([]);
   const targetUrl = useRef<string>('http://localhost:3000');
-  const userAnswers = useRef<any[]>([]);
   const futureSteps = useRef<string[]>([
     'Please record your actions while reproducing the bug.',
-    'Please answer the following questions.',
     'Please wait while we are analyzing and formulating hypotheses.',
+    'Please select tags that you think are relevant to the bug.',
     'We will offer a list potential hypotheses if we found any.',
   ]);
   const doneStepsRef = useRef<string[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const searchButtonRef = useRef<HTMLInputElement>(null);
+  const initSelectedTags = useRef<string[]>([]);
 
   useEffect(() => {
     document.addEventListener('keydown', (e) => {
@@ -40,32 +40,15 @@ const App = (): JSX.Element => {
         futureSteps.current.shift();
       }
       subscribeToCommand('hypotheses', (hypotheses) => {
-        unfiltredHypotheses.current = hypotheses;
-        if (userAnswers.current.length > 0) {
-          setCurrentStep(4);
-          futureSteps.current.shift();
-          doneStepsRef.current.push('Analysis is done!');
-        }
+        potentialHypotheses.current = hypotheses;
+        setCurrentStep(3);
+        futureSteps.current.shift();
+        doneStepsRef.current.push('Analysis is done!');
       });
     });
     sendCommand('launch', { targetUrl: targetUrl.current });
     return () => removeAllListeners();
   }, []);
-
-  const getPotintialHypotheses = () => {
-    return unfiltredHypotheses.current;
-    // .filter((hypothesis) => hypothesis.score > 0.5)
-    // .filter((hypothesis) => {
-    //   const { defect_category } = hypothesis;
-    //   return (
-    //     userAnswers.current[0].answer.includes(defect_category.type) &&
-    //     userAnswers.current[1].answer.includes(
-    //       defect_category.incorrectOutput
-    //     )
-    //   );
-    // })
-    // .sort((a, b) => a.score - b.score);
-  };
 
   const getMainContainer = (): JSX.Element => {
     switch (currentStep) {
@@ -119,34 +102,6 @@ const App = (): JSX.Element => {
       case 2:
         return (
           <div className="mainContainer">
-            <div
-              className="questioningContainer addedAnnimation"
-              key={currentStep}
-            >
-              <Questions
-                setFinalAnswers={(answers) => {
-                  userAnswers.current = answers;
-                  setCurrentStep(3);
-                  futureSteps.current.shift();
-                  doneStepsRef.current.push(
-                    `We know that ${answers[0].answer}`
-                  );
-                  doneStepsRef.current.push(
-                    `We also know that ${answers[1].answer}`
-                  );
-                  if (unfiltredHypotheses.current.length > 0) {
-                    setCurrentStep(4);
-                    futureSteps.current.shift();
-                    doneStepsRef.current.push('Analysis is done!');
-                  }
-                }}
-              />
-            </div>
-          </div>
-        );
-      case 3:
-        return (
-          <div className="mainContainer">
             <div className="addedAnnimation" key={currentStep}>
               <h1>Hypothesizing...</h1>
               <div className="thinking">
@@ -157,10 +112,44 @@ const App = (): JSX.Element => {
             </div>
           </div>
         );
+      case 3:
+        return (
+          <div className="mainContainer">
+            <div className="addedAnnimation" key={currentStep}>
+              <h2>How would you describe the bug?</h2>
+              <p>
+                Please select tag(s) that describe the bug and its behaivor. You
+                can change your selection later.
+              </p>
+              <Tags
+                tags={potentialHypotheses.current
+                  .flatMap((hypothesis) => hypothesis.tags)
+                  .filter((tag, index, self) => self.indexOf(tag) === index)}
+                tagsUpdate={(tags) => {
+                  initSelectedTags.current = tags;
+                }}
+                initSelectedTags={[]}
+              />
+              <input
+                className="nextButton"
+                onClick={() => {
+                  setCurrentStep(4);
+                  futureSteps.current.shift();
+                  doneStepsRef.current.push('Tags are done!');
+                }}
+                type="button"
+                value="Show Hypotheses"
+              />
+            </div>
+          </div>
+        );
       case 4:
         return (
           <div className="reportContainer addedAnnimation">
-            <Hypotheses hypotheses={getPotintialHypotheses()} />
+            <Hypotheses
+              hypotheses={potentialHypotheses.current}
+              initSelectedTags={initSelectedTags.current}
+            />
           </div>
         );
       default:

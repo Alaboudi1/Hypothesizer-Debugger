@@ -1,6 +1,6 @@
 import React from 'react';
 
-import './questions.css';
+import './Questions.css';
 
 const questions = [
   {

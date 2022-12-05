@@ -1,0 +1,26 @@
+.tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 0 1rem 0;
+}
+
+.tag {
+  margin: 0 0.6rem 0.6rem 0;
+  background-color: rgb(255, 255, 255);
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.selected {
+  background-color: rgb(255, 102, 0);
+  color: rgb(1, 31, 21);
+}
+
+.tag:hover {
+
+  cursor: pointer;
+}

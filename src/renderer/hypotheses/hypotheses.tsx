@@ -1,15 +1,21 @@
 import React from 'react';
-import './hypotheses.css';
+import './Hypotheses.css';
 import TimeLine from '../timeLine/TimeLine';
+import Tags from '../tags/Tags';
 
-const Hypotheses: React.FC<any> = ({ hypotheses }): JSX.Element => {
+const Hypotheses: React.FC<any> = ({
+  hypotheses,
+  initSelectedTags,
+}): JSX.Element => {
+  const [showedHypotheses, setShowedHypotheses] =
+    React.useState<any[]>(hypotheses);
   return (
     <div className="container">
       <div className="defectDescription">
-        {hypotheses.length > 0 ? (
+        {showedHypotheses.length > 0 ? (
           <p className="hypothesesFound">
-            🎉 We found {hypotheses.length} potential hypothese(s) that may
-            explain what causes the bug!
+            🎉 We found {showedHypotheses.length} potential hypothese(s) that
+            may explain what causes the bug!
           </p>
         ) : (
           <p className="hypothesesNoFound">
@@ -19,8 +25,21 @@ const Hypotheses: React.FC<any> = ({ hypotheses }): JSX.Element => {
         )}
       </div>
       <div className="hypotheses">
+        <Tags
+          tags={hypotheses
+            .flatMap((hypothesis) => hypothesis.tags)
+            .filter((tag, index, self) => self.indexOf(tag) === index)}
+          tagsUpdate={(newTags) => {
+            setShowedHypotheses(
+              hypotheses.filter((hypothesis) =>
+                hypothesis.tags.some((tag) => newTags.includes(tag))
+              )
+            );
+          }}
+          initSelectedTags={initSelectedTags}
+        />
         <h3>💡 Hypotheses</h3>
-        {hypotheses.map((hypothesis, index) => (
+        {showedHypotheses.map((hypothesis, index) => (
           <details key={index}>
             <summary>
               <b>

@@ -10,6 +10,7 @@
   justify-self: start;
   align-self: stretch;
 }
+
 .logo {
   grid-column: 3;
   grid-row: 1;
@@ -17,10 +18,12 @@
   align-self: start;
   justify-content: center;
 }
-.logo > p {
+
+.logo>p {
   text-align: center;
   font-size: 0.6em;
 }
+
 .mainContainer {
   grid-column: 2;
   grid-row: 2;
@@ -32,13 +35,15 @@
   align-self: stretch;
   justify-self: stretch;
 }
-.logo > img {
+
+.logo>img {
   width: 30%;
   height: 30%;
   margin: 0 auto;
   display: block;
 }
-.startContainer > h1,
+
+.startContainer>h1,
 h2,
 h3,
 h4,
@@ -79,13 +84,16 @@ h6 {
   0% {
     transform: translateY(100%);
   }
+
   50% {
     transform: translateY(-10%);
   }
+
   100% {
     transform: translateY(0%);
   }
 }
+
 .reportContainer {
   grid-column: 1 / -1;
   grid-row: 2/-1;
@@ -100,4 +108,21 @@ h6 {
   border-bottom: none;
   border-end-end-radius: 0px;
   border-end-start-radius: 0px;
+}
+
+
+
+.nextButton {
+  margin-left: 10px;
+  background-color: rgb(0, 139, 185);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+  float: right;
+}
+
+.nextButton:hover {
+  background-color: rgb(0, 119, 165);
 }

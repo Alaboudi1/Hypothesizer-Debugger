@@ -297,12 +297,36 @@ const cleanningUpEvidence = (hypotheses, files) => {
   });
 };
 
+const getPotentialHypotheses = (hypotheses) => {
+  return (
+    hypotheses
+      // this is to filter out the hypotheses that have no evidence related to the defect
+      .filter((hypothesis) => {
+        const criticalEvidence = hypothesis.evidence.filter(
+          (e) => e.DoesContainTheDefect
+        );
+        return criticalEvidence.every((e) => {
+          if (e.isFound) return e.matched.length > 0;
+          return e.matched.length === 0;
+        });
+      })
+      // this is to filter out the hypotheses that do not have at least one extra evidence related to the defect beside the critical evidence
+      .filter((hypothesis) => {
+        return hypothesis.evidence.some(
+          (e) => e.matched.length > 0 && e.DoesContainTheDefect === false
+        );
+      })
+  );
+};
+
 const hypotheses = reasonAboutEvidence(
   workerData.gatheredEvidence,
   workerData.knowledgeMap,
   workerData.files
 );
 
-const cleanedEvidence = cleanningUpEvidence(hypotheses, workerData.files);
+const cleanedHypotheses = cleanningUpEvidence(hypotheses, workerData.files);
 
-parentPort.postMessage(cleanedEvidence);
+const potintialHypotheses = getPotentialHypotheses(cleanedHypotheses);
+
+parentPort.postMessage(potintialHypotheses);
