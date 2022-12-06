@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { CopyBlock, CodeBlock, dracula } from 'react-code-blocks';
-import './codeSnippet.css';
+import './CodeSnippet.css';
 
 const CodeSnippet: React.FC<any> = ({
   code,
@@ -12,7 +12,6 @@ const CodeSnippet: React.FC<any> = ({
     codeLines?.forEach((line, index) => {
       if (index + 1 >= lineNumbers[0] && index + 1 <= lineNumbers[1])
         line.classList.add('highlight');
-      line.style.opacity = '1';
     });
   };
 
