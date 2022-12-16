@@ -41,7 +41,8 @@ const App = (): JSX.Element => {
       }
       subscribeToCommand('hypotheses', (hypotheses) => {
         potentialHypotheses.current = hypotheses;
-        setCurrentStep(3);
+        if (hypotheses.length > 0) setCurrentStep(3);
+        else setCurrentStep(4);
         futureSteps.current.shift();
         doneStepsRef.current.push('Analysis is done!');
       });

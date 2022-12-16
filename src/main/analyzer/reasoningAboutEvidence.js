@@ -203,32 +203,57 @@ const cleanMutationEvidence = (evidence, files) => {
   return groupedEvents;
 };
 
-const cleanCodeCoverageEvidence = (codeCoverages, files) => {
-  const cleanedCodeCoverage = codeCoverages.map((codeCoverage) => {
-    const { evidence } = codeCoverage;
-    const callee = files.find(
-      ({ file }) => file.replace(/=/g, '/') === evidence.file
-    )?.content;
-    const caller = files.find(
-      ({ file }) => file.replace(/=/g, '/') === evidence.caller?.file
-    )?.content;
-    return {
-      callee: {
-        file: evidence.file,
-        ranges: evidence.ranges,
-      },
-      caller: {
-        file: evidence.caller?.file,
-        ranges: evidence.caller?.lines,
-      },
-      calleeContent: callee,
-      callerContent: caller,
-      type: evidence.type,
-      count: evidence.count,
-      functionName: evidence.functionName,
-    };
-  });
-  return cleanedCodeCoverage;
+const cleanCodeCoverageEvidence = (matched, files) => {
+  const mergeCodeEvidence = (m) =>
+    m.location.map((e) => ({
+      ...e,
+      functionName: m.functionName,
+      timeStamp: m.timeStamp,
+    }));
+  const cleanedCodeCoverage = matched.reduce((acc, m) => {
+    const rule = acc[m.rule];
+    if (!rule) {
+      acc[m.rule] = {
+        ...m,
+        timeStamp: [m.evidence.timeStamp],
+        evidence: mergeCodeEvidence(m.evidence).map((e) => ({
+          ...e,
+          count: 1,
+          fileContent: files.find(
+            ({ file }) => file.replace(/=/g, '/') === e.file
+          )?.content,
+        })),
+      };
+    } else {
+      acc[m.rule] = {
+        ...rule,
+        evidence: mergeCodeEvidence(m.evidence).reduce(
+          (acc2, e) => {
+            const found = acc2.find(
+              (a) =>
+                a.file === e.file &&
+                a.lines[0] === e.lines[0] &&
+                a.lines[1] === e.lines[1]
+            );
+            if (!found) {
+              acc2.push({
+                ...e,
+                count: 1,
+              });
+            } else {
+              found.count += 1;
+            }
+            return acc2;
+          },
+
+          rule.evidence
+        ),
+      };
+    }
+    return acc;
+  }, {});
+
+  return Object.values(cleanedCodeCoverage).pop();
 };
 
 const cleanningUpEvidence = (hypotheses, files) => {
@@ -239,10 +264,7 @@ const cleanningUpEvidence = (hypotheses, files) => {
       evidence: hypothesis.evidence.map((evidence) => {
         const { matched } = evidence;
         if (matched.length === 0) {
-          return {
-            ...evidence,
-            type: 'no evidence',
-          };
+          return evidence;
         }
         const oneMatch = matched[0];
 
@@ -253,11 +275,16 @@ const cleanningUpEvidence = (hypotheses, files) => {
             type: oneMatch.evidence.type,
           };
 
-        if (oneMatch.evidence.type === 'codeCoverage')
+        if (
+          oneMatch.type === 'API_call_with_pattern' ||
+          oneMatch.type === 'API_pattern' ||
+          oneMatch.type === 'API_call'
+        )
           return {
             ...evidence,
             matched: cleanCodeCoverageEvidence(matched, files),
-            type: oneMatch.evidence.type,
+            type: 'codeCoverage',
+            API_type: oneMatch.type,
           };
 
         if (
@@ -312,8 +339,12 @@ const getPotentialHypotheses = (hypotheses) => {
       })
       // this is to filter out the hypotheses that do not have at least one extra evidence related to the defect beside the critical evidence
       .filter((hypothesis) => {
-        return hypothesis.evidence.some(
-          (e) => e.matched.length > 0 && e.DoesContainTheDefect === false
+        return (
+          hypothesis.evidence.filter(
+            (e) =>
+              (e.DoesContainTheDefect && e.matched.length > 0 && e.isFound) ||
+              (e.DoesContainTheDefect && e.matched.length === 0 && !e.isFound)
+          ).length > 0
         );
       })
   );

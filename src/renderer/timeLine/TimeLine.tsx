@@ -63,20 +63,15 @@ function TimeLine({ hypothesis }) {
 
   const getBadges = (evidence) => {
     if (evidence.DoesContainTheDefect)
-      if (evidence.isFound)
-        return <div className="timeLine__item__dot__badges">X</div>;
-      else return <div className="timeLine__item__dot__badges">?</div>;
+      return <div className="timeLine__item__dot__badges">X</div>;
     return <></>;
   };
 
-  const getTimelineItem = (
-    evidence: { type: string },
-    index: string | undefined
-  ) => {
+  const getTimelineItem = (evidence: any, index: string | undefined) => {
     return (
       <button
         className={
-          evidence.type === 'no evidence'
+          evidence.matched.length === 0 && evidence.isFound
             ? 'timeLine__item__dot timeLine__item__dot--noEvidence'
             : 'timeLine__item__dot'
         }

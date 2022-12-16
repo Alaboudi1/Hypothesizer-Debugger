@@ -9,7 +9,7 @@ const getTypeingEventContent = (matches) => {
     return (
       <p key={match + Math.random()}>
         <p>
-          You typed: <i>{match.keyPressed}</i>
+          You typed: <i>{match.keyPressed} </i>
         </p>
         <CodeSnipet
           code={match.fileContent}
@@ -152,44 +152,51 @@ const HowToFix = (evidence, hypotheses) => {
     );
 };
 
-const getCodeCoverage = (matches) => {
-  return matches
-    .reduce((acc, match) => {
-      const found = acc.findIndex(
-        (a) => a.file === match.file && a.line === match.line
-      );
-      if (found > -1) {
-        acc[found].count += match.count;
-      } else {
-        acc.push(match);
-      }
+const getCodeCoverage = (codeCoverage) => {
+  return codeCoverage.evidence.map((match) => {
+    switch (codeCoverage.type) {
+      case 'API_call_with_pattern':
+        return (
+          <>
+            <p>
+              You called this function: <i>{match.functionName}</i> in the
+              following file:
+            </p>
 
-      return acc;
-    }, [])
-    .map((match) => {
-      return (
-        <>
-          {match.caller && (
-            <>
-              <p>
-                You called this function: <i>{match.functionName}</i> in the
-                following file:
-              </p>
+            <CodeSnipet
+              code={match.fileContent}
+              lineNumbers={match.lines}
+              fileName={match.file}
+            />
+          </>
+        );
 
-              <CodeSnipet
-                code={match.callerContent}
-                lineNumbers={match.caller.ranges}
-                fileName={match.caller.file}
-              />
-            </>
-          )}
-        </>
-      );
-    });
+      case 'API_call':
+        return (
+          <>
+            <p>
+              You called this function: <i>{match.functionName}</i>
+            </p>
+          </>
+        );
+      case 'API_pattern':
+        return (
+          <>
+            <CodeSnipet
+              code={match.fileContent}
+              lineNumbers={match.lines}
+              fileName={match.file}
+            />
+          </>
+        );
+      default:
+        return <></>;
+    }
+  });
 };
 
 const getNoEvidenceContent = (evidence) => {
-  return <></>;
+  return <>No evidence found on the execution trace.</>;
 };
 
 const getReqeustWillBeSentContent = (matches) => {
@@ -282,10 +289,8 @@ const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
         return getReqeustWillBeSentContent(evidence.matched);
       case 'responseReceived':
         return getResponseReceivedContent(evidence.matched);
-      case 'no evidence':
-        return getNoEvidenceContent(evidence);
       default:
-        return <> </>;
+        return getNoEvidenceContent(evidence);
     }
   };
   return (
