@@ -118,7 +118,7 @@ const HowToFix = (evidence, hypotheses) => {
     return (
       <>
         <p>
-          <b>How To Fix?</b>
+          <b>How To Fix?</b>{' '}
           <ol>
             {evidence.HowToFix.steps.map((step) => {
               const { description, codeExample, relatedEvidenceLocation } =
@@ -224,7 +224,8 @@ const getCodeCoverage = (codeCoverage) => {
 };
 
 const getNoEvidenceContent = (evidence) => {
-  return <>No evidence found on the execution trace.</>;
+  if (evidence.DoesContainTheDefect === false)
+    return <h3 className="missing"> This did not happen in your program! </h3>;
 };
 
 const getReqeustWillBeSentContent = (matches) => {
@@ -321,9 +322,37 @@ const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
         return getNoEvidenceContent(evidence);
     }
   };
+  const getTitle = (type, DoesContainTheDefect) => {
+    let title = '';
+    switch (type) {
+      case 'keydown':
+        title = 'Keydown Event ';
+        break;
+      case 'click':
+        title = 'Click Event ';
+        break;
+      case 'childList':
+      case 'attributes':
+        title = 'DOM Change ';
+        break;
+      case 'codeCoverage':
+        title = 'API Call';
+        break;
+      case 'requestWillBeSent':
+      case 'responseReceived':
+        title = 'Network Activity ';
+        break;
+      default:
+        title = '';
+    }
+    if (DoesContainTheDefect) title += 'Potintial Fix';
+
+    return title;
+  };
+
   return (
     <div className="timeLine__item__box__content">
-      <h3>{evidence.type}</h3>
+      <h3>{getTitle(evidence.type, evidence.DoesContainTheDefect)}</h3>
       <p>{evidence.description}</p>
       {getInformation(evidence)}
       {HowToFix(evidence, hypotheses)}
