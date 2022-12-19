@@ -97,7 +97,7 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
 const getStartAndEndLineForJSX = (start, fileContent) => {
   const lines = fileContent?.split('\n');
   if (!lines) {
-    return [];
+    return [start, start];
   }
   const startContent = lines[start - 1];
   // does this line contain an opening tag?
@@ -337,15 +337,9 @@ const getPotentialHypotheses = (hypotheses) => {
           return e.matched.length === 0;
         });
       })
-      // this is to filter out the hypotheses that do not have at least one extra evidence related to the defect beside the critical evidence
+      // this is to filter out the hypotheses that do not have at least one extra evidence related to the defect
       .filter((hypothesis) => {
-        return (
-          hypothesis.evidence.filter(
-            (e) =>
-              (e.DoesContainTheDefect && e.matched.length > 0 && e.isFound) ||
-              (e.DoesContainTheDefect && e.matched.length === 0 && !e.isFound)
-          ).length > 0
-        );
+        return hypothesis.evidence.flatMap((e) => e.matched).length > 0;
       })
   );
 };

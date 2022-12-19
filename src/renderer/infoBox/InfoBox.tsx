@@ -9,13 +9,27 @@ const getTypeingEventContent = (matches) => {
     return (
       <p key={match + Math.random()}>
         <p>
-          You typed: <i>{match.keyPressed} </i>
+          You typed: <i>{match.keyPressed} </i> in the following file:
         </p>
-        <CodeSnipet
-          code={match.fileContent}
-          lineNumbers={match.ranges}
-          fileName={match.file}
-        />
+        {match.fileContent && (
+          <CodeSnipet
+            code={match.fileContent}
+            lineNumbers={match.ranges}
+            fileName={match.file}
+          />
+        )}
+        {match.fileContent === undefined && (
+          <>
+            <p>
+              {' '}
+              <b> File:</b> {match.file}{' '}
+            </p>
+            <p>
+              {' '}
+              <b> Line:</b> {match.ranges[0]}{' '}
+            </p>
+          </>
+        )}
       </p>
     );
   });
@@ -25,11 +39,25 @@ const getClickEventContent = (matches) => {
     return (
       <p key={match + Math.random()}>
         <p>You clicked on the element in the following file: </p>
-        <CodeSnipet
-          code={match.fileContent}
-          lineNumbers={match.ranges}
-          fileName={match.file}
-        />
+        {match.fileContent && (
+          <CodeSnipet
+            code={match.fileContent}
+            lineNumbers={match.ranges}
+            fileName={match.file}
+          />
+        )}
+        {match.fileContent === undefined && (
+          <>
+            <p>
+              {' '}
+              <b> File:</b> {match.file}{' '}
+            </p>
+            <p>
+              {' '}
+              <b> Line:</b> {match.ranges[0]}{' '}
+            </p>
+          </>
+        )}
       </p>
     );
   });

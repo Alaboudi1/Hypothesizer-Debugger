@@ -66,7 +66,6 @@ const getFiles = async (coverages: any[]) =>
         };
       })
   ).catch((error) => {
-    debugger;
     console.log(error);
   });
 
