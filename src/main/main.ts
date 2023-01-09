@@ -9,10 +9,12 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, globalShortcut } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
+import contextMenu from 'electron-context-menu';
 import { resolveHtmlPath, isDockerRunning } from './util';
 import initConnector from './backendConnector';
 
+contextMenu();
 let mainWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production') {

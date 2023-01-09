@@ -57,6 +57,10 @@ const initConnector = (
       const setBackendState = ({ payload, step }) => {
         switch (step) {
           case 'trace':
+            if (payload.trace.length === 0) {
+              notifyFrontend('hypotheses', []);
+              return;
+            }
             getEvidence(
               payload.trace,
               payload.filesContent,

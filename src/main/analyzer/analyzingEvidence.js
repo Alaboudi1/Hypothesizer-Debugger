@@ -287,11 +287,13 @@ const groupPatternWithApiCalls = (semgrepOutput, knowledge) => {
           return {
             rule: item.rule,
             evidence: {
-              location: {
-                file: item.evidence.file,
-                lines: item.lines,
-                syntax: item.evidence.syntax,
-              },
+              location: [
+                {
+                  file: item.evidence.file,
+                  lines: item.lines,
+                  syntax: item.evidence.syntax,
+                },
+              ],
               timeStamp: -1,
             },
             type: 'API_pattern',

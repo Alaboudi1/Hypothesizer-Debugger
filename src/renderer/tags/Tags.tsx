@@ -3,7 +3,12 @@
 import { useState, useEffect } from 'react';
 import './Tags.css';
 
-function Tags({ tagsUpdate, tags, initSelectedTags }) {
+function Tags({
+  tagsUpdate,
+  tagsMostLikley,
+  tagsLessLikley,
+  initSelectedTags,
+}) {
   const [selectedTags, setSelectedTags] = useState<string[]>(initSelectedTags);
 
   useEffect(() => {
@@ -19,18 +24,42 @@ function Tags({ tagsUpdate, tags, initSelectedTags }) {
   };
 
   return (
-    <div className="tags">
-      {tags.map((tag) => (
-        <div
-          className={`tag ${selectedTags.includes(tag) && 'selected'}`}
-          onClick={() => updateTags(tag)}
-          key={tag}
-          role="button"
-        >
-          {tag}
+    <>
+      <details open>
+        <summary>
+          <h3 className="mostLikely">Most likely descriptions of the bug</h3>
+        </summary>
+        <div className="tags">
+          {tagsMostLikley.map((tag) => (
+            <div
+              className={`tag ${selectedTags.includes(tag) ? 'selected' : ''}`}
+              onClick={() => updateTags(tag)}
+              key={tag}
+              role="button"
+            >
+              {tag}
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </details>
+      <details>
+        <summary>
+          <h3 className="lessLikely"> Less likely descriptions of the bug</h3>
+        </summary>
+        <div className="tags">
+          {tagsLessLikley.map((tag) => (
+            <div
+              className={`tag ${selectedTags.includes(tag) && 'selected'}`}
+              onClick={() => updateTags(tag)}
+              key={tag}
+              role="button"
+            >
+              {tag}
+            </div>
+          ))}
+        </div>
+      </details>
+    </>
   );
 }
 

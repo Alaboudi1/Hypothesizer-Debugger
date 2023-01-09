@@ -1,8 +1,8 @@
 import React from 'react';
 import htmlBeautify from 'html-beautify';
 import './InfoBox.css';
-import CodeSnipet from '../codeSnippet/CodeSnippet';
 import ReactJson from 'react-json-view';
+import CodeSnipet from '../codeSnippet/CodeSnippet';
 
 const getTypeingEventContent = (matches) => {
   return matches.map((match) => {
@@ -35,32 +35,34 @@ const getTypeingEventContent = (matches) => {
   });
 };
 const getClickEventContent = (matches) => {
-  return matches.map((match) => {
-    return (
-      <p key={match + Math.random()}>
-        <p>You clicked on the element in the following file: </p>
-        {match.fileContent && (
-          <CodeSnipet
-            code={match.fileContent}
-            lineNumbers={match.ranges}
-            fileName={match.file}
-          />
-        )}
-        {match.fileContent === undefined && (
-          <>
-            <p>
-              {' '}
-              <b> File:</b> {match.file}{' '}
-            </p>
-            <p>
-              {' '}
-              <b> Line:</b> {match.ranges[0]}{' '}
-            </p>
-          </>
-        )}
-      </p>
-    );
-  });
+  return (
+    <>
+      <p>You clicked on {matches.length} elements</p>
+      {matches.map((match) => (
+        <p key={match + Math.random()}>
+          {match.fileContent && (
+            <CodeSnipet
+              code={match.fileContent}
+              lineNumbers={match.ranges}
+              fileName={match.file}
+            />
+          )}
+          {match.fileContent === undefined && (
+            <>
+              <p>
+                {' '}
+                <b> File:</b> {match.file}{' '}
+              </p>
+              <p>
+                {' '}
+                <b> Line:</b> {match.ranges[0]}{' '}
+              </p>
+            </>
+          )}
+        </p>
+      ))}
+    </>
+  );
 };
 
 const getMutationEventContent = (matches) => {
@@ -181,51 +183,46 @@ const HowToFix = (evidence, hypotheses) => {
 };
 
 const getCodeCoverage = (codeCoverage) => {
-  return codeCoverage.evidence.map((match) => {
-    switch (codeCoverage.type) {
-      case 'API_call_with_pattern':
-        return (
-          <>
-            <p>
-              You called this function: <i>{match.functionName}</i> in the
-              following file:
-            </p>
+  const item = codeCoverage[0];
+  return (
+    <>
+      <p>This API has been called in {item.evidence.length} files</p>
+      {item.evidence.map((match) => {
+        switch (item.type) {
+          case 'API_call_with_pattern':
+            return (
+              <>
+                {/* <p> {match.functionName}</p> */}
+                <CodeSnipet
+                  code={match.fileContent}
+                  lineNumbers={match.lines}
+                  fileName={match.file}
+                />
+              </>
+            );
 
-            <CodeSnipet
-              code={match.fileContent}
-              lineNumbers={match.lines}
-              fileName={match.file}
-            />
-          </>
-        );
-
-      case 'API_call':
-        return (
-          <>
-            <p>
-              You called this function: <i>{match.functionName}</i>
-            </p>
-          </>
-        );
-      case 'API_pattern':
-        return (
-          <>
-            <CodeSnipet
-              code={match.fileContent}
-              lineNumbers={match.lines}
-              fileName={match.file}
-            />
-          </>
-        );
-      default:
-        return <></>;
-    }
-  });
-};
-
-const getNoEvidenceContent = (evidence) => {
-  if (evidence.DoesContainTheDefect === false)
-    return <h3 className="missing"> This did not happen in your program! </h3>;
+          case 'API_call':
+            return (
+              <>
+                <p>{match.functionName}</p>
+              </>
+            );
+          case 'API_pattern':
+            return (
+              <>
+                <CodeSnipet
+                  code={match.fileContent}
+                  lineNumbers={match.lines}
+                  fileName={match.file}
+                />
+              </>
+            );
+          default:
+            return <></>;
+        }
+      })}
+    </>
+  );
 };
 
 const getReqeustWillBeSentContent = (matches) => {
@@ -319,12 +316,29 @@ const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
       case 'responseReceived':
         return getResponseReceivedContent(evidence.matched);
       default:
-        return getNoEvidenceContent(evidence);
+        return <></>;
     }
   };
-  const getTitle = (type, DoesContainTheDefect) => {
+  const getNoEvidenceContent = (evidence) => {
+    if (evidence.DoesContainTheDefect === false)
+      return (
+        <h3 className="missing"> This did not happen in your program! </h3>
+      );
+    return (
+      <h3 className="warning"> This is where the bug might have happened! </h3>
+    );
+  };
+  const getEvidenceContent = (evidence, text) => {
+    if (evidence.DoesContainTheDefect === false)
+      return <h3 className="found"> {text} worked as expected! </h3>;
+    return (
+      <h3 className="warning"> This is where the bug might have happened! </h3>
+    );
+  };
+
+  const getTitle = (evidence) => {
     let title = '';
-    switch (type) {
+    switch (evidence.type) {
       case 'keydown':
         title = 'Keydown Event ';
         break;
@@ -339,20 +353,21 @@ const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
         title = 'API Call';
         break;
       case 'requestWillBeSent':
+        title = 'Network request';
+        break;
       case 'responseReceived':
-        title = 'Network Activity ';
+        title = 'Server response';
         break;
       default:
-        title = '';
+        return getNoEvidenceContent(evidence);
     }
-    if (DoesContainTheDefect) title += 'Potintial Fix';
 
-    return title;
+    return getEvidenceContent(evidence, title);
   };
 
   return (
     <div className="timeLine__item__box__content">
-      <h3>{getTitle(evidence.type, evidence.DoesContainTheDefect)}</h3>
+      {getTitle(evidence)}
       <p>{evidence.description}</p>
       {getInformation(evidence)}
       {HowToFix(evidence, hypotheses)}

@@ -5,20 +5,22 @@
   border: 1px solid #ccc;
   margin: auto;
   border-radius: 10px;
-  position: relative;
   background: white;
 }
 
 details {
   cursor: auto;
 }
+
 summary {
   cursor: pointer;
 }
-.defectDescription > h3 {
+
+.defectDescription>h3 {
   text-align: center;
 }
-.defectDescription > ul {
+
+.defectDescription>ul {
   margin: 0px;
   font-size: 1em;
 }
@@ -36,26 +38,26 @@ summary {
   font-size: 1em;
   text-align: center;
 }
+
 .hypotheses {
   padding: 0.5em;
 }
 
-.hypotheses > h3 {
+.hypotheses>h3 {
   text-align: center;
   /* make fancy border  for section */
 }
 
-.hypotheses > details {
-  overflow: hidden;
+.hypotheses>details {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
-.hypotheses > details[open] {
-  background-color: #f9f9f9;
+
+.hypotheses>details[open] {
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 5px;
 }
 
-.hypotheses > details[open] > summary {
+.hypotheses>details[open]>summary {
   margin-bottom: 0px;
   font-weight: 500;
 }
@@ -69,7 +71,8 @@ summary {
   opacity: 1;
   text-decoration: underline;
 }
-.hypotheses > details[open] > summary > .tellMeMore {
+
+.hypotheses>details[open]>summary>.tellMeMore {
   display: none;
 }
 
@@ -77,12 +80,12 @@ summary {
   font-size: 0.9em;
 }
 
-.evidenceList > summary {
+.evidenceList>summary {
   margin: 15px;
   font-size: 0.9em;
 }
 
-.fix > summary {
+.fix>summary {
   padding: 15px;
   font-size: 0.9em;
 }
@@ -93,6 +96,7 @@ summary {
   font-size: 0.9em;
   margin: 0.5em;
 }
+
 .eventItem {
   font-size: 0.9em;
   margin-left: 0.7em;

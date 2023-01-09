@@ -123,7 +123,12 @@ const App = (): JSX.Element => {
                 can change your selection later.
               </p>
               <Tags
-                tags={potentialHypotheses.current
+                tagsMostLikley={potentialHypotheses.current
+                  .filter((hypothesis) => hypothesis.score === 1)
+                  .flatMap((hypothesis) => hypothesis.tags)
+                  .filter((tag, index, self) => self.indexOf(tag) === index)}
+                tagsLessLikley={potentialHypotheses.current
+                  .filter((hypothesis) => hypothesis.score < 1)
                   .flatMap((hypothesis) => hypothesis.tags)
                   .filter((tag, index, self) => self.indexOf(tag) === index)}
                 tagsUpdate={(tags) => {
@@ -165,12 +170,11 @@ const App = (): JSX.Element => {
           onClick={() => {
             window.location.reload();
           }}
+          style={{ fontSize: '2rem' }}
         >
           ⟳
         </button>
-        <button type="button" onClick={() => sendCommand('openDevTools')}>
-          🐞
-        </button>
+
         {/* <input
           type="text"
           value={targetUrl.current}

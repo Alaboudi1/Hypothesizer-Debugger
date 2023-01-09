@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './Hypotheses.css';
 import TimeLine from '../timeLine/TimeLine';
 import Tags from '../tags/Tags';
@@ -9,6 +9,13 @@ const Hypotheses: React.FC<any> = ({
 }): JSX.Element => {
   const [showedHypotheses, setShowedHypotheses] =
     React.useState<any[]>(hypotheses);
+
+  useEffect(() => {
+    const details = document.getElementsByClassName('hypothesis');
+    for (let i = 0; i < details.length; i++) {
+      details[i].removeAttribute('open');
+    }
+  }, [showedHypotheses]);
   return (
     <div className="container">
       <div className="defectDescription">
@@ -26,7 +33,12 @@ const Hypotheses: React.FC<any> = ({
       </div>
       <div className="hypotheses">
         <Tags
-          tags={hypotheses
+          tagsMostLikley={hypotheses
+            .filter((hypothesis) => hypothesis.score === 1)
+            .flatMap((hypothesis) => hypothesis.tags)
+            .filter((tag, index, self) => self.indexOf(tag) === index)}
+          tagsLessLikley={hypotheses
+            .filter((hypothesis) => hypothesis.score < 1)
             .flatMap((hypothesis) => hypothesis.tags)
             .filter((tag, index, self) => self.indexOf(tag) === index)}
           tagsUpdate={(newTags) => {
@@ -40,7 +52,7 @@ const Hypotheses: React.FC<any> = ({
         />
         <h3>💡 Hypotheses</h3>
         {showedHypotheses.map((hypothesis, index) => (
-          <details key={index}>
+          <details key={Math.random()} className="hypothesis">
             <summary>
               <b>
                 <i>H{index + 1}:</i>

@@ -1,7 +1,7 @@
 .appContainer {
   display: grid;
-  grid-template-columns: 20vmin 60vmin 20vmin;
-  grid-template-rows: 20vmin 60vmin 20vmin;
+  grid-template-columns: 1fr 8fr 1fr;
+  grid-template-rows: 1fr auto;
 }
 
 .toolsBar {
@@ -9,6 +9,7 @@
   grid-row: 1;
   justify-self: start;
   align-self: stretch;
+
 }
 
 .logo {
@@ -61,11 +62,12 @@ h6 {
   grid-column: 2 / 3;
   grid-row: 1 / 2;
   align-self: flex-end;
-  justify-self: start;
+  justify-self: center;
   /* change bullet style */
   list-style-type: '✔ ';
   font-size: 0.9em;
   color: rgb(13, 101, 8);
+
 }
 
 .nextSteps {
@@ -125,4 +127,25 @@ h6 {
 
 .nextButton:hover {
   background-color: rgb(0, 119, 165);
+}
+
+/* width */
+::-webkit-scrollbar {
+
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

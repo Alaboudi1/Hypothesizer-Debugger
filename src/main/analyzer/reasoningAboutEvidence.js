@@ -89,6 +89,16 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
       return {
         ...hypothesis,
         evidence,
+        score:
+          evidence.reduce((acc, ev) => {
+            if (ev.isFound && ev.matched.length > 0) {
+              return acc + 1;
+            }
+            if (!ev.isFound && ev.matched.length === 0) {
+              return acc + 1;
+            }
+            return acc;
+          }, 0) / evidence.length,
       };
     });
   });
@@ -204,12 +214,13 @@ const cleanMutationEvidence = (evidence, files) => {
 };
 
 const cleanCodeCoverageEvidence = (matched, files) => {
-  const mergeCodeEvidence = (m) =>
-    m.location.map((e) => ({
+  const mergeCodeEvidence = (m) => {
+    return m.location.map((e) => ({
       ...e,
       functionName: m.functionName,
       timeStamp: m.timeStamp,
     }));
+  };
   const cleanedCodeCoverage = matched.reduce((acc, m) => {
     const rule = acc[m.rule];
     if (!rule) {
@@ -282,7 +293,7 @@ const cleanningUpEvidence = (hypotheses, files) => {
         )
           return {
             ...evidence,
-            matched: cleanCodeCoverageEvidence(matched, files),
+            matched: [cleanCodeCoverageEvidence(matched, files)],
             type: 'codeCoverage',
             API_type: oneMatch.type,
           };

@@ -63,8 +63,9 @@ function TimeLine({ hypothesis }) {
 
   const getBadges = (evidence) => {
     if (evidence.DoesContainTheDefect)
-      return <div className="timeLine__item__dot__badges">X</div>;
-    return <></>;
+      return <div className="timeLine__item__dot__badges">x</div>;
+    if (evidence.matched.length > 0 && evidence.isFound)
+      return <div className="timeLine__item__dot__badges__check">✔︎</div>;
   };
 
   const getTimelineItem = (evidence: any, index: string | undefined) => {
