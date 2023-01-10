@@ -4,7 +4,7 @@ import './InfoBox.css';
 import ReactJson from 'react-json-view';
 import CodeSnipet from '../codeSnippet/CodeSnippet';
 
-const getTypeingEventContent = (matches) => {
+const getTypeingEventContent = (matches, linkToProject) => {
   return matches.map((match) => {
     return (
       <p key={match + Math.random()}>
@@ -13,6 +13,7 @@ const getTypeingEventContent = (matches) => {
         </p>
         {match.fileContent && (
           <CodeSnipet
+            linkToProject={linkToProject}
             code={match.fileContent}
             lineNumbers={match.ranges}
             fileName={match.file}
@@ -34,7 +35,7 @@ const getTypeingEventContent = (matches) => {
     );
   });
 };
-const getClickEventContent = (matches) => {
+const getClickEventContent = (matches, linkToProject) => {
   return (
     <>
       <p>You clicked on {matches.length} elements</p>
@@ -42,6 +43,7 @@ const getClickEventContent = (matches) => {
         <p key={match + Math.random()}>
           {match.fileContent && (
             <CodeSnipet
+              linkToProject={linkToProject}
               code={match.fileContent}
               lineNumbers={match.ranges}
               fileName={match.file}
@@ -65,7 +67,7 @@ const getClickEventContent = (matches) => {
   );
 };
 
-const getMutationEventContent = (matches) => {
+const getMutationEventContent = (matches, linkToProject) => {
   return matches.flatMap((match) => {
     const info = [];
     if (match.removeNode.length > 0) {
@@ -73,6 +75,7 @@ const getMutationEventContent = (matches) => {
         <>
           <p> this html nodes were removed</p>
           <CodeSnipet
+            linkToProject={linkToProject}
             code={htmlBeautify(
               match.removeNode.map((node) => node.HTML).join(' ')
             )}
@@ -88,6 +91,7 @@ const getMutationEventContent = (matches) => {
         <>
           <p> this html nodes were added</p>
           <CodeSnipet
+            linkToProject={linkToProject}
             code={htmlBeautify(
               match.addNode.map((node) => node.HTML).join(' ')
             )}
@@ -105,6 +109,7 @@ const getMutationEventContent = (matches) => {
             {match.attributeValue}
           </p>
           <CodeSnipet
+            linkToProject={linkToProject}
             code={match.fileContent}
             lineNumbers={match.ranges}
             fileName={match.file}
@@ -115,7 +120,7 @@ const getMutationEventContent = (matches) => {
   });
 };
 
-const HowToFix = (evidence, hypotheses) => {
+const HowToFix = (evidence, hypotheses, linkToProject) => {
   if (evidence.DoesContainTheDefect)
     return (
       <>
@@ -130,6 +135,7 @@ const HowToFix = (evidence, hypotheses) => {
                   <li key={step + Math.random()}>{description}</li>
                   {codeExample && (
                     <CodeSnipet
+                      linkToProject={linkToProject}
                       code={codeExample}
                       lineNumbers={[]}
                       fileName="tsx"
@@ -147,6 +153,7 @@ const HowToFix = (evidence, hypotheses) => {
                           const { fileContent, file, ranges } = location;
                           return (
                             <CodeSnipet
+                              linkToProject={linkToProject}
                               code={fileContent}
                               lineNumbers={
                                 relatedEvidenceLocation.exactLocation
@@ -182,7 +189,7 @@ const HowToFix = (evidence, hypotheses) => {
     );
 };
 
-const getCodeCoverage = (codeCoverage) => {
+const getCodeCoverage = (codeCoverage, linkToProject) => {
   const item = codeCoverage[0];
   return (
     <>
@@ -194,6 +201,7 @@ const getCodeCoverage = (codeCoverage) => {
               <>
                 {/* <p> {match.functionName}</p> */}
                 <CodeSnipet
+                  linkToProject={linkToProject}
                   code={match.fileContent}
                   lineNumbers={match.lines}
                   fileName={match.file}
@@ -211,6 +219,7 @@ const getCodeCoverage = (codeCoverage) => {
             return (
               <>
                 <CodeSnipet
+                  linkToProject={linkToProject}
                   code={match.fileContent}
                   lineNumbers={match.lines}
                   fileName={match.file}
@@ -225,7 +234,7 @@ const getCodeCoverage = (codeCoverage) => {
   );
 };
 
-const getReqeustWillBeSentContent = (matches) => {
+const getReqeustWillBeSentContent = (matches, linkToProject) => {
   return matches.map((match) => {
     return (
       <>
@@ -248,6 +257,7 @@ const getReqeustWillBeSentContent = (matches) => {
               following file:
             </p>
             <CodeSnipet
+              linkToProject={linkToProject}
               code={match.fileContent}
               lineNumbers={match.ranges}
               fileName={match.file}
@@ -261,7 +271,7 @@ const getReqeustWillBeSentContent = (matches) => {
   });
 };
 
-const getResponseReceivedContent = (matches) => {
+const getResponseReceivedContent = (matches, linkToProject) => {
   return matches.map((match) => {
     return (
       <>
@@ -286,6 +296,7 @@ const getResponseReceivedContent = (matches) => {
               the following file:
             </p>
             <CodeSnipet
+              linkToProject={linkToProject}
               code={match.fileContent}
               lineNumbers={match.ranges}
               fileName={match.file}
@@ -299,22 +310,26 @@ const getResponseReceivedContent = (matches) => {
   });
 };
 
-const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
-  const getInformation = (evidence) => {
+const InfoBox: React.FC<any> = ({
+  evidence,
+  hypotheses,
+  linkToProject,
+}): JSX.Element => {
+  const getInformation = (evidence, linkToProject) => {
     switch (evidence.type) {
       case 'keydown':
-        return getTypeingEventContent(evidence.matched);
+        return getTypeingEventContent(evidence.matched, linkToProject);
       case 'click':
-        return getClickEventContent(evidence.matched);
+        return getClickEventContent(evidence.matched, linkToProject);
       case 'childList':
       case 'attributes':
-        return getMutationEventContent(evidence.matched);
+        return getMutationEventContent(evidence.matched, linkToProject);
       case 'codeCoverage':
-        return getCodeCoverage(evidence.matched);
+        return getCodeCoverage(evidence.matched, linkToProject);
       case 'requestWillBeSent':
-        return getReqeustWillBeSentContent(evidence.matched);
+        return getReqeustWillBeSentContent(evidence.matched, linkToProject);
       case 'responseReceived':
-        return getResponseReceivedContent(evidence.matched);
+        return getResponseReceivedContent(evidence.matched, linkToProject);
       default:
         return <></>;
     }
@@ -369,8 +384,8 @@ const InfoBox: React.FC<any> = ({ evidence, hypotheses }): JSX.Element => {
     <div className="timeLine__item__box__content">
       {getTitle(evidence)}
       <p>{evidence.description}</p>
-      {getInformation(evidence)}
-      {HowToFix(evidence, hypotheses)}
+      {getInformation(evidence, linkToProject)}
+      {HowToFix(evidence, hypotheses, linkToProject)}
     </div>
   );
 };

@@ -35,7 +35,12 @@ const getCoverage = (coverage, files, setBackendState) => {
           payload: {
             trace: result.data,
             filesContent: result.filesContent,
-            linkToKnowledge: `${localHypothesesLink}../hypotheses.json`,
+            linkToKonwledge: path.join(
+              localHypothesesLink ?? '',
+              '..',
+              'hypotheses.json'
+            ),
+            linktoProject: localHypothesesLink,
           },
           step: 'trace',
         });

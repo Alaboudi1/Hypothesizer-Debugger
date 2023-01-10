@@ -11,7 +11,7 @@
 import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
 import contextMenu from 'electron-context-menu';
-import { resolveHtmlPath, isDockerRunning } from './util';
+import { resolveHtmlPath, isDockerRunning, openFile } from './util';
 import initConnector from './backendConnector';
 
 contextMenu();
@@ -141,7 +141,8 @@ app
       getMainWindowPositions,
       isDockerRunning,
       searchInPage,
-      focusOnMainWindow
+      focusOnMainWindow,
+      openFile
     );
   })
   .catch(console.log);

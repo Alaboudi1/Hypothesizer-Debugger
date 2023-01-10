@@ -39,9 +39,9 @@ const App = (): JSX.Element => {
         setCurrentStep(1);
         futureSteps.current.shift();
       }
-      subscribeToCommand('hypotheses', (hypotheses) => {
-        potentialHypotheses.current = hypotheses;
-        if (hypotheses.length > 0) setCurrentStep(3);
+      subscribeToCommand('hypotheses', (payload) => {
+        potentialHypotheses.current = payload;
+        if (payload.hypotheses.length > 0) setCurrentStep(3);
         else setCurrentStep(4);
         futureSteps.current.shift();
         doneStepsRef.current.push('Analysis is done!');
@@ -123,11 +123,11 @@ const App = (): JSX.Element => {
                 can change your selection later.
               </p>
               <Tags
-                tagsMostLikley={potentialHypotheses.current
+                tagsMostLikley={potentialHypotheses.current.hypotheses
                   .filter((hypothesis) => hypothesis.score === 1)
                   .flatMap((hypothesis) => hypothesis.tags)
                   .filter((tag, index, self) => self.indexOf(tag) === index)}
-                tagsLessLikley={potentialHypotheses.current
+                tagsLessLikley={potentialHypotheses.current.hypotheses
                   .filter((hypothesis) => hypothesis.score < 1)
                   .flatMap((hypothesis) => hypothesis.tags)
                   .filter((tag, index, self) => self.indexOf(tag) === index)}
@@ -153,8 +153,9 @@ const App = (): JSX.Element => {
         return (
           <div className="reportContainer addedAnnimation">
             <Hypotheses
-              hypotheses={potentialHypotheses.current}
+              hypotheses={potentialHypotheses.current.hypotheses}
               initSelectedTags={initSelectedTags.current}
+              linkToProject={potentialHypotheses.current.linkToProject}
             />
           </div>
         );

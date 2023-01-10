@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react';
 import { CopyBlock, CodeBlock, dracula } from 'react-code-blocks';
 import './CodeSnippet.css';
+import { sendCommand } from 'renderer/frontendConnectors';
 
 const CodeSnippet: React.FC<any> = ({
   code,
   lineNumbers,
   fileName,
+  linkToProject,
 }): JSX.Element => {
   const divRef = React.createRef<HTMLDivElement>();
   const linesHighlighted = (codeLines) => {
@@ -34,7 +36,21 @@ const CodeSnippet: React.FC<any> = ({
     <div key={code + Math.random()}>
       {lineNumbers.length > 0 ? (
         <>
-          <p className="fileName"> {fileName}</p>
+          <p className="fileName">
+            {' '}
+            {fileName}
+            <a
+              onClick={() =>
+                sendCommand('openFile', {
+                  url: `${linkToProject}${fileName}:${lineNumbers[0]}`,
+                })
+              }
+              type="link"
+              className="openFileButton"
+            >
+              Show in Editor ↗
+            </a>
+          </p>
           <div ref={divRef} className="codeSnippet">
             <CopyBlock
               text={code}

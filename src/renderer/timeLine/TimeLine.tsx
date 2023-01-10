@@ -12,14 +12,14 @@ import response from './icons/response.png';
 import mouseOver from './icons/mouseOver.png';
 import mouseOut from './icons/mouseOut.png';
 
-function TimeLine({ hypothesis }) {
+function TimeLine({ hypothesis, linkToProject }) {
   const boxRef = useRef(null);
-  const [infoBoxData, setInfoBoxData] = useState(hypothesis.evidence[0]);
+  const [currentDot, setCurrentDot] = useState(0);
 
   const selectedDot = (e: { currentTarget: { id: string } }) => {
     const id = parseInt(e.currentTarget.id, 10);
     boxRef.current.style.transform = `translateY(${id * 88 + 30}px)`;
-    setInfoBoxData(hypothesis.evidence[id]);
+    setCurrentDot(id);
   };
   const getIconForDOMEvent = (type: any) => {
     switch (type) {
@@ -105,9 +105,10 @@ function TimeLine({ hypothesis }) {
         <div className="timeLine__item__box_arrow" ref={boxRef} />
         <div className="timeLine__item__box">
           <InfoBox
-            evidence={infoBoxData}
+            evidence={hypothesis.evidence[currentDot]}
             hypotheses={hypothesis}
             key={hypothesis.id}
+            linkToProject={linkToProject}
           />
         </div>
       </div>

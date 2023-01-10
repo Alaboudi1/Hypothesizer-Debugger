@@ -6,6 +6,7 @@ import Tags from '../tags/Tags';
 const Hypotheses: React.FC<any> = ({
   hypotheses,
   initSelectedTags,
+  linkToProject,
 }): JSX.Element => {
   const [showedHypotheses, setShowedHypotheses] =
     React.useState<any[]>(hypotheses);
@@ -66,7 +67,7 @@ const Hypotheses: React.FC<any> = ({
             </div>
             <div className="hypothesis_Evidence">
               <b>Where is what happened exactly: </b>
-              <TimeLine hypothesis={hypothesis} />
+              <TimeLine hypothesis={hypothesis} linkToProject={linkToProject} />
             </div>
           </details>
         ))}

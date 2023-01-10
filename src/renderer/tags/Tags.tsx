@@ -27,7 +27,10 @@ function Tags({
     <>
       <details open>
         <summary>
-          <h3 className="mostLikely">Most likely descriptions of the bug</h3>
+          <h3 className="mostLikely">
+            Most likely descriptions of the bug
+            <p className="padgetDescription"> {tagsMostLikley.length}</p>
+          </h3>
         </summary>
         <div className="tags">
           {tagsMostLikley.map((tag) => (
@@ -44,7 +47,10 @@ function Tags({
       </details>
       <details>
         <summary>
-          <h3 className="lessLikely"> Less likely descriptions of the bug</h3>
+          <h3 className="lessLikely">
+            Less likely descriptions of the bug
+            <p className="padgetDescription"> {tagsMostLikley.length}</p>
+          </h3>
         </summary>
         <div className="tags">
           {tagsLessLikley.map((tag) => (

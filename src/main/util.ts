@@ -21,3 +21,11 @@ export function isDockerRunning() {
     return false;
   }
 }
+
+export function openFile(url: string) {
+  try {
+    execSync(`code -g ${url}`);
+  } catch (e) {
+    throw new Error('Could not open file');
+  }
+}

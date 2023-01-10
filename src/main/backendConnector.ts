@@ -25,7 +25,8 @@ const initConnector = (
   getMainWindowPositions: () => { width: number; height: number },
   isDockerRunning: () => boolean,
   searchInPage: (searchTerm: string) => void,
-  focusOnMainWindow: (flag: boolean) => void
+  focusOnMainWindow: (flag: boolean) => void,
+  openFile: (url: string) => void
 ) => {
   const setuplisteners = () => {
     ipcMain.on('CDP', async (event, arg) => {
@@ -35,6 +36,7 @@ const initConnector = (
           payload: args,
         });
       };
+      let linkToProject = '';
       const readFromCache = () => {
         try {
           const data = fs.readFileSync(
@@ -58,13 +60,17 @@ const initConnector = (
         switch (step) {
           case 'trace':
             if (payload.trace.length === 0) {
-              notifyFrontend('hypotheses', []);
+              notifyFrontend('hypotheses', {
+                hypotheses: [],
+                linkToProject: '',
+              });
               return;
             }
+            linkToProject = payload.linktoProject;
             getEvidence(
               payload.trace,
               payload.filesContent,
-              [payload.linkToKnowledge],
+              [payload.linkToKonwledge],
               setBackendState
             );
             break;
@@ -78,7 +84,10 @@ const initConnector = (
             break;
           case 'hypotheses': {
             // writeToCache(payload);
-            notifyFrontend('hypotheses', payload);
+            notifyFrontend('hypotheses', {
+              hypotheses: payload,
+              linkToProject,
+            });
             break;
           }
           default:
@@ -118,6 +127,10 @@ const initConnector = (
 
         case 'isDockerRunning':
           notifyFrontend('isDockerRunning', isDockerRunning());
+          break;
+
+        case 'openFile':
+          openFile(payload.url);
           break;
 
         default:
