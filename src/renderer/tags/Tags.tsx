@@ -25,7 +25,7 @@ function Tags({
 
   return (
     <>
-      <details open>
+      <details open={tagsMostLikley.length > 0}>
         <summary>
           <h3 className="mostLikely">
             Most likely descriptions of the bug
@@ -43,13 +43,16 @@ function Tags({
               {tag}
             </div>
           ))}
+          {tagsMostLikley.length === 0 && (
+            <p className="noTags">No descriptions found</p>
+          )}
         </div>
       </details>
-      <details>
+      <details open={tagsLessLikley.length > 0 && tagsMostLikley.length === 0}>
         <summary>
           <h3 className="lessLikely">
             Less likely descriptions of the bug
-            <p className="padgetDescription"> {tagsMostLikley.length}</p>
+            <p className="padgetDescription"> {tagsLessLikley.length}</p>
           </h3>
         </summary>
         <div className="tags">
@@ -63,6 +66,9 @@ function Tags({
               {tag}
             </div>
           ))}
+          {tagsLessLikley.length === 0 && (
+            <p className="noTags">No descriptions found</p>
+          )}
         </div>
       </details>
     </>

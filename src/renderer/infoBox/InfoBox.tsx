@@ -164,6 +164,29 @@ const HowToFix = (evidence, hypotheses, linkToProject) => {
                             />
                           );
                         }
+                        const locations = e.matched.filter(
+                          (m) => m.evidence.length > 0
+                        );
+                        if (locations.length > 0) {
+                          return locations.map((location) =>
+                            location.evidence.map((ev) => {
+                              const { fileContent, file, lines } = ev;
+                              return (
+                                <CodeSnipet
+                                  linkToProject={linkToProject}
+                                  code={fileContent}
+                                  lineNumbers={
+                                    relatedEvidenceLocation.exactLocation
+                                      ? lines
+                                      : [0, 0]
+                                  }
+                                  fileName={file}
+                                />
+                              );
+                            })
+                          );
+                        }
+
                         return <b>No file found!</b>;
                       })}
                 </>

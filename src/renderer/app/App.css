@@ -129,6 +129,11 @@ h6 {
   background-color: rgb(0, 119, 165);
 }
 
+.nextButton:disabled {
+  background-color: lightgray;
+  cursor: not-allowed;
+}
+
 /* width */
 ::-webkit-scrollbar {
 

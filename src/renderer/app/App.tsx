@@ -22,7 +22,7 @@ const App = (): JSX.Element => {
   const doneStepsRef = useRef<string[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const searchButtonRef = useRef<HTMLInputElement>(null);
-  const initSelectedTags = useRef<string[]>([]);
+  const [initSelectedTags, setInitSelectedTags] = useState<string[]>([]);
 
   useEffect(() => {
     document.addEventListener('keydown', (e) => {
@@ -132,11 +132,11 @@ const App = (): JSX.Element => {
                   .flatMap((hypothesis) => hypothesis.tags)
                   .filter((tag, index, self) => self.indexOf(tag) === index)}
                 tagsUpdate={(tags) => {
-                  initSelectedTags.current = tags;
+                  setInitSelectedTags(tags);
                 }}
                 initSelectedTags={[]}
               />
-              <input
+              <button
                 className="nextButton"
                 onClick={() => {
                   setCurrentStep(4);
@@ -144,8 +144,10 @@ const App = (): JSX.Element => {
                   doneStepsRef.current.push('Tags are done!');
                 }}
                 type="button"
-                value="Show Hypotheses"
-              />
+                disabled={initSelectedTags.length === 0}
+              >
+                Show Hypotheses
+              </button>
             </div>
           </div>
         );
@@ -154,7 +156,7 @@ const App = (): JSX.Element => {
           <div className="reportContainer addedAnnimation">
             <Hypotheses
               hypotheses={potentialHypotheses.current.hypotheses}
-              initSelectedTags={initSelectedTags.current}
+              initSelectedTags={initSelectedTags}
               linkToProject={potentialHypotheses.current.linkToProject}
             />
           </div>
