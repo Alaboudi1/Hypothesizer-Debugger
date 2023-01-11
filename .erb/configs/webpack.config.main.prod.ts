@@ -31,11 +31,16 @@ const configuration: webpack.Configuration = {
       'sourceMap',
       'sourceMapping.js'
     ),
-    hypotheses: path.join(
+    reasoningAboutEvidence: path.join(
       webpackPaths.srcMainPath,
       'analyzer',
-      'hypotheses.js'
+      'reasoningAboutEvidence.js'
     ),
+    analyzingEvidence: path.join(
+      webpackPaths.srcMainPath,
+      'analyzer',
+      'analyzingEvidence.js'
+    )
   },
 
   output: {
@@ -77,7 +82,7 @@ const configuration: webpack.Configuration = {
     new CopyPlugin({
       patterns: [
         {
-          from: path.join(webpackPaths.srcMainPath, 'analyzer', 'src'),
+          from: path.join(webpackPaths.srcMainPath, 'analyzer', 'container'),
           to: path.join(webpackPaths.distMainPath, 'src'),
         },
       ],
