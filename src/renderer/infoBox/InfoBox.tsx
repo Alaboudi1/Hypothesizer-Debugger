@@ -200,7 +200,9 @@ const HowToFix = (evidence, hypotheses, linkToProject) => {
                 {evidence.HowToFix.links.map(({ url, title }) => {
                   return (
                     <li key={url + Math.random()}>
-                      <a href={url}>{title}</a>
+                      <a href={url} target="_blank" rel="noreferrer">
+                        {title}
+                      </a>
                     </li>
                   );
                 })}
