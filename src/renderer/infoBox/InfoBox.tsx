@@ -38,7 +38,9 @@ const getTypeingEventContent = (matches, linkToProject) => {
 const getClickEventContent = (matches, linkToProject) => {
   return (
     <>
-      <p>You clicked on {matches.length} elements</p>
+      <p>
+        You {matches[0].type} on {matches.length} elements
+      </p>
       {matches.map((match) => (
         <p key={match + Math.random()}>
           {match.fileContent && (
@@ -345,6 +347,8 @@ const InfoBox: React.FC<any> = ({
       case 'keydown':
         return getTypeingEventContent(evidence.matched, linkToProject);
       case 'click':
+      case 'mouseover':
+      case 'mouseout':
         return getClickEventContent(evidence.matched, linkToProject);
       case 'childList':
       case 'attributes':

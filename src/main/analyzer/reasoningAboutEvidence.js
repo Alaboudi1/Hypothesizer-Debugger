@@ -279,7 +279,12 @@ const cleanningUpEvidence = (hypotheses, files) => {
         }
         const oneMatch = matched[0];
 
-        if (oneMatch.evidence.keyPressed || oneMatch.evidence.type === 'click')
+        if (
+          oneMatch.evidence.keyPressed ||
+          oneMatch.evidence.type === 'click' ||
+          oneMatch.evidence.type === 'mouseover' ||
+          oneMatch.evidence.type === 'mouseout'
+        )
           return {
             ...evidence,
             matched: cleanEventKeyPressAndClickEvidence(matched, files),
