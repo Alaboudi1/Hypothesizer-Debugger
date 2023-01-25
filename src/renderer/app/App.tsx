@@ -128,7 +128,10 @@ const App = (): JSX.Element => {
                   .flatMap((hypothesis) => hypothesis.tags)
                   .filter((tag, index, self) => self.indexOf(tag) === index)}
                 tagsLessLikley={potentialHypotheses.current.hypotheses
-                  .filter((hypothesis) => hypothesis.score < 1)
+                  .filter(
+                    (hypothesis) =>
+                      hypothesis.score < 1 && hypothesis.score > 0.5
+                  )
                   .flatMap((hypothesis) => hypothesis.tags)
                   .filter((tag, index, self) => self.indexOf(tag) === index)}
                 tagsUpdate={(tags) => {

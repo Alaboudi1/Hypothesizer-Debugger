@@ -81,6 +81,11 @@ const writeCoverageToFiles = (coverage) => {
   //     2
   //   )
   // );
+
+  return {
+    events: otherCoverage,
+    projecturl: codeCoverage[0].file.split('node_modules')[0],
+  };
 };
 
 const clearFiles = () => {
@@ -209,13 +214,45 @@ const writeSemgrepRules = (knowledge) => {
   });
 };
 
-const writeCoverageFilesToFiles = (files) => {
+const writeCoverageFilesToFiles = (files, events, url) => {
+  const eventsFiles = events
+    .filter(
+      (event) =>
+        files.find((file) => file.file === event.jsx.fileName) === undefined
+    )
+    .map((event) => {
+      return event.jsx.fileName;
+    })
+    .reduce((acc, curr) => {
+      if (acc.find((file) => file === curr) === undefined) {
+        acc.push(curr);
+      }
+      return acc;
+    }, [])
+    .map((fileUrl) => {
+      // replace = with proper path
+      return path.join(url, fileUrl.replace(/=/g, '/'));
+    });
   files.forEach((file) => {
     fs.writeFileSync(
       path.join(__dirname, 'container', 'inputs', 'Code', file.file),
       file.content
     );
   });
+  const newFiles = [];
+  eventsFiles.forEach((f) => {
+    const content = fs.readFileSync(f, 'utf8');
+    const file = f.split(url).pop().replace(/\//g, '=');
+    fs.writeFileSync(
+      path.join(__dirname, 'container', 'inputs', 'Code', file),
+      content
+    );
+    newFiles.push({
+      file,
+      content,
+    });
+  });
+  return [...files, ...newFiles];
 };
 
 const readSemgrepOutput = () => {
@@ -324,8 +361,8 @@ const analyzeEvidence = async (coverages, files, knowledgeURL) => {
   const knowledgeRaw = await getKnowledge(knowledgeURL);
   const knowledge = knowledgeRaw.map((item) => JSON.parse(item));
   clearFiles();
-  writeCoverageToFiles(coverages);
-  writeCoverageFilesToFiles(files);
+  const { events, projecturl } = writeCoverageToFiles(coverages);
+  const newFiles = writeCoverageFilesToFiles(files, events, projecturl);
   writeSemgrepRules(knowledge);
   semgrepAnalysis();
   const semgrepOutput = readSemgrepOutput();
@@ -334,7 +371,7 @@ const analyzeEvidence = async (coverages, files, knowledgeURL) => {
   parentPort.postMessage({
     evidence,
     knowledge,
-    files,
+    files: newFiles,
   });
 };
 analyzeEvidence(

@@ -50,18 +50,10 @@ const init = () => {
     saveEvents(data);
   };
 
-  // attach click event to all input elements
-  document.querySelectorAll('input').forEach((input) => {
-    input.addEventListener('click', (e, timeStamp = Date.now()) =>
-      getDataForEvent(e, 'click', timeStamp)
-    );
-  });
-  // attach click event to all button elements
-  document.querySelectorAll('button').forEach((button) => {
-    button.addEventListener('click', (e, timeStamp = Date.now()) =>
-      getDataForEvent(e, 'click', timeStamp)
-    );
-  });
+  // attach click event to all elements in the DOM
+  document.addEventListener('click', (e, timeStamp = Date.now()) =>
+    getDataForEvent(e, 'click', timeStamp)
+  );
 
   // attach keydown event
   document.addEventListener('keydown', (e, timeStamp = Date.now()) =>
