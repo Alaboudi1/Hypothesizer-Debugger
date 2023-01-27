@@ -216,13 +216,13 @@ const writeSemgrepRules = (knowledge) => {
 
 const writeCoverageFilesToFiles = (files, events, url) => {
   const eventsFiles = events
-    .filter(
-      (event) =>
-        files.find((file) => file.file === event.jsx.fileName) === undefined
-    )
     .map((event) => {
-      return event.jsx.fileName;
+      return event.jsx?.fileName;
     })
+    .filter((file) => file !== undefined && file !== 'srcundefined')
+    .filter(
+      (fileName) => files.find((file) => file.file === fileName) === undefined
+    )
     .reduce((acc, curr) => {
       if (acc.find((file) => file === curr) === undefined) {
         acc.push(curr);

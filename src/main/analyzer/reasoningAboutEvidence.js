@@ -109,19 +109,17 @@ const getStartAndEndLineForJSX = (start, fileContent) => {
   if (!lines) {
     return [start, start];
   }
-  const startContent = lines[start - 1];
-  // does this line contain an opening tag?
-  const openingTag = startContent.includes('<');
+
   let end = start;
-  if (openingTag) {
-    while (
-      end < lines.length &&
-      !lines[end - 1].includes('>') &&
-      !lines[end - 1].includes('/>')
-    ) {
-      end += 1;
+  let i = start;
+  while (i < lines.length) {
+    if (lines[i].includes('</')) {
+      end = i + 1;
+      break;
     }
+    i++;
   }
+
   return [start, end];
 };
 
