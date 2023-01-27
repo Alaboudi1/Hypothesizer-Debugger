@@ -84,7 +84,10 @@ const writeCoverageToFiles = (coverage) => {
 
   return {
     events: otherCoverage,
-    projecturl: codeCoverage[0].file.split('node_modules')[0],
+    // find the first file with node_modules in the path
+    projecturl: codeCoverage
+      .find((item) => item.file.includes('node_modules'))
+      .file.split('node_modules')[0],
   };
 };
 
@@ -233,26 +236,24 @@ const writeCoverageFilesToFiles = (files, events, url) => {
       // replace = with proper path
       return path.join(url, fileUrl.replace(/=/g, '/'));
     });
-  files.forEach((file) => {
-    fs.writeFileSync(
-      path.join(__dirname, 'container', 'inputs', 'Code', file.file),
-      file.content
-    );
-  });
+
   const newFiles = [];
   eventsFiles.forEach((f) => {
     const content = fs.readFileSync(f, 'utf8');
     const file = f.split(url).pop().replace(/\//g, '=');
-    fs.writeFileSync(
-      path.join(__dirname, 'container', 'inputs', 'Code', file),
-      content
-    );
     newFiles.push({
       file,
       content,
     });
   });
-  return [...files, ...newFiles];
+  const finalFiles = files.concat(newFiles);
+  finalFiles.forEach((file) => {
+    fs.writeFileSync(
+      path.join(__dirname, 'container', 'inputs', 'Code', file.file),
+      file.content
+    );
+  });
+  return finalFiles;
 };
 
 const readSemgrepOutput = () => {
