@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-restricted-syntax */
 const init = () => {
+  let cacheJSX = {};
   document.body.focus();
   const saveEvents = (events) => {
     const previousEvents = JSON.parse(localStorage.getItem('events')) || [];
@@ -46,6 +47,22 @@ const init = () => {
           : event.srcElement.outerHTML,
       timeStamp,
     };
+    if (
+      data.jsx.fileName === 'srcundefined' &&
+      cacheJSX.fileName !== undefined &&
+      data.target === cacheJSX.target
+    ) {
+      data.jsx = {
+        fileName: cacheJSX.fileName,
+        lineNumber: cacheJSX.lineNumber,
+      };
+    }
+    if (type === 'mouseover') {
+      cacheJSX = {
+        ...data.jsx,
+        target: data.target,
+      };
+    }
 
     saveEvents(data);
   };
