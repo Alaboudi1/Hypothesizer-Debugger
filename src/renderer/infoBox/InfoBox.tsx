@@ -51,20 +51,18 @@ const getClickEventContent = (matches, linkToProject) => {
               fileName={match.file}
             />
           )}
-          {match.fileContent === undefined &&
-            match.file !==
-              'srcundefined'(
-                <>
-                  <p>
-                    {' '}
-                    <b> File:</b> {match.file}{' '}
-                  </p>
-                  <p>
-                    {' '}
-                    <b> Line:</b> {match.ranges[0]}{' '}
-                  </p>
-                </>
-              )}
+          {match.fileContent === undefined && match.file !== 'srcundefined' && (
+            <>
+              <p>
+                {' '}
+                <b> File:</b> {match.file}{' '}
+              </p>
+              <p>
+                {' '}
+                <b> Line:</b> {match.ranges[0]}{' '}
+              </p>
+            </>
+          )}
         </p>
       ))}
     </>
