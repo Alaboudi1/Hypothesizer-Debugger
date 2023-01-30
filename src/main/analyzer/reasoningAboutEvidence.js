@@ -247,6 +247,9 @@ const cleanCodeCoverageEvidence = (matched, files) => {
             if (!found) {
               acc2.push({
                 ...e,
+                fileContent: files.find(
+                  ({ file }) => file.replace(/=/g, '/') === e.file
+                )?.content,
                 count: 1,
               });
             } else {
