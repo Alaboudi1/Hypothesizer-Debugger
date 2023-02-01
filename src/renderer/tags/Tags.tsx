@@ -3,23 +3,24 @@
 import { useState, useEffect } from 'react';
 import './Tags.css';
 
-function Tags({
-  tagsUpdate,
-  tagsMostLikley,
-  tagsLessLikley,
-  initSelectedTags,
-}) {
-  const [selectedTags, setSelectedTags] = useState<string[]>(initSelectedTags);
+function Tags({ tagsUpdate, tags, initSelectedTags }) {
+  const [selectedTags, setSelectedTags] =
+    useState<{ tag: string; score: number }[]>(initSelectedTags);
+  const tagsMostLikley = tags.filter(({ score }) => score === 1);
+  const tagsLessLikley = tags.filter(({ score }) => score > 0.5 && score < 1);
 
   useEffect(() => {
     tagsUpdate(selectedTags);
   }, [selectedTags]);
 
-  const updateTags = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter((t) => t !== tag));
+  const updateTags = (tag: string, score: number) => {
+    if (selectedTags.some((t) => t.tag === tag && t.score === score)) {
+      // remove tag fomr selected tags
+      setSelectedTags(
+        selectedTags.filter((t) => t.tag !== tag || t.score !== score)
+      );
     } else {
-      setSelectedTags([...selectedTags, tag]);
+      setSelectedTags([...selectedTags, { tag, score }]);
     }
   };
 
@@ -33,11 +34,14 @@ function Tags({
           </h3>
         </summary>
         <div className="tags">
-          {tagsMostLikley.map((tag) => (
+          {tagsMostLikley.map(({ tag, score }) => (
             <div
-              className={`tag ${selectedTags.includes(tag) ? 'selected' : ''}`}
-              onClick={() => updateTags(tag)}
-              key={tag}
+              className={`tag ${
+                selectedTags.find((t) => t.tag === tag && t.score === score) &&
+                'selected'
+              }`}
+              onClick={() => updateTags(tag, score)}
+              key={tag + score}
               role="button"
             >
               {tag}
@@ -56,11 +60,14 @@ function Tags({
           </h3>
         </summary>
         <div className="tags">
-          {tagsLessLikley.map((tag) => (
+          {tagsLessLikley.map(({ tag, score }) => (
             <div
-              className={`tag ${selectedTags.includes(tag) && 'selected'}`}
-              onClick={() => updateTags(tag)}
-              key={tag}
+              className={`tag ${
+                selectedTags.find((t) => t.tag === tag && t.score === score) &&
+                'selected'
+              }`}
+              onClick={() => updateTags(tag, score)}
+              key={tag + score}
               role="button"
             >
               {tag}

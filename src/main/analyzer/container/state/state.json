@@ -1,0 +1,782 @@
+[
+  {
+    "filesNumber": 5,
+    "lineOfCode": 193,
+    "eventsNumber": 107,
+    "coveragesNumber": 6227,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsMix/bug-1/",
+    "recordingTime": 5.224,
+    "totalAnalysisTime": 10.763,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 4,
+    "lineOfCode": 158,
+    "eventsNumber": 39,
+    "coveragesNumber": 4917,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsMix/bug-2/",
+    "recordingTime": 4.633,
+    "totalAnalysisTime": 8.78,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 1,
+    "lineOfCode": 166,
+    "eventsNumber": 11,
+    "coveragesNumber": 976,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsMix/bug-3/",
+    "recordingTime": 2.623,
+    "totalAnalysisTime": 6.538,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 5,
+    "lineOfCode": 208,
+    "eventsNumber": 84,
+    "coveragesNumber": 2416,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsMix/bug-4/",
+    "recordingTime": 4.11,
+    "totalAnalysisTime": 7.256,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 4,
+    "lineOfCode": 165,
+    "eventsNumber": 27,
+    "coveragesNumber": 2794,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsMix/bug-6/",
+    "recordingTime": 3.095,
+    "totalAnalysisTime": 14.113,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 1,
+    "lineOfCode": 88,
+    "eventsNumber": 30,
+    "coveragesNumber": 4204,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsMix/bug-7/",
+    "recordingTime": 3.298,
+    "totalAnalysisTime": 7.739,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 1,
+    "lineOfCode": 102,
+    "eventsNumber": 16,
+    "coveragesNumber": 2006,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsMix/bug-8/",
+    "recordingTime": 2.875,
+    "totalAnalysisTime": 6.696,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 18,
+    "lineOfCode": 487,
+    "eventsNumber": 32,
+    "coveragesNumber": 5662,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-1/",
+    "recordingTime": 5.506,
+    "totalAnalysisTime": 9.051,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 3,
+    "lineOfCode": 99,
+    "eventsNumber": 13,
+    "coveragesNumber": 1743,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-2/",
+    "recordingTime": 3.745,
+    "totalAnalysisTime": 6.133,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 3,
+    "lineOfCode": 103,
+    "eventsNumber": 13,
+    "coveragesNumber": 822,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-3/",
+    "recordingTime": 2.5,
+    "totalAnalysisTime": 8.239,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 15,
+    "lineOfCode": 495,
+    "eventsNumber": 16,
+    "coveragesNumber": 1660,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-4/",
+    "recordingTime": 3.473,
+    "totalAnalysisTime": 6.048,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 17,
+    "lineOfCode": 483,
+    "eventsNumber": 43,
+    "coveragesNumber": 7413,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-6/",
+    "recordingTime": 5.947,
+    "totalAnalysisTime": 9.146,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 17,
+    "lineOfCode": 498,
+    "eventsNumber": 69,
+    "coveragesNumber": 7921,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-7/",
+    "recordingTime": 6.502,
+    "totalAnalysisTime": 9.9,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 15,
+    "lineOfCode": 387,
+    "eventsNumber": 12,
+    "coveragesNumber": 1495,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-8/",
+    "recordingTime": 3.27,
+    "totalAnalysisTime": 5.64,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 35,
+    "lineOfCode": 16084,
+    "eventsNumber": 12,
+    "coveragesNumber": 1228,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsMix/bug-5/",
+    "recordingTime": 2.519,
+    "totalAnalysisTime": 9.103,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 3,
+    "lineOfCode": 114,
+    "eventsNumber": 14,
+    "coveragesNumber": 821,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsMix/bug-9/",
+    "recordingTime": 2.689,
+    "totalAnalysisTime": 6.054,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 3,
+    "lineOfCode": 114,
+    "eventsNumber": 13,
+    "coveragesNumber": 620,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsMix/bug-10/",
+    "recordingTime": 2.252,
+    "totalAnalysisTime": 6.211,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 3,
+    "lineOfCode": 88,
+    "eventsNumber": 13,
+    "coveragesNumber": 748,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-5/",
+    "recordingTime": 2.112,
+    "totalAnalysisTime": 5.454,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 5,
+    "lineOfCode": 240,
+    "eventsNumber": 15,
+    "coveragesNumber": 1168,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-9/",
+    "recordingTime": 2.203,
+    "totalAnalysisTime": 7.132,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 5,
+    "lineOfCode": 243,
+    "eventsNumber": 13,
+    "coveragesNumber": 781,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-10/",
+    "recordingTime": 2.327,
+    "totalAnalysisTime": 5.749,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  }
+]

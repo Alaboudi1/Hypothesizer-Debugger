@@ -34,20 +34,17 @@ const Hypotheses: React.FC<any> = ({
       </div>
       <div className="hypotheses">
         <Tags
-          tagsMostLikley={hypotheses
-            .filter((hypothesis) => hypothesis.score === 1)
-            .flatMap((hypothesis) => hypothesis.tags)
-            .filter((tag, index, self) => self.indexOf(tag) === index)}
-          tagsLessLikley={hypotheses
-            .filter(
-              (hypothesis) => hypothesis.score < 1 && hypothesis.score > 0.5
-            )
-            .flatMap((hypothesis) => hypothesis.tags)
-            .filter((tag, index, self) => self.indexOf(tag) === index)}
-          tagsUpdate={(newTags) => {
+          tags={hypotheses.flatMap((hypothesis) =>
+            hypothesis.tags.map((tag) => ({ tag, score: hypothesis.score }))
+          )}
+          tagsUpdate={(tags) => {
             setShowedHypotheses(
               hypotheses.filter((hypothesis) =>
-                hypothesis.tags.some((tag) => newTags.includes(tag))
+                tags.some(
+                  (tag) =>
+                    hypothesis.tags.includes(tag.tag) &&
+                    hypothesis.score === tag.score
+                )
               )
             );
           }}

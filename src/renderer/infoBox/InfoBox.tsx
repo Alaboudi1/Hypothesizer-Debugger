@@ -363,50 +363,42 @@ const InfoBox: React.FC<any> = ({
         return <></>;
     }
   };
-  const getNoEvidenceContent = (evidence) => {
-    if (evidence.DoesContainTheDefect === false)
-      return (
-        <h3 className="missing"> This did not happen in your program! </h3>
-      );
-    return (
-      <h3 className="warning"> This is where the bug might have happened! </h3>
-    );
-  };
-  const getEvidenceContent = (evidence, text) => {
-    if (evidence.DoesContainTheDefect === false)
-      return <h3 className="found"> {text} worked as expected! </h3>;
-    return (
-      <h3 className="warning"> This is where the bug might have happened! </h3>
-    );
-  };
-
   const getTitle = (evidence) => {
-    let title = '';
-    switch (evidence.type) {
-      case 'keydown':
-        title = 'Keydown Event ';
-        break;
-      case 'click':
-        title = 'Click Event ';
-        break;
-      case 'childList':
-      case 'attributes':
-        title = 'DOM Change ';
-        break;
-      case 'codeCoverage':
-        title = 'API Call';
-        break;
-      case 'requestWillBeSent':
-        title = 'Network request';
-        break;
-      case 'responseReceived':
-        title = 'Server response';
-        break;
-      default:
-        return getNoEvidenceContent(evidence);
-    }
-
-    return getEvidenceContent(evidence, title);
+    if (evidence.DoesContainTheDefect === true)
+      return (
+        <h3 className="warning">
+          {' '}
+          This is where the bug might have happened!{' '}
+        </h3>
+      );
+    if (evidence.isFound === false && evidence.matched.length === 0)
+      return (
+        <h3 className="found">
+          {' '}
+          This did not happen in your program, but was expected!
+        </h3>
+      );
+    if (evidence.isFound === false && evidence.matched.length > 0)
+      return (
+        <h3 className="missing">
+          {' '}
+          This did happen in your program, but was expected not to happen!
+        </h3>
+      );
+    if (evidence.isFound === true && evidence.matched.length > 0)
+      return (
+        <h3 className="found">
+          {' '}
+          This did happen in your program, and was expected!
+        </h3>
+      );
+    if (evidence.isFound === true && evidence.matched.length === 0)
+      return (
+        <h3 className="missing">
+          {' '}
+          This did not happen in your program, but was expected to happen!
+        </h3>
+      );
   };
 
   return (

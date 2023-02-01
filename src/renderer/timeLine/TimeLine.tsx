@@ -63,16 +63,19 @@ function TimeLine({ hypothesis, linkToProject }) {
 
   const getBadges = (evidence) => {
     if (evidence.DoesContainTheDefect)
-      return <div className="timeLine__item__dot__badges">x</div>;
+      return <div className="timeLine__item__dot__badges">✘</div>;
     if (evidence.matched.length > 0 && evidence.isFound)
       return <div className="timeLine__item__dot__badges__check">✔︎</div>;
+    if (evidence.matched.length === 0 && !evidence.isFound)
+      return <div className="timeLine__item__dot__badges__check">✔︎</div>;
+    return <div className="timeLine__item__dot__badges__warning">⚠︎</div>;
   };
 
   const getTimelineItem = (evidence: any, index: string | undefined) => {
     return (
       <button
         className={
-          evidence.matched.length === 0 && evidence.isFound
+          evidence.matched.length === 0
             ? 'timeLine__item__dot timeLine__item__dot--noEvidence'
             : 'timeLine__item__dot'
         }
@@ -86,33 +89,31 @@ function TimeLine({ hypothesis, linkToProject }) {
   };
 
   return (
-    <>
-      <div className="hypothesis-time-line ">
-        <div className="timeLine">
-          {hypothesis.evidence.map(
-            (evidence: { type: string }, index: string | undefined) => (
-              <>
-                <div key={`${evidence.type}-${index}`}>
-                  {getTimelineItem(evidence, index)}
-                  {getBadges(evidence)}
-                </div>
+    <div className="hypothesis-time-line ">
+      <div className="timeLine">
+        {hypothesis.evidence.map(
+          (evidence: { type: string }, index: string | undefined) => (
+            <>
+              <div key={`${evidence.type}-${index}`}>
+                {getTimelineItem(evidence, index)}
+                {getBadges(evidence)}
+              </div>
 
-                <div className="timeLine__item__line" />
-              </>
-            )
-          )}
-        </div>
-        <div className="timeLine__item__box_arrow" ref={boxRef} />
-        <div className="timeLine__item__box">
-          <InfoBox
-            evidence={hypothesis.evidence[currentDot]}
-            hypotheses={hypothesis}
-            key={hypothesis.id}
-            linkToProject={linkToProject}
-          />
-        </div>
+              <div className="timeLine__item__line" />
+            </>
+          )
+        )}
       </div>
-    </>
+      <div className="timeLine__item__box_arrow" ref={boxRef} />
+      <div className="timeLine__item__box">
+        <InfoBox
+          evidence={hypothesis.evidence[currentDot]}
+          hypotheses={hypothesis}
+          key={hypothesis.id}
+          linkToProject={linkToProject}
+        />
+      </div>
+    </div>
   );
 }
 

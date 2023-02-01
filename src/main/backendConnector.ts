@@ -19,6 +19,7 @@ import getCoverage from './sourceMap/mainSourceMap';
 // the second step is to run the queries inside analyzer/src using semgrep with python and docker
 // the third step is to write the results to files inside analyzer/src/output
 // Finally, the result files are read by reasoninAboutEvidence.js and sent to the frontend
+let recordingTime = 0;
 
 const initConnector = (
   setupDevTools: () => void,
@@ -37,25 +38,7 @@ const initConnector = (
         });
       };
       let linkToProject = '';
-      const readFromCache = () => {
-        try {
-          const data = fs.readFileSync(
-            path.join(__dirname, 'cache.json'),
-            'utf8'
-          );
-          notifyFrontend('hypotheses', JSON.parse(data));
-          return true;
-        } catch (error) {
-          return false;
-        }
-      };
 
-      const writeToCache = (data: any) => {
-        fs.writeFileSync(
-          path.join(__dirname, 'cache.json'),
-          JSON.stringify(data)
-        );
-      };
       const setBackendState = ({ payload, step }) => {
         switch (step) {
           case 'trace':
@@ -71,7 +54,8 @@ const initConnector = (
               payload.trace,
               payload.filesContent,
               [payload.linkToKonwledge],
-              setBackendState
+              setBackendState,
+              recordingTime
             );
             break;
           case 'evidence':
@@ -105,6 +89,7 @@ const initConnector = (
 
         case 'record': {
           // if (!readFromCache()) {
+          recordingTime = Date.now();
           await record();
           focusOnMainWindow(false);
           // }
@@ -113,6 +98,7 @@ const initConnector = (
 
         case 'stopRecording': {
           const { coverage, files } = await stopRecording();
+          recordingTime = (Date.now() - recordingTime) / 1000;
           getCoverage(coverage, files, setBackendState);
           break;
         }

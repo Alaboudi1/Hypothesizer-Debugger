@@ -22,7 +22,7 @@ const App = (): JSX.Element => {
   const doneStepsRef = useRef<string[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const searchButtonRef = useRef<HTMLInputElement>(null);
-  const [initSelectedTags, setInitSelectedTags] = useState<string[]>([]);
+  const initSelectedTags = useRef<string[]>([]);
 
   useEffect(() => {
     document.addEventListener('keydown', (e) => {
@@ -123,21 +123,17 @@ const App = (): JSX.Element => {
                 can change your selection later.
               </p>
               <Tags
-                tagsMostLikley={potentialHypotheses.current.hypotheses
-                  .filter((hypothesis) => hypothesis.score === 1)
-                  .flatMap((hypothesis) => hypothesis.tags)
-                  .filter((tag, index, self) => self.indexOf(tag) === index)}
-                tagsLessLikley={potentialHypotheses.current.hypotheses
-                  .filter(
-                    (hypothesis) =>
-                      hypothesis.score < 1 && hypothesis.score > 0.5
-                  )
-                  .flatMap((hypothesis) => hypothesis.tags)
-                  .filter((tag, index, self) => self.indexOf(tag) === index)}
+                tags={potentialHypotheses.current.hypotheses.flatMap(
+                  (hypothesis) =>
+                    hypothesis.tags.map((tag) => ({
+                      tag,
+                      score: hypothesis.score,
+                    }))
+                )}
                 tagsUpdate={(tags) => {
-                  setInitSelectedTags(tags);
+                  initSelectedTags.current = tags;
                 }}
-                initSelectedTags={[]}
+                initSelectedTags={initSelectedTags.current}
               />
               <button
                 className="nextButton"
@@ -147,7 +143,6 @@ const App = (): JSX.Element => {
                   doneStepsRef.current.push('Tags are done!');
                 }}
                 type="button"
-                disabled={initSelectedTags.length === 0}
               >
                 Show Hypotheses
               </button>
@@ -159,7 +154,7 @@ const App = (): JSX.Element => {
           <div className="reportContainer addedAnnimation">
             <Hypotheses
               hypotheses={potentialHypotheses.current.hypotheses}
-              initSelectedTags={initSelectedTags}
+              initSelectedTags={initSelectedTags.current}
               linkToProject={potentialHypotheses.current.linkToProject}
             />
           </div>

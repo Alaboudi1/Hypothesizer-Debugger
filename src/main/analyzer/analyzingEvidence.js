@@ -358,7 +358,46 @@ const groupPatternWithApiCalls = (semgrepOutput, knowledge) => {
   return evidence;
 };
 
-const analyzeEvidence = async (coverages, files, knowledgeURL) => {
+const writeStateFile = (
+  start,
+  files,
+  events,
+  coverages,
+  projecturl,
+  recordingTime
+) => {
+  const state = {
+    start,
+    filesNumber: files.length,
+    lineOfCode: files.reduce(
+      (acc, curr) => curr.content.split('\n').length + acc,
+      0
+    ),
+    eventsNumber: events.length,
+    coveragesNumber: coverages.length,
+    projecturl,
+    recordingTime,
+  };
+  let existingState =
+    fs.readFileSync(
+      path.join(__dirname, 'container', 'state', `state.json`),
+      'utf8'
+    ) || '[]';
+  existingState = JSON.parse(existingState);
+  existingState.push(state);
+  fs.writeFileSync(
+    path.join(__dirname, 'container', 'state', `state.json`),
+    JSON.stringify(existingState)
+  );
+};
+
+const analyzeEvidence = async (
+  coverages,
+  files,
+  knowledgeURL,
+  recordingTime
+) => {
+  const start = Date.now();
   const knowledgeRaw = await getKnowledge(knowledgeURL);
   const knowledge = knowledgeRaw.map((item) => JSON.parse(item));
   clearFiles();
@@ -369,6 +408,8 @@ const analyzeEvidence = async (coverages, files, knowledgeURL) => {
   const semgrepOutput = readSemgrepOutput();
   const evidence = groupPatternWithApiCalls(semgrepOutput, knowledge);
 
+  // writeStateFile(start, newFiles, events, coverages, projecturl, recordingTime);
+
   parentPort.postMessage({
     evidence,
     knowledge,
@@ -378,5 +419,6 @@ const analyzeEvidence = async (coverages, files, knowledgeURL) => {
 analyzeEvidence(
   workerData.coverages,
   workerData.files,
-  workerData.knowledgeURL
+  workerData.knowledgeURL,
+  workerData.recordingTime
 );
