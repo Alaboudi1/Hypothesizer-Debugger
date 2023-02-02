@@ -380,13 +380,13 @@ const writeStateFile = (
   };
   let existingState =
     fs.readFileSync(
-      path.join(__dirname, 'container', 'state', `state.json`),
+      path.join(__dirname, 'container', 'state', `state2.json`),
       'utf8'
     ) || '[]';
   existingState = JSON.parse(existingState);
   existingState.push(state);
   fs.writeFileSync(
-    path.join(__dirname, 'container', 'state', `state.json`),
+    path.join(__dirname, 'container', 'state', `state2.json`),
     JSON.stringify(existingState)
   );
 };
@@ -408,7 +408,7 @@ const analyzeEvidence = async (
   const semgrepOutput = readSemgrepOutput();
   const evidence = groupPatternWithApiCalls(semgrepOutput, knowledge);
 
-  // writeStateFile(start, newFiles, events, coverages, projecturl, recordingTime);
+  writeStateFile(start, newFiles, events, coverages, projecturl, recordingTime);
 
   parentPort.postMessage({
     evidence,

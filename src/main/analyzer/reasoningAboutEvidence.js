@@ -373,27 +373,28 @@ const cleanedHypotheses = cleanningUpEvidence(hypotheses, workerData.files);
 
 const potintialHypotheses = getPotentialHypotheses(cleanedHypotheses);
 
-// let state = fs.readFileSync(
-//   path.join(__dirname, 'container', 'state', 'state.json'),
-//   'utf8'
-// );
+let state = fs.readFileSync(
+  path.join(__dirname, 'container', 'state', 'state2.json'),
+  'utf8'
+);
 
-// state = JSON.parse(state).map((s) => {
-//   if (s.totalAnalysisTime === undefined) {
-//     s.end = Date.now();
-//     s.totalAnalysisTime = (s.end - s.start) / 1000;
-//   }
-//   const { start, end, ...rest } = s;
-//   return {
-//     ...rest,
-//     hypothesesScore: potintialHypotheses.map((h) => ({
-//       hypothesis: h.hypothesis,
-//       score: h.score,
-//     })),
-//   };
-// });
-// fs.writeFileSync(
-//   path.join(__dirname, 'container', 'state', 'state.json'),
-//   JSON.stringify(state)
-// );
+state = JSON.parse(state).map((s) => {
+  if (s.totalAnalysisTime === undefined) {
+    s.end = Date.now();
+    s.totalAnalysisTime = (s.end - s.start) / 1000;
+    s.hypothesesScore = potintialHypotheses.map((h) => ({
+      hypothesis: h.hypothesis,
+      score: h.score,
+    }));
+    const { start, end, ...rest } = s;
+    return {
+      ...rest,
+    };
+  }
+  return s;
+});
+fs.writeFileSync(
+  path.join(__dirname, 'container', 'state', 'state2.json'),
+  JSON.stringify(state)
+);
 parentPort.postMessage(potintialHypotheses);
