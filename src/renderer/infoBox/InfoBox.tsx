@@ -127,7 +127,9 @@ const HowToFix = (evidence, hypotheses, linkToProject) => {
     return (
       <>
         <p>
-          <b>How To Fix?</b>{' '}
+          <b>How To Fix? <small style={{ color: 'red' }}
+          > <i>Please follow these {evidence.HowToFix.steps.length} steps: </i> </small></b>
+
           <ol>
             {evidence.HowToFix.steps.map((step) => {
               const { description, codeExample, relatedEvidenceLocation } =

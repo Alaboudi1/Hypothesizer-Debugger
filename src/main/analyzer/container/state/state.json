@@ -1,1 +1,356 @@
-[{"filesNumber":18,"lineOfCode":487,"eventsNumber":37,"coveragesNumber":5263,"projecturl":"/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-1/","recordingTime":5.48,"totalAnalysisTime":8.624,"hypothesesScore":[{"hypothesis":"You are not using 'preventDefault' API to prevent the default behavior of the submit button.","score":1},{"hypothesis":"The data received from the server is not being parsed, resulting in the program not rendering anything","score":0.75},{"hypothesis":"The event listener for keyboard events is not attached to the correct element","score":0.5},{"hypothesis":"You are only handling onmouseOver event, but not onmouseOut event.","score":0.75},{"hypothesis":"You need to apply the animation inside setTimeout and useEffect.","score":0.8}]},{"filesNumber":4,"lineOfCode":121,"eventsNumber":29,"coveragesNumber":4934,"projecturl":"/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-2/","recordingTime":6.249,"totalAnalysisTime":8.226,"hypothesesScore":[{"hypothesis":"You are not using 'preventDefault' API to prevent the default behavior of the submit button.","score":0.4},{"hypothesis":"The data received from the server is not being parsed, resulting in the program not rendering anything","score":1},{"hypothesis":"You are only handling onmouseOver event, but not onmouseOut event.","score":0.75},{"hypothesis":"You need to apply the animation inside setTimeout and useEffect.","score":0.6}]},{"filesNumber":3,"lineOfCode":103,"eventsNumber":12,"coveragesNumber":648,"projecturl":"/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-3/","recordingTime":3.065,"totalAnalysisTime":5.831,"hypothesesScore":[{"hypothesis":"The data received from the server is not being parsed, resulting in the program not rendering anything","score":0.5},{"hypothesis":"You are only handling onmouseOver event, but not onmouseOut event.","score":0.75},{"hypothesis":"You need to apply the animation inside setTimeout and useEffect.","score":0.4},{"hypothesis":"You are not alighing the elements correctly, which causes the elements to overlap","score":1},{"hypothesis":" You are not updating the state of the element(s) after the onClick event handler is called.","score":0.8},{"hypothesis":" You are not assigning a type to the button element.","score":0.3333333333333333}]},{"filesNumber":15,"lineOfCode":495,"eventsNumber":16,"coveragesNumber":1155,"projecturl":"/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-4/","recordingTime":3.535,"totalAnalysisTime":6.555,"hypothesesScore":[{"hypothesis":"You are not using 'preventDefault' API to prevent the default behavior of the submit button.","score":0.4},{"hypothesis":"The data received from the server is not being parsed, resulting in the program not rendering anything","score":0.5},{"hypothesis":"The event listener for keyboard events is not attached to the correct element","score":0.5},{"hypothesis":"You are only handling onmouseOver event, but not onmouseOut event.","score":0.75},{"hypothesis":"You need to apply the animation inside setTimeout and useEffect.","score":0.8},{"hypothesis":"You are not alighing the elements correctly, which causes the elements to overlap","score":0.3333333333333333},{"hypothesis":" You are not explicitly passing the props to the onClick event handler.","score":1},{"hypothesis":" You are not updating the state of the element(s) after the onClick event handler is called.","score":0.8},{"hypothesis":" You are not assigning a type to the button element.","score":0.6666666666666666}]},{"filesNumber":2,"lineOfCode":61,"eventsNumber":7,"coveragesNumber":728,"projecturl":"/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-5/","recordingTime":3.473,"totalAnalysisTime":6.052,"hypothesesScore":[{"hypothesis":"You are not using 'preventDefault' API to prevent the default behavior of the submit button.","score":0.4},{"hypothesis":"The data received from the server is not being parsed, resulting in the program not rendering anything","score":0.5},{"hypothesis":"The event listener for keyboard events is not attached to the correct element","score":0.5},{"hypothesis":"You are only handling onmouseOver event, but not onmouseOut event.","score":0.75},{"hypothesis":"You need to apply the animation inside setTimeout and useEffect.","score":0.4},{"hypothesis":"You are not alighing the elements correctly, which causes the elements to overlap","score":0.3333333333333333},{"hypothesis":" You are not updating the state of the element(s) after the onClick event handler is called.","score":1},{"hypothesis":" You are not assigning a type to the button element.","score":0.6666666666666666}]},{"filesNumber":17,"lineOfCode":483,"eventsNumber":41,"coveragesNumber":5965,"projecturl":"/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-6/","recordingTime":6.817,"totalAnalysisTime":9.047,"hypothesesScore":[{"hypothesis":"The data received from the server is not being parsed, resulting in the program not rendering anything","score":0.5},{"hypothesis":"The event listener for keyboard events is not attached to the correct element","score":0.5},{"hypothesis":"You are only handling onmouseOver event, but not onmouseOut event.","score":0.75},{"hypothesis":"You need to apply the animation inside setTimeout and useEffect.","score":0.8},{"hypothesis":"You are not alighing the elements correctly, which causes the elements to overlap","score":0.3333333333333333},{"hypothesis":" You are not updating the state of the element(s) after the onClick event handler is called.","score":0.8},{"hypothesis":" You are not assigning a type to the button element.","score":1}]},{"filesNumber":17,"lineOfCode":498,"eventsNumber":45,"coveragesNumber":5028,"projecturl":"/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-7/","recordingTime":4.359,"totalAnalysisTime":8.785,"hypothesesScore":[{"hypothesis":"The data received from the server is not being parsed, resulting in the program not rendering anything","score":0.5},{"hypothesis":"The event listener for keyboard events is not attached to the correct element","score":0.5},{"hypothesis":"You are only handling onmouseOver event, but not onmouseOut event.","score":0.75},{"hypothesis":"You need to apply the animation inside setTimeout and useEffect.","score":1}]},{"filesNumber":15,"lineOfCode":387,"eventsNumber":12,"coveragesNumber":1160,"projecturl":"/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-8/","recordingTime":2.867,"totalAnalysisTime":6.57,"hypothesesScore":[{"hypothesis":"The data received from the server is not being parsed, resulting in the program not rendering anything","score":0.5},{"hypothesis":"You are only handling onmouseOver event, but not onmouseOut event.","score":0.75},{"hypothesis":"You need to apply the animation inside setTimeout and useEffect.","score":0.6},{"hypothesis":"You are not placeing the label element correctly.","score":1}]},{"filesNumber":5,"lineOfCode":240,"eventsNumber":12,"coveragesNumber":805,"projecturl":"/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-9/","recordingTime":3.176,"totalAnalysisTime":5.952,"hypothesesScore":[{"hypothesis":"The data received from the server is not being parsed, resulting in the program not rendering anything","score":0.5},{"hypothesis":"You are only handling onmouseOver event, but not onmouseOut event.","score":0.75},{"hypothesis":"You need to apply the animation inside setTimeout and useEffect.","score":0.4},{"hypothesis":"You are not alighing the elements correctly, which causes the elements to overlap","score":0.6666666666666666},{"hypothesis":" You are not explicitly passing the props to the onClick event handler.","score":0.3333333333333333},{"hypothesis":" You are not updating the state of the element(s) after the onClick event handler is called.","score":0.8},{"hypothesis":" You are not using currentTarget API to get the button id.","score":1}]},{"filesNumber":5,"lineOfCode":243,"eventsNumber":12,"coveragesNumber":714,"projecturl":"/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-10/","recordingTime":2.768,"totalAnalysisTime":6.385,"hypothesesScore":[{"hypothesis":"The data received from the server is not being parsed, resulting in the program not rendering anything","score":0.5},{"hypothesis":"You are only handling onmouseOver event, but not onmouseOut event.","score":0.75},{"hypothesis":"You need to apply the animation inside setTimeout and useEffect.","score":0.4},{"hypothesis":"You are not alighing the elements correctly, which causes the elements to overlap","score":0.6666666666666666},{"hypothesis":" You are not explicitly passing the props to the onClick event handler.","score":0.3333333333333333},{"hypothesis":" You are not updating the state of the element(s) after the onClick event handler is called.","score":0.8},{"hypothesis":" You are not parsing user input to a number.","score":1}]}]
+[
+  {
+    "filesNumber": 18,
+    "lineOfCode": 487,
+    "eventsNumber": 37,
+    "coveragesNumber": 5263,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-1/",
+    "recordingTime": 5.48,
+    "totalAnalysisTime": 8.624,
+    "hypothesesScore": [
+      {
+        "hypothesis": "You are not using 'preventDefault' API to prevent the default behavior of the submit button.",
+        "score": 1
+      },
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "The event listener for keyboard events is not attached to the correct element",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.8
+      }
+    ]
+  },
+  {
+    "filesNumber": 4,
+    "lineOfCode": 121,
+    "eventsNumber": 29,
+    "coveragesNumber": 4934,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-2/",
+    "recordingTime": 6.249,
+    "totalAnalysisTime": 8.226,
+    "hypothesesScore": [
+      {
+        "hypothesis": "You are not using 'preventDefault' API to prevent the default behavior of the submit button.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 1
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.6
+      }
+    ]
+  },
+  {
+    "filesNumber": 3,
+    "lineOfCode": 103,
+    "eventsNumber": 12,
+    "coveragesNumber": 648,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-3/",
+    "recordingTime": 3.065,
+    "totalAnalysisTime": 5.831,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 1
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not assigning a type to the button element.",
+        "score": 0.3333333333333333
+      }
+    ]
+  },
+  {
+    "filesNumber": 15,
+    "lineOfCode": 495,
+    "eventsNumber": 16,
+    "coveragesNumber": 1155,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-4/",
+    "recordingTime": 3.535,
+    "totalAnalysisTime": 6.555,
+    "hypothesesScore": [
+      {
+        "hypothesis": "You are not using 'preventDefault' API to prevent the default behavior of the submit button.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "The event listener for keyboard events is not attached to the correct element",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 1
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not assigning a type to the button element.",
+        "score": 0.6666666666666666
+      }
+    ]
+  },
+  {
+    "filesNumber": 2,
+    "lineOfCode": 61,
+    "eventsNumber": 7,
+    "coveragesNumber": 728,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-5/",
+    "recordingTime": 3.473,
+    "totalAnalysisTime": 6.052,
+    "hypothesesScore": [
+      {
+        "hypothesis": "You are not using 'preventDefault' API to prevent the default behavior of the submit button.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "The event listener for keyboard events is not attached to the correct element",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 1
+      },
+      {
+        "hypothesis": " You are not assigning a type to the button element.",
+        "score": 0.6666666666666666
+      }
+    ]
+  },
+  {
+    "filesNumber": 17,
+    "lineOfCode": 483,
+    "eventsNumber": 41,
+    "coveragesNumber": 5965,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-6/",
+    "recordingTime": 6.817,
+    "totalAnalysisTime": 9.047,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "The event listener for keyboard events is not attached to the correct element",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not assigning a type to the button element.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 17,
+    "lineOfCode": 498,
+    "eventsNumber": 45,
+    "coveragesNumber": 5028,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-7/",
+    "recordingTime": 4.359,
+    "totalAnalysisTime": 8.785,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "The event listener for keyboard events is not attached to the correct element",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 15,
+    "lineOfCode": 387,
+    "eventsNumber": 12,
+    "coveragesNumber": 1160,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-8/",
+    "recordingTime": 2.867,
+    "totalAnalysisTime": 6.57,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.6
+      },
+      {
+        "hypothesis": "You are not placeing the label element correctly.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 5,
+    "lineOfCode": 240,
+    "eventsNumber": 12,
+    "coveragesNumber": 805,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-9/",
+    "recordingTime": 3.176,
+    "totalAnalysisTime": 5.952,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not using currentTarget API to get the button id.",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "filesNumber": 5,
+    "lineOfCode": 243,
+    "eventsNumber": 12,
+    "coveragesNumber": 714,
+    "projecturl": "/Users/abdulaziz/Documents/projects/caseStudyHypothesizer/tenBugsTodo/bug-10/",
+    "recordingTime": 2.768,
+    "totalAnalysisTime": 6.385,
+    "hypothesesScore": [
+      {
+        "hypothesis": "The data received from the server is not being parsed, resulting in the program not rendering anything",
+        "score": 0.5
+      },
+      {
+        "hypothesis": "You are only handling onmouseOver event, but not onmouseOut event.",
+        "score": 0.75
+      },
+      {
+        "hypothesis": "You need to apply the animation inside setTimeout and useEffect.",
+        "score": 0.4
+      },
+      {
+        "hypothesis": "You are not alighing the elements correctly, which causes the elements to overlap",
+        "score": 0.6666666666666666
+      },
+      {
+        "hypothesis": " You are not explicitly passing the props to the onClick event handler.",
+        "score": 0.3333333333333333
+      },
+      {
+        "hypothesis": " You are not updating the state of the element(s) after the onClick event handler is called.",
+        "score": 0.8
+      },
+      {
+        "hypothesis": " You are not parsing user input to a number.",
+        "score": 1
+      }
+    ]
+  }
+]
