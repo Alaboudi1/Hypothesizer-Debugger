@@ -65,7 +65,8 @@ const Hypotheses: React.FC<any> = ({
               <p>{hypothesis.description}</p>
             </div>
             <div className="hypothesis_Evidence">
-              <b>Where is what happened exactly: </b>
+              <b>Evidence Timeline: </b> <small style={{ color: 'gray' }}
+              > ℹ️ These are the items that we found in the progam execution that may support the hypothesis.</small>
               <TimeLine hypothesis={hypothesis} linkToProject={linkToProject} />
             </div>
           </details>
