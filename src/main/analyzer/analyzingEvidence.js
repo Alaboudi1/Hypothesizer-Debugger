@@ -73,14 +73,11 @@ const writeCoverageToFiles = (coverage) => {
       JSON.stringify(item, null, 2)
     );
   });
-  // fs.writeFileSync(
-  //   path.join(__dirname, 'container', 'diff', `${Date.now()}Diff.json`),
-  //   JSON.stringify(
-  //     coverage.sort((a, b) => a.timeStamp - b.timeStamp),
-  //     null,
-  //     2
-  //   )
-  // );
+    fs.writeFileSync(
+      path.join(__dirname, 'container', 'recording', `recording.json`),
+      JSON.stringify(coverage)
+    );
+
 
   return {
     events: otherCoverage,
@@ -103,9 +100,14 @@ const clearFiles = () => {
 
     if (fs.existsSync(getPath('inputs')))
       execSync(`rmdir /s /q ${getPath('inputs')}`);
+      if (fs.existsSync(getPath('recording')))
+      execSync(`rmdir /s /q ${getPath('recording')}`);
+
+
 
     execSync(`mkdir ${getPath('inputs')}`);
     execSync(`mkdir ${getPath('outputs')}`);
+    execSync(`mkdir ${getPath('recording')}`);
     execSync(`mkdir ${getPath('inputs', 'Events')}`);
     execSync(`mkdir ${getPath('inputs', 'Code')}`);
     execSync(`mkdir ${getPath('semgrep_rules')}`);
@@ -122,6 +124,10 @@ const clearFiles = () => {
     if (fs.existsSync(getPath('inputs')))
       execSync(`rm -rf ${getPath('inputs')}`);
     execSync(`mkdir ${getPath('inputs')}`);
+
+    if (fs.existsSync(getPath('recording')))
+      execSync(`rm -rf ${getPath('recording')}`);
+    execSync(`mkdir ${getPath('recording')}`)
 
     execSync(`mkdir ${getPath('inputs', 'Events')}`);
     execSync(`mkdir ${getPath('inputs', 'Code')}`);

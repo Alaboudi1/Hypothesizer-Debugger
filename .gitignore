@@ -35,3 +35,4 @@ src/main/analyzer/container/semgrep_rules
 src/main/analyzer/container/outputs
 src/main/analyzer/container/inputs
 src/main/analyzer/container/diff
+src/main/analyzer/container/recording

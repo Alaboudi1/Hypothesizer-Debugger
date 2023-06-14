@@ -39,6 +39,9 @@ const initConnector = (
       };
       let linkToProject = '';
 
+      // write recording to file 
+     
+
       const setBackendState = ({ payload, step }) => {
         switch (step) {
           case 'trace':
@@ -65,9 +68,9 @@ const initConnector = (
               payload.files,
               setBackendState
             );
+
             break;
           case 'hypotheses': {
-            // writeToCache(payload);
             notifyFrontend('hypotheses', {
               hypotheses: payload,
               linkToProject,
