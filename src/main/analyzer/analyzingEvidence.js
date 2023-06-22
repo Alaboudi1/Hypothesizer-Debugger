@@ -5,6 +5,20 @@ const path = require('path');
 const { parentPort, workerData } = require('worker_threads');
 const YAML = require('yaml');
 
+const encoudeURLPath = (url) => {
+  if (process.platform === 'win32') {
+    return url?.replace(/\\/g, '=');
+  }
+  return url?.replace(/\//g, '=');
+};
+
+const decodeURLPath = (url) => {
+  if (process.platform === 'win32') {
+    return url?.replace(/=/g, '\\');
+  }
+  return url?.replace(/=/g, '/');
+};
+
 const getKnowledgeFromURL = async (url) => {
   const response = await axios.get(url);
   return response.data;
@@ -73,11 +87,10 @@ const writeCoverageToFiles = (coverage) => {
       JSON.stringify(item, null, 2)
     );
   });
-    fs.writeFileSync(
-      path.join(__dirname, 'container', 'recording', `recording.json`),
-      JSON.stringify(coverage)
-    );
-
+  fs.writeFileSync(
+    path.join(__dirname, 'container', 'recording', `recording.json`),
+    JSON.stringify(coverage)
+  );
 
   return {
     events: otherCoverage,
@@ -100,10 +113,8 @@ const clearFiles = () => {
 
     if (fs.existsSync(getPath('inputs')))
       execSync(`rmdir /s /q ${getPath('inputs')}`);
-      if (fs.existsSync(getPath('recording')))
+    if (fs.existsSync(getPath('recording')))
       execSync(`rmdir /s /q ${getPath('recording')}`);
-
-
 
     execSync(`mkdir ${getPath('inputs')}`);
     execSync(`mkdir ${getPath('outputs')}`);
@@ -127,7 +138,7 @@ const clearFiles = () => {
 
     if (fs.existsSync(getPath('recording')))
       execSync(`rm -rf ${getPath('recording')}`);
-    execSync(`mkdir ${getPath('recording')}`)
+    execSync(`mkdir ${getPath('recording')}`);
 
     execSync(`mkdir ${getPath('inputs', 'Events')}`);
     execSync(`mkdir ${getPath('inputs', 'Code')}`);
@@ -239,14 +250,13 @@ const writeCoverageFilesToFiles = (files, events, url) => {
       return acc;
     }, [])
     .map((fileUrl) => {
-      // replace = with proper path
-      return path.join(url, fileUrl.replace(/=/g, '/'));
+      return path.join(url, decodeURLPath(fileUrl));
     });
 
   const newFiles = [];
   eventsFiles.forEach((f) => {
     const content = fs.readFileSync(f, 'utf8');
-    const file = f.split(url).pop().replace(/\//g, '=');
+    const file = encoudeURLPath(f.split(url).pop());
     newFiles.push({
       file,
       content,
@@ -278,7 +288,7 @@ const readSemgrepOutput = () => {
           result.extra.message === 'pattern'
             ? {
                 syntax: result.extra.lines,
-                file: `src${result.path.split('src').pop().replace(/=/g, '/')}`,
+                file: `src${decodeURLPath(result.path.split('src').pop())}`,
               }
             : JSON.parse(result.extra.lines.replace(/,$/, '')),
       };

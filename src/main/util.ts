@@ -1,7 +1,7 @@
 /* eslint import/prefer-default-export: off */
-import { URL } from 'url';
-import path from 'path';
-import { execSync } from 'child_process';
+const { URL } = require('url');
+const path = require('path');
+const { execSync } = require('child_process');
 
 export function resolveHtmlPath(htmlFileName: string) {
   if (process.env.NODE_ENV === 'development') {

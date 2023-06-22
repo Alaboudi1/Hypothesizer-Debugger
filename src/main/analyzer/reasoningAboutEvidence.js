@@ -2,6 +2,13 @@ const { parentPort, workerData } = require('worker_threads');
 const fs = require('fs');
 const path = require('path');
 
+const decodeURLPath = (url) => {
+  if (process.platform === 'win32') {
+    return url?.replace(/=/g, '\\');
+  }
+  return url?.replace(/=/g, '/');
+};
+
 const getFirstAfter = (evidence, evidenceIndex) => {
   const afterEv = evidence.slice(evidenceIndex + 1);
 
@@ -133,13 +140,13 @@ const cleanNetworkEvidence = (evidence, matched, files) => {
       if (!location) return m;
       const file = files.find(
         (f) =>
-          f.file.replace(/=/g, '/').split('src')[1] ===
+          decodeURLPath(f.file).split('src')[1] ===
           location.file.split('src')[1]
       );
       return {
         ...m.evidence,
         functionName: location.functionName,
-        file: `src${file?.file.replace(/=/g, '/').split('src')[1]}`,
+        file: `src${decodeURLPath(file?.file).split('src')[1]}`,
         ranges: [location.lineNumber + 1, location.lineNumber + 1],
         fileContent: file?.content,
       };
@@ -154,7 +161,7 @@ const cleanDOMEvidence = (events, files) => {
       ({ file }) => file === evidence.jsx.fileName
     )?.content;
     return {
-      file: evidence.jsx.fileName?.replace(/=/g, '/'),
+      file: decodeURLPath(evidence.jsx.fileName),
       ranges: getStartAndEndLineForJSX(evidence.jsx.lineNumber, fileContent),
       fileContent,
       keyPressed: evidence.keyPressed,
@@ -230,9 +237,8 @@ const cleanCodeCoverageEvidence = (matched, files) => {
         evidence: mergeCodeEvidence(m.evidence).map((e) => ({
           ...e,
           count: 1,
-          fileContent: files.find(
-            ({ file }) => file.replace(/=/g, '/') === e.file
-          )?.content,
+          fileContent: files.find(({ file }) => decodeURLPath(file) === e.file)
+            ?.content,
         })),
       };
     } else {
@@ -250,7 +256,7 @@ const cleanCodeCoverageEvidence = (matched, files) => {
               acc2.push({
                 ...e,
                 fileContent: files.find(
-                  ({ file }) => file.replace(/=/g, '/') === e.file
+                  ({ file }) => decodeURLPath(file) === e.file
                 )?.content,
                 count: 1,
               });

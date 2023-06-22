@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-restricted-syntax */
+
 const init = () => {
   let cacheJSX = {};
   document.body.focus();
