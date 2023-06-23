@@ -1,12 +1,5 @@
 const { parentPort, workerData } = require('worker_threads');
 
-const encoudeURLPath = (url) => {
-  if (process.platform === 'win32') {
-    return url?.replace(/\\/g, '=');
-  }
-  return url?.replace(/\//g, '=');
-};
-
 const getFileContent = (coverages, files) => {
   const filesContent = [];
   coverages.forEach((coverage) => {
@@ -21,7 +14,8 @@ const getFileContent = (coverages, files) => {
           const file = files.find((f) => f.scriptId === coverage.scriptId);
           const paths = file.map.sources.map((s) => {
             if (s.includes('src'))
-              return `src${encoudeURLPath(s.split('src')[1])}`;
+              return `src${s.split('src')[1].replace(/\//g, '=')}`;
+            return undefined;
           });
           const orginalFileIndex = paths.indexOf(filePath);
           const originalFile = file.map.sourcesContent[orginalFileIndex];
@@ -36,7 +30,7 @@ const getFileContent = (coverages, files) => {
   return filesContent;
 };
 
-const cleanCodeCoverage = (coverage, files) => {
+const cleanCodeCoverage = (coverage) => {
   const getCoverage = (func) => ({
     functionName: func.functionName,
     count: func.count,
@@ -45,7 +39,7 @@ const cleanCodeCoverage = (coverage, files) => {
     file:
       func.start.source.includes('src') &&
       !func.start.source.includes('node_modules')
-        ? `src${encoudeURLPath(func.start.source.split('src')[1])}`
+        ? `src${func.start.source.split('src')[1].replace(/\//g, '=')}`
         : func.start.source,
     timeStamp: coverage.timeStamp,
     scriptId: coverage.scriptId,

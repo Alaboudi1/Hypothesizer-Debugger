@@ -3,27 +3,24 @@ const fs = require('fs');
 const path = require('path');
 
 const decodeURLPath = (url) => {
-  if (process.platform === 'win32') {
-    return url?.replace(/=/g, '\\');
-  }
   return url?.replace(/=/g, '/');
 };
 
-const getFirstAfter = (evidence, evidenceIndex) => {
-  const afterEv = evidence.slice(evidenceIndex + 1);
+// const getFirstAfter = (evidence, evidenceIndex) => {
+//   const afterEv = evidence.slice(evidenceIndex + 1);
 
-  return (
-    afterEv
-      .find((ev) => ev.matched.length > 0)
-      ?.matched.sort((a, b) => a.evidence.timeStamp - b.evidence.timeStamp) || [
-      {
-        evidence: {
-          timeStamp: Infinity,
-        },
-      },
-    ]
-  );
-};
+//   return (
+//     afterEv
+//       .find((ev) => ev.matched.length > 0)
+//       ?.matched.sort((a, b) => a.evidence.timeStamp - b.evidence.timeStamp) || [
+//       {
+//         evidence: {
+//           timeStamp: Infinity,
+//         },
+//       },
+//     ]
+//   );
+// };
 
 const getFirstBefore = (evidence, evidenceIndex) => {
   const beforeEv = evidence.slice(0, evidenceIndex);
@@ -52,18 +49,18 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
     // knowledgeItem is a single knowledge source with multiple hypotheses
     return hypotheses.map((hypothesis) => {
       // match all gathered evidence to the hypothesis evidence
-      let evidence = hypothesis.evidence.map((evidence) => {
-        evidence.matched = [];
-        gatheredEvidence.forEach((gatheredEvidenceItem, index) => {
-          if (gatheredEvidenceItem.rule === evidence.rule) {
-            evidence.matched.push(gatheredEvidenceItem);
+      let evidenceList = hypothesis.evidence.map((ev) => {
+        ev.matched = [];
+        gatheredEvidence.forEach((gatheredEvidenceItem) => {
+          if (gatheredEvidenceItem.rule === ev.rule) {
+            ev.matched.push(gatheredEvidenceItem);
           }
         });
-        return evidence;
+        return ev;
       });
       // for each evidence in the hypothesis, check the time stamp if a is after b, then remove a
-      evidence = evidence.map((ev, evidenceIndex) => {
-        const after = getFirstAfter(evidence, evidenceIndex);
+      evidenceList = evidence.map((ev, evidenceIndex) => {
+        // const after = getFirstAfter(evidence, evidenceIndex);
         const before = getFirstBefore(evidence, evidenceIndex);
         return {
           ...ev,
@@ -97,9 +94,9 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
 
       return {
         ...hypothesis,
-        evidence,
+        evidenceList,
         score:
-          evidence.reduce((acc, ev) => {
+          evidenceList.reduce((acc, ev) => {
             if (ev.isFound && ev.matched.length > 0) {
               return acc + 1;
             }
@@ -126,7 +123,7 @@ const getStartAndEndLineForJSX = (start, fileContent) => {
       end = i + 1;
       break;
     }
-    i++;
+    i += 1;
   }
 
   return [start, end];
