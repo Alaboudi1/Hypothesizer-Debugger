@@ -59,9 +59,9 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
         return ev;
       });
       // for each evidence in the hypothesis, check the time stamp if a is after b, then remove a
-      evidenceList = evidence.map((ev, evidenceIndex) => {
+      evidenceList = evidenceList.map((ev, evidenceIndex) => {
         // const after = getFirstAfter(evidence, evidenceIndex);
-        const before = getFirstBefore(evidence, evidenceIndex);
+        const before = getFirstBefore(evidenceList, evidenceIndex);
         return {
           ...ev,
           matched: ev.matched.filter((m) => {
@@ -94,7 +94,7 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
 
       return {
         ...hypothesis,
-        evidenceList,
+        evidence: evidenceList,
         score:
           evidenceList.reduce((acc, ev) => {
             if (ev.isFound && ev.matched.length > 0) {
@@ -104,7 +104,7 @@ const reasonAboutEvidence = (gatheredEvidence, knowledgeMap) => {
               return acc + 1;
             }
             return acc;
-          }, 0) / evidence.length,
+          }, 0) / evidenceList.length,
       };
     });
   });
