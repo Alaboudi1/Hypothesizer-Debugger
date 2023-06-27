@@ -88,12 +88,6 @@ Steps:
 6. Click on the most relevant issue
 7. Read the given hypothesis and fix the bug in the application
 
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
 ## Authors
 
 * **Abdulaziz Alaboudi** - *Initial work* - [GitHub](https://github.com/Alaboudi1)
