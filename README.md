@@ -1,6 +1,6 @@
 # Hypothesizer Debugger
 
-Hypothesizer is an interactive debugger for web applications that allows developers to recreate bugs they are experiencing. Hypothesizer records and analyzes DOM events, API calls, and Network events. It uses this information to provide solutions with code examples from the developer's codebase to fix the bug efficiently.
+Hypothesizer is an interactive debugger for web applications that allows developers to recreate bugs they are experiencing and get helpful feedback. Hypothesizer records and analyzes DOM events, API calls, and Network events. It uses this information to provide solutions with code examples from the developer's codebase to fix the bug efficiently.
 
 ## Getting Started
 
